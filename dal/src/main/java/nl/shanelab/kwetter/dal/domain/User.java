@@ -10,7 +10,7 @@ import java.util.Set;
 
 @Data
 @Entity
-@EqualsAndHashCode(exclude = {"favoriteKweets", "followers", "following"})
+@EqualsAndHashCode(exclude = {"kweets", "favoriteKweets", "followers", "following"})
 @NoArgsConstructor
 @RequiredArgsConstructor
 public class User {

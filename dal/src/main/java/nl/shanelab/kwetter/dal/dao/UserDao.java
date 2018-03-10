@@ -31,7 +31,7 @@ public interface UserDao extends GenericDao<User, Long> {
      * @param b The user who is following
      * @return boolean Returns true if User A is being followed by User B
      */
-    boolean isFollower(User a, User b);
+    boolean isFollowedBy(User a, User b);
 
     /**
      * Get a collection of a users latest Kweets
@@ -40,4 +40,21 @@ public interface UserDao extends GenericDao<User, Long> {
      * @return Collection<Kweet> Returns a collection of @{nth} Kweets
      */
     Collection<Kweet> getNthLatestKweets(int nth);
+
+    /**
+     * Sets a following from a user to another user
+     *
+     * @param a The user to follow
+     * @param b The user who is following
+     */
+    void createFollow(User a, User b);
+
+    /**
+     * Unsets a following from a user to another user
+     *
+     * @param a The user to unfollow
+     * @param b The user who is unfollwoing
+     */
+    void unFollow(User a, User b);
+
 }

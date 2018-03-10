@@ -44,11 +44,19 @@ public class UserJPADaoImpl implements UserDao {
         return false;
     }
 
-    public boolean isFollower(User a, User b) {
+    public boolean isFollowedBy(User a, User b) {
         return false;
     }
 
     public Collection<Kweet> getNthLatestKweets(int nth) {
         return null;
+    }
+
+    public void createFollow(User a, User b) {
+
+    }
+
+    public void unFollow(User a, User b) {
+
     }
 }

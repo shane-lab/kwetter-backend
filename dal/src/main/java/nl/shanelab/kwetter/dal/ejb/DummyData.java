@@ -104,6 +104,15 @@ public class DummyData {
         assert kweetBob.getId() == 3;
         assert kweetBob1.getId() == 4;
 
+        // set kweets
+        setUserKweet(userShane, kweetShane);
+        setUserKweet(userShane, kweetShane1);
+
+        setUserKweet(userAlice, kweetAlice);
+
+        setUserKweet(userBob, kweetBob);
+        setUserKweet(userBob, kweetBob1);
+
         // set hashtags
         setKweetHashTag(kweetShane1, hashTagFhict);
         setKweetHashTag(kweetShane1, hashTagKwetter);
@@ -126,7 +135,7 @@ public class DummyData {
         createFollow(userAlice, userBob);
 
         createFollow(userBob, userShane);
-        createFollow(userBob, userAlice);
+//        createFollow(userBob, userAlice); // disabled for demo purposes
     }
 
     /**
@@ -135,7 +144,7 @@ public class DummyData {
      * @param a The user to follow
      * @param b The user who is following
      */
-    private void createFollow(User a, User b) {
+    public void createFollow(User a, User b) {
         if (a.equals(b)) {
             return;
         }
@@ -170,8 +179,44 @@ public class DummyData {
         a.setFollowers(followers);
         b.setFollowing(following);
 
-        users.put(a.getId(), a);
-        users.put(b.getId(), b);
+        users.replace(a.getId(), a);
+        users.replace(b.getId(), b);
+    }
+
+    /**
+     * Appends a Kweet to a user
+     *
+     * @param user The user to append the Kweet to
+     * @param kweet The Kweet to append
+     */
+    public void setUserKweet(User user, Kweet kweet) {
+        Set<Kweet> kweets = user.getKweets();
+        if (kweets == null) {
+            kweets = new HashSet<>();
+        }
+
+        // omit circular reference recursion (lazy LAZY-implementation)
+        User newUser = new User(user.getUsername(), user.getPassword(), user.getRole());
+        newUser.setId(user.getId());
+        newUser.setBio(user.getBio());
+        newUser.setFollowing(user.getFollowing());
+        newUser.setFollowers(user.getFollowers());
+
+        assert newUser.equals(user);
+
+        Kweet newKweet = new Kweet(kweet.getMessage(), newUser);
+        newKweet.setId(kweet.getId());
+        newKweet.setCreatedAt(kweet.getCreatedAt());
+        newKweet.setMentions(kweet.getMentions());
+        newKweet.setHashTags(kweet.getHashTags());
+
+        assert newKweet.equals(kweet);
+
+        kweets.add(newKweet);
+
+        user.setKweets(kweets);
+
+        users.replace(user.getId(), user);
     }
 
     /**
@@ -180,7 +225,7 @@ public class DummyData {
      * @param kweet The Kweet to append the hashtag to
      * @param hashTag The hashtag to append
      */
-    private void setKweetHashTag(Kweet kweet, HashTag hashTag) {
+    public void setKweetHashTag(Kweet kweet, HashTag hashTag) {
         Set<HashTag> hashTags = kweet.getHashTags();
         if (hashTags == null) {
             hashTags = new HashSet<>();
@@ -199,7 +244,7 @@ public class DummyData {
      * @param kweet The Kweet to append the mention to
      * @param user The mention to append
      */
-    private void setKweetMention(Kweet kweet, User user) {
+    public void setKweetMention(Kweet kweet, User user) {
         Set<User> mentions = kweet.getMentions();
         if (mentions == null) {
             mentions = new HashSet<>();
@@ -218,7 +263,7 @@ public class DummyData {
      * @param kweet The Kweet to favorite
      * @param user The user who favourited the Kweet
      */
-    private void setKweetFavouritedBy(Kweet kweet, User user) {
+    public void setKweetFavouritedBy(Kweet kweet, User user) {
         Set<User> favouritedBy = kweet.getFavoritedBy();
         if (favouritedBy == null) {
             favouritedBy = new HashSet<>();
