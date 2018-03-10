@@ -1,5 +1,8 @@
 package nl.shanelab.kwetter.util;
 
+import lombok.NoArgsConstructor;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import org.jboss.weld.environment.se.Weld;
 import org.jboss.weld.environment.se.WeldContainer;
 import org.junit.runners.BlockJUnit4ClassRunner;
@@ -7,22 +10,25 @@ import org.junit.runners.model.InitializationError;
 
 public class WeldJUnit4Runner extends BlockJUnit4ClassRunner {
 
-    private final Class klass;
-    private final Weld weld;
-    private final WeldContainer container;
-
-    public WeldJUnit4Runner(final Class klass) throws InitializationError {
-        super(klass);
-        this.klass = klass;
-        this.weld = new Weld();
-        this.container = weld.initialize();
+    public WeldJUnit4Runner(final Class<Object> clazz) throws InitializationError {
+        super(clazz);
+    }
+    @Override
+    protected Object createTest() {
+        return WeldContext.SINGLETON.getBean(getTestClass().getJavaClass());
     }
 
-    @Override
-    @SuppressWarnings("deprecation")
-    protected Object createTest() throws Exception {
-        final Object test = container.instance().select(klass).get();
+    @NoArgsConstructor
+    @RequiredArgsConstructor
+    private static class WeldContext {
+        @NonNull
+        private WeldContainer weldContainer;
 
-        return test;
+        static final WeldContext SINGLETON = new WeldContext(new Weld().initialize());
+
+        @SuppressWarnings("deprecation")
+        public <T> T getBean(final Class<T> type) {
+            return this.weldContainer.instance().select(type).get();
+        }
     }
 }
