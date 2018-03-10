@@ -56,6 +56,15 @@ public class UserDaoTest {
         assertUser(userBob, (long) 2, 2, 1, 2);
     }
 
+    /**
+     * Assert expected user properties
+     *
+     * @param user The user to assert
+     * @param id The expected id
+     * @param kweets The expected amount of kweets
+     * @param followers The expected amount of followers
+     * @param following The expected amount of following
+     */
     private void assertUser(User user, long id, int kweets, int followers, int following) {
         String name = user.getUsername();
 
@@ -68,7 +77,7 @@ public class UserDaoTest {
                 .isEqualTo(kweets);
 
         if (followers > 0) {
-            assertWithMessage(String.format("The expected amount of followers(%d) for user '%s' differs", followers, name))
+            assertWithMessage(String.format("The expected amount of followers(%d) for user '%s' differs from the actual amount", followers, name))
                     .that(user.getFollowers().size())
                     .isEqualTo(followers);
         }

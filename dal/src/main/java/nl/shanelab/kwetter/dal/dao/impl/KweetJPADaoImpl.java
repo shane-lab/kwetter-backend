@@ -54,4 +54,16 @@ public class KweetJPADaoImpl implements KweetDao {
     public Collection<Kweet> getByMention(String name) {
         return null;
     }
+
+    public Collection<Kweet> getByFavoritedBy(String name) {
+        return null;
+    }
+
+    public boolean isFavoritedBy(Kweet kweet, String name) {
+        return false;
+    }
+
+    public boolean isMentionedIn(Kweet kweet, String name) {
+        return false;
+    }
 }
