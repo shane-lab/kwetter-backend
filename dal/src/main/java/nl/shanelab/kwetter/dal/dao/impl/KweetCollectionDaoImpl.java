@@ -55,9 +55,9 @@ public class KweetCollectionDaoImpl extends BaseCollectionDao implements KweetDa
 
         data.setUserKweet(kweet.getAuthor(), kweet);
 
-        handleHashTags(kweet);
+        this.handleHashTags(kweet);
 
-        handleMentions(kweet);
+        this.handleMentions(kweet);
 
         return kweet;
     }
