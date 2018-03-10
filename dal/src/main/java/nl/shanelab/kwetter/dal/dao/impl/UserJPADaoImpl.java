@@ -1,6 +1,7 @@
 package nl.shanelab.kwetter.dal.dao.impl;
 
 import nl.shanelab.kwetter.dal.dao.UserDao;
+import nl.shanelab.kwetter.dal.domain.Kweet;
 import nl.shanelab.kwetter.dal.domain.User;
 import nl.shanelab.kwetter.dal.qualifiers.JPADao;
 
@@ -36,6 +37,18 @@ public class UserJPADaoImpl implements UserDao {
     }
 
     public User getByUsername(String name) {
+        return null;
+    }
+
+    public boolean isFollowing(User a, User b) {
+        return false;
+    }
+
+    public boolean isFollower(User a, User b) {
+        return false;
+    }
+
+    public Collection<Kweet> getNthLatestKweets(int nth) {
         return null;
     }
 }

@@ -53,57 +53,57 @@ public class DummyData {
         users.put(++usersIndex, userBob);
 
         // initialize HashTags
-        long hashTagsIndex = -1;
-
-        HashTag hashTagFhict = new HashTag("FHICT");
-        HashTag hashTagKwetter = new HashTag("kwetter");
-
-        hashTags.put(++hashTagsIndex, hashTagFhict);
-        hashTags.put(++hashTagsIndex, hashTagKwetter);
-
-        // initialize Kweets
-        long kweetsIndex = -1;
-
-        // kweets for userShane
-        Kweet kweetShane = new Kweet("Message by Shane", userShane);
-        Kweet kweetShane1 = new Kweet("Message with hashtags by Shane #FHICT #kwetter", userShane);
-
-        // kweets for userAlice
-        Kweet kweetAlice = new Kweet("Message by Alice", userAlice);
-
-        // kweets for userBob
-        Kweet kweetBob = new Kweet("Message by Bob", userBob);
-        Kweet kweetBob1 = new Kweet("Message by Bob, in reply to @Shane", userBob);
-
-        kweets.put(++kweetsIndex, kweetShane);
-        kweets.put(++kweetsIndex, kweetShane1);
-        kweets.put(++kweetsIndex, kweetAlice);
-        kweets.put(++kweetsIndex, kweetBob);
-        kweets.put(++kweetsIndex, kweetBob1);
-
-        // set hashtags
-        setKweetHashTag(kweetShane1, hashTagFhict);
-        setKweetHashTag(kweetShane1, hashTagKwetter);
-
-        // set mentions
-        setKweetMention(kweetBob1, userShane);
-
-        // set favorited
-        setKweetFavouritedBy(kweetShane, userAlice);
-        setKweetFavouritedBy(kweetShane1, userAlice);
-        setKweetFavouritedBy(kweetShane1, userBob);
-
-        setKweetFavouritedBy(kweetAlice, userShane);
-
-        // set following
-        createFollow(userShane, userAlice);
-        createFollow(userShane, userBob);
-
-        createFollow(userAlice, userShane);
-        createFollow(userAlice, userBob);
-
-        createFollow(userBob, userShane);
-        createFollow(userBob, userAlice);
+//        long hashTagsIndex = -1;
+//
+//        HashTag hashTagFhict = new HashTag("FHICT");
+//        HashTag hashTagKwetter = new HashTag("kwetter");
+//
+//        hashTags.put(++hashTagsIndex, hashTagFhict);
+//        hashTags.put(++hashTagsIndex, hashTagKwetter);
+//
+//        // initialize Kweets
+//        long kweetsIndex = -1;
+//
+//        // kweets for userShane
+//        Kweet kweetShane = new Kweet("Message by Shane", userShane);
+//        Kweet kweetShane1 = new Kweet("Message with hashtags by Shane #FHICT #kwetter", userShane);
+//
+//        // kweets for userAlice
+//        Kweet kweetAlice = new Kweet("Message by Alice", userAlice);
+//
+//        // kweets for userBob
+//        Kweet kweetBob = new Kweet("Message by Bob", userBob);
+//        Kweet kweetBob1 = new Kweet("Message by Bob, in reply to @Shane", userBob);
+//
+//        kweets.put(++kweetsIndex, kweetShane);
+//        kweets.put(++kweetsIndex, kweetShane1);
+//        kweets.put(++kweetsIndex, kweetAlice);
+//        kweets.put(++kweetsIndex, kweetBob);
+//        kweets.put(++kweetsIndex, kweetBob1);
+//
+//        // set hashtags
+//        setKweetHashTag(kweetShane1, hashTagFhict);
+//        setKweetHashTag(kweetShane1, hashTagKwetter);
+//
+//        // set mentions
+//        setKweetMention(kweetBob1, userShane);
+//
+//        // set favorited
+//        setKweetFavouritedBy(kweetShane, userAlice);
+//        setKweetFavouritedBy(kweetShane1, userAlice);
+//        setKweetFavouritedBy(kweetShane1, userBob);
+//
+//        setKweetFavouritedBy(kweetAlice, userShane);
+//
+//        // set following
+//        createFollow(userShane, userAlice);
+//        createFollow(userShane, userBob);
+//
+//        createFollow(userAlice, userShane);
+//        createFollow(userAlice, userBob);
+//
+//        createFollow(userBob, userShane);
+//        createFollow(userBob, userAlice);
     }
 
     /**
