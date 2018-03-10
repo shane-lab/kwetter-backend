@@ -154,10 +154,15 @@ public class DummyData {
         newUserA.setId(a.getId());
         newUserA.setBio(a.getBio());
         newUserA.setKweets(a.getKweets());
+
+        assert newUserA.equals(a);
+
         User newUserB = new User(b.getUsername(), b.getPassword(), b.getRole());
         newUserB.setId(b.getId());
         newUserB.setBio(b.getBio());
         newUserB.setKweets(b.getKweets());
+
+        assert newUserB.equals(b);
 
         followers.add(newUserB);
         following.add(newUserA);
@@ -229,12 +234,17 @@ public class DummyData {
         newKweet.setCreatedAt(kweet.getCreatedAt());
         newKweet.setHashTags(kweet.getHashTags());
         newKweet.setMentions(kweet.getMentions());
+
+        assert newKweet.equals(kweet);
+
         User newUser = new User(user.getUsername(), user.getPassword(), user.getRole());
         newUser.setId(user.getId());
         newUser.setBio(user.getBio());
         newUser.setKweets(user.getKweets());
         newUser.setFollowing(user.getFollowing());
         newUser.setFollowers(user.getFollowers());
+
+        assert newUser.equals(user);
 
         favouritedBy.add(newUser);
         favourited.add(newKweet);
