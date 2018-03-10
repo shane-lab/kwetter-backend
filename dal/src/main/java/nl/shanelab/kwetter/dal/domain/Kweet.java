@@ -11,7 +11,7 @@ import java.util.Set;
 
 @Data
 @Entity
-@EqualsAndHashCode
+@EqualsAndHashCode(exclude = "favoritedBy")
 @NoArgsConstructor
 @RequiredArgsConstructor
 public class Kweet {

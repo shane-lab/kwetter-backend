@@ -12,6 +12,7 @@
         <module>api</module>
         <module>services</module>
         <module>dal</module>
+        <module>util</module>
     </modules>
 
     <build>
