@@ -2,6 +2,7 @@ package nl.shanelab.kwetter.dal.dao.impl;
 
 import nl.shanelab.kwetter.dal.dao.KweetDao;
 import nl.shanelab.kwetter.dal.domain.Kweet;
+import nl.shanelab.kwetter.dal.domain.User;
 import nl.shanelab.kwetter.dal.qualifiers.JPADao;
 
 import javax.ejb.Stateless;
@@ -59,11 +60,19 @@ public class KweetJPADaoImpl implements KweetDao {
         return null;
     }
 
-    public boolean isFavoritedBy(Kweet kweet, String name) {
+    public boolean isFavoritedBy(Kweet kweet, User user) {
         return false;
     }
 
-    public boolean isMentionedIn(Kweet kweet, String name) {
+    public boolean isMentionedIn(Kweet kweet, User user) {
         return false;
+    }
+
+    public void favourite(Kweet kweet, User user) {
+
+    }
+
+    public void unFavourite(Kweet kweet, User user) {
+
     }
 }

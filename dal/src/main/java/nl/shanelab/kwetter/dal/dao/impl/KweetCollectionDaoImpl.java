@@ -2,15 +2,22 @@ package nl.shanelab.kwetter.dal.dao.impl;
 
 import lombok.NoArgsConstructor;
 import nl.shanelab.kwetter.dal.dao.KweetDao;
+import nl.shanelab.kwetter.dal.domain.HashTag;
 import nl.shanelab.kwetter.dal.domain.Kweet;
+import nl.shanelab.kwetter.dal.domain.User;
 import nl.shanelab.kwetter.dal.ejb.DummyData;
 import nl.shanelab.kwetter.dal.qualifiers.InMemoryDao;
+import nl.shanelab.kwetter.util.Patterns;
 
 import javax.ejb.Stateless;
 import javax.inject.Inject;
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @InMemoryDao
 @Stateless
@@ -30,12 +37,27 @@ public class KweetCollectionDaoImpl extends BaseCollectionDao implements KweetDa
         if (kweet.getAuthor() == null) {
             return null;
         }
+        User foundUser = data.getUsers().get(kweet.getAuthor().getId());
+        if (foundUser != null && !foundUser.equals(kweet.getAuthor())) {
+            return null; // user not in repository
+        }
 
         long nextId = (long) this.count();
 
         kweet.setId(nextId);
+        kweet.setCreatedAt(LocalDateTime.now());
+        // do not permit predefined collections, parse Kweet message
+        kweet.setHashTags(null);
+        kweet.setFavoritedBy(null);
+        kweet.setMentions(null);
 
         data.getKweets().put(nextId, kweet);
+
+        data.setUserKweet(kweet.getAuthor(), kweet);
+
+        handleHashTags(kweet);
+
+        handleMentions(kweet);
 
         return kweet;
     }
@@ -174,7 +196,7 @@ public class KweetCollectionDaoImpl extends BaseCollectionDao implements KweetDa
         return kweetsRef.get();
     }
 
-    public boolean isFavoritedBy(Kweet kweet, String name) {
+    public boolean isFavoritedBy(Kweet kweet, User user) {
         if (kweet == null) {
             return false;
         }
@@ -189,7 +211,7 @@ public class KweetCollectionDaoImpl extends BaseCollectionDao implements KweetDa
         AtomicReference<Boolean> flagRef = new AtomicReference<>(false);
 
         kweet.getFavoritedBy().forEach(favoritedBy -> {
-            if (favoritedBy.getUsername().equals(name)) {
+            if (favoritedBy.equals(user)) {
                 flagRef.set(true);
                 return;
             }
@@ -198,7 +220,7 @@ public class KweetCollectionDaoImpl extends BaseCollectionDao implements KweetDa
         return flagRef.get();
     }
 
-    public boolean isMentionedIn(Kweet kweet, String name) {
+    public boolean isMentionedIn(Kweet kweet, User user) {
         if (kweet == null) {
             return false;
         }
@@ -213,12 +235,90 @@ public class KweetCollectionDaoImpl extends BaseCollectionDao implements KweetDa
         AtomicReference<Boolean> flagRef = new AtomicReference<>(false);
 
         kweet.getMentions().forEach(mentioned -> {
-            if (mentioned.getUsername().equals(name)) {
+            if (mentioned.equals(user)) {
                 flagRef.set(true);
                 return;
             }
         });
 
         return flagRef.get();
+    }
+
+    public void favourite(Kweet kweet, User user) {
+        if (isFavoritedBy(kweet, user)) {
+            return;
+        }
+        if (kweet.getAuthor().equals(user)) {
+            return;
+        }
+
+        data.setKweetFavouritedBy(kweet, user);
+    }
+
+    public void unFavourite(Kweet kweet, User user) {
+        if (!isFavoritedBy(kweet, user)) {
+            return;
+        }
+
+        if (kweet.getFavoritedBy() != null) {
+            kweet.getFavoritedBy().remove(user);
+            edit(kweet);
+        }
+        if (user.getFavoriteKweets() != null) {
+            user.getFavoriteKweets().remove(kweet);
+            edit(kweet);
+        }
+    }
+
+    private void handleMentions(Kweet kweet) {
+        if (kweet == null || data.getUsers().size() <= 0) {
+            return;
+        }
+
+        Pattern pattern = Pattern.compile(Patterns.MENTION_PATTERN);
+        Matcher matcher = pattern.matcher(kweet.getMessage());
+
+        Set<String> mentions = new HashSet<>();
+
+        while (matcher.find()) {
+            mentions.add(matcher.group(0).substring(1));
+        }
+
+        for (User user : data.getUsers().values()) {
+            if (mentions.contains(user.getUsername())) {
+                data.setKweetMention(kweet, user);
+            }
+        }
+    }
+
+    private void handleHashTags(Kweet kweet) {
+        if (kweet == null) {
+            return;
+        }
+
+        Pattern pattern = Pattern.compile(Patterns.HASHTAG_PATTERN);
+        Matcher matcher = pattern.matcher(kweet.getMessage());
+
+        Set<String> hashTagNames = new HashSet<>();
+
+        while (matcher.find()) {
+            hashTagNames.add(matcher.group(0).substring(1));
+        }
+
+        for (HashTag hashTag : data.getHashTags().values()) {
+            if (hashTagNames.contains(hashTag.getName())) {
+                hashTagNames.remove(hashTag.getName());
+
+                data.setKweetHashTag(kweet, hashTag);
+            }
+        }
+
+        for (String hashTagName : hashTagNames) {
+            HashTag hashTag = new HashTag(hashTagName);
+
+            data.getHashTags().put((long) data.getHashTags().size(), hashTag);
+
+            data.setKweetHashTag(kweet, hashTag);
+        }
     }
 }

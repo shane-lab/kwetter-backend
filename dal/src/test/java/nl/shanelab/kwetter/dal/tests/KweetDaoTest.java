@@ -1,8 +1,11 @@
 package nl.shanelab.kwetter.dal.tests;
 
 import nl.shanelab.kwetter.dal.dao.KweetDao;
+import nl.shanelab.kwetter.dal.dao.UserDao;
 import nl.shanelab.kwetter.dal.dao.impl.KweetCollectionDaoImpl;
 import nl.shanelab.kwetter.dal.domain.Kweet;
+import nl.shanelab.kwetter.dal.domain.Role;
+import nl.shanelab.kwetter.dal.domain.User;
 import nl.shanelab.kwetter.dal.qualifiers.InMemoryDao;
 import nl.shanelab.kwetter.util.WeldJUnit4Runner;
 import org.junit.Before;
@@ -11,6 +14,9 @@ import org.junit.runner.RunWith;
 
 import javax.inject.Inject;
 
+import java.util.ArrayList;
+
+import static com.google.common.truth.Truth.assertThat;
 import static com.google.common.truth.Truth.assertWithMessage;
 
 @RunWith(WeldJUnit4Runner.class)
@@ -19,6 +25,12 @@ public class KweetDaoTest {
     @Inject
     @InMemoryDao
     KweetDao kweetDao;
+
+    @Inject
+    @InMemoryDao
+    // required to inject UserDao to create new test users,
+    // fake users are not permitted
+    UserDao userDao;
 
     @Before
     public void shouldInjectDao() {
@@ -85,5 +97,94 @@ public class KweetDaoTest {
                     .that(kweet.getHashTags().size())
                     .isEqualTo(hashtags);
         }
+    }
+
+    @Test
+    public void shouldBeAbleToPostAKweet() {
+        User user = userDao.create(new User("shouldBeAbleToPostAKweet", "password", Role.USER));
+
+        assertWithMessage("Newly created user already has Kweets")
+                .that(user.getKweets())
+                .isNull();
+
+        Kweet kweet = kweetDao.create(new Kweet("aa", user));
+
+        assertThat(kweet).isNotNull();
+
+        assertWithMessage("Newly created user does not have any Kweets")
+                .that(user.getKweets().size())
+                .isEqualTo(1);
+    }
+
+    @Test
+    public void shouldBeAbleToFavouriteAKweet() {
+        User userIsfavouriter = userDao.create(new User("Favouriter", "password", Role.USER));
+
+        assertWithMessage("Newly created user without kweets already favourited some Kweets")
+                .that(userIsfavouriter.getFavoriteKweets())
+                .isNull();
+
+        User userWhosKweetGotFavourited = userDao.create(new User("Favourited", "password", Role.USER));
+
+        Kweet kweet = kweetDao.create(new Kweet("bb", userWhosKweetGotFavourited));
+
+        kweetDao.favourite(kweet, userIsfavouriter);
+
+        assertWithMessage("Newly created user without kweets does not have any favourited Kweets")
+                .that(userIsfavouriter.getFavoriteKweets().size())
+                .isEqualTo(1);
+
+        assertWithMessage("The newly created Kweet is not favourited")
+                .that(kweet.getFavoritedBy().size())
+                .isEqualTo(1);
+
+        // self-favouriting
+        kweetDao.favourite(kweet, userWhosKweetGotFavourited);
+
+        assertWithMessage("Newly created user with kweets self-favourited a his Kweet")
+                .that(userWhosKweetGotFavourited.getFavoriteKweets())
+                .isNull();
+
+        assertWithMessage("The newly created Kweet is not favourited")
+                .that(kweet.getFavoritedBy().size())
+                .isEqualTo(1);
+
+        // unset favourite
+        kweetDao.unFavourite(kweet, userIsfavouriter);
+
+        assertWithMessage("The newly created Kweet is not favourited")
+                .that(kweet.getFavoritedBy().size())
+                .isEqualTo(0);
+    }
+
+    @Test
+    public void shouldBeAbleToMentionAUser() {
+        User userIsMentioner = userDao.create(new User("Mentioner", "password", Role.USER));
+
+        // TODO share injected dummydata context, WeldJUnit does not share injected singleton-bean over other injected beans
+//        User userWhoGotMentioned = userDao.create(new User("Mentioned", "password", Role.USER));
+
+        Kweet kweet = kweetDao.create(new Kweet("In reply to @Shane, @Alice and @NonExisting", userIsMentioner));
+
+        assertWithMessage("The newly created Kweet does not have any mentions")
+                .that(kweet.getMentions().size())
+                .isEqualTo(2);
+
+        User user = new ArrayList<User>(kweet.getMentions()).get(0);
+
+        assertWithMessage("The mentioned user was not mentioned")
+                .that(kweetDao.isMentionedIn(kweet, user))
+                .isTrue();
+    }
+
+    @Test
+    public void shouldBeAbleToInvokeAHashTagOnAKweet() {
+        User user = userDao.create(new User("HashTagInvoker", "password", Role.USER));
+
+        Kweet kweet = kweetDao.create(new Kweet("This is a message with hashtags #One #two three", user));
+
+        assertWithMessage("The newly created Kweet does not have any hashtags")
+                .that(kweet.getHashTags().size())
+                .isEqualTo(2);
     }
 }

@@ -1,6 +1,7 @@
 package nl.shanelab.kwetter.dal.dao;
 
 import nl.shanelab.kwetter.dal.domain.Kweet;
+import nl.shanelab.kwetter.dal.domain.User;
 
 import java.util.Collection;
 
@@ -60,18 +61,34 @@ public interface KweetDao extends GenericDao<Kweet, Long> {
     /**
      * Checks if a user favourited the given Kweet
      *
-     * @param kweet The Kweet to check
-     * @param name The name of the user to fetch
+     * @param kweet The Kweet to check against
+     * @param user The user to check with
      * @return Boolean Returns true if the user exists and favourited the Kweet
      */
-    boolean isFavoritedBy(Kweet kweet, String name);
+    boolean isFavoritedBy(Kweet kweet, User user);
 
     /**
      * Checks if a user is mentioned in the given Kweet
      *
-     * @param kweet The Kweet to check
-     * @param name The name of user to fetch
+     * @param kweet The Kweet to check against
+     * @param user The user to check with
      * @return Boolean Returns true if the user exists and was mentioned in the Kweet
      */
-    boolean isMentionedIn(Kweet kweet, String name);
+    boolean isMentionedIn(Kweet kweet, User user);
+
+    /**
+     * Favourites a kweet
+     *
+     * @param kweet The Kweet to favourite
+     * @param user The user who favourites the Kweet
+     */
+    void favourite(Kweet kweet, User user);
+
+    /**
+     * Un-favourites a Kweet
+     *
+     * @param kweet The Kweet to un-favourite
+     * @param user The user who un-favourites the Kweet
+     */
+    void unFavourite(Kweet kweet, User user);
 }
