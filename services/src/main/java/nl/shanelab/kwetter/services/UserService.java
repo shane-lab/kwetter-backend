@@ -2,6 +2,7 @@ package nl.shanelab.kwetter.services;
 
 import nl.shanelab.kwetter.dal.domain.Role;
 import nl.shanelab.kwetter.dal.domain.User;
+import nl.shanelab.kwetter.services.exceptions.UserException;
 
 import java.util.Collection;
 
@@ -13,8 +14,9 @@ public interface UserService {
      * @param name The name of the user
      * @param password The password of the user
      * @return User Returns the created user
+     * @throws UserException Throws an exception if a user with the given username already exists
      */
-    User register(String name, String password);
+    User register(String name, String password) throws UserException;
 
     /**
      * Creates a new user
@@ -23,8 +25,9 @@ public interface UserService {
      * @param password The password of the user
      * @param role The role of the user
      * @return User Returns the created user
+     * @throws UserException Throws an exception if a user with the given username already exists
      */
-    User register(String name, String password, Role role);
+    User register(String name, String password, Role role) throws UserException;
 
     /**
      * Checks the given user credentials to sign the user in
@@ -32,23 +35,34 @@ public interface UserService {
      * @param name The username of the user
      * @param password The associated password of the user
      * @return User Returns the user matching the given credentials
+     * @throws UserException Throws an exception when no user was found with the given name or credentials mismatched
      */
-    User signIn(String name, String password);
+    User signIn(String name, String password) throws UserException;
 
     /**
-     * Persists changes to the user
+     * Sets a new username for the user
      *
-     * @param user The user to edit
+     * @param name The new username of the user
+     * @param user The user to rename
+     * @return
+     */
+    User rename(String name, User user) throws UserException;
+
+    /**
+     * Sets a new biography for the user
+     *
+     * @param bio The biography
+     * @param user The user to set the biography for
      * @return User Returns the edited user
      */
-    User edit(User user);
+    User setBiography(String bio, User user) throws UserException;
 
     /**
      * Removes a user
      *
      * @param user The user to remove
      */
-    void remove(User user);
+    void remove(User user) throws UserException;
 
     /**
      * Find a user by its discriminator value
