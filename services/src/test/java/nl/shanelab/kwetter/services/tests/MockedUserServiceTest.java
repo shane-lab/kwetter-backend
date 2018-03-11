@@ -14,13 +14,10 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.MockitoJUnitRunner;
 
-import javax.inject.Inject;
-import javax.ws.rs.Produces;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.google.common.truth.Truth.assertThat;
 import static com.google.common.truth.Truth.assertWithMessage;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.times;
@@ -52,8 +49,6 @@ public class MockedUserServiceTest {
                 .isNotNull();
     }
 
-    @Produces
-    @Inject
     private void mocks() {
         when(userDaoMock.create(any(User.class))).thenReturn(users.get((long) 0));
         when(userDaoMock.edit(any(User.class))).thenReturn(users.get((long) 0));
@@ -68,7 +63,9 @@ public class MockedUserServiceTest {
 
         User u = userService.getById(anyLong());
 
-        assertThat(u).isNotNull();
+        assertWithMessage("The expected user was not invoked when given any long")
+                .that(u)
+                .isNotNull();
 
         Mockito.verify(userDaoMock).find(anyLong());
     }
@@ -79,7 +76,7 @@ public class MockedUserServiceTest {
 
         User u = userService.getByUserName(anyString());
 
-        assertWithMessage("The expecte duser was not invoked given any string")
+        assertWithMessage("The expected user was not invoked when given any string")
                 .that(u)
                 .isNotNull();
 
@@ -94,7 +91,9 @@ public class MockedUserServiceTest {
 
         User edited = userService.setBiography(anyString(), u);
 
-        assertThat(u).isEqualTo(edited);
+        assertWithMessage("The returned user from the change differs from the fetched user by name")
+                .that(u)
+                .isEqualTo(edited);
 
         Mockito.verify(userDaoMock, times(1)).edit(any());
     }
@@ -104,6 +103,10 @@ public class MockedUserServiceTest {
         mocks();
 
         Collection<User> users = userService.getAllUsers();
+
+        assertWithMessage("No collection was returned")
+                .that(users.size())
+                .isGreaterThan(0);
 
         Mockito.verify(userDaoMock).findAll();
     }
