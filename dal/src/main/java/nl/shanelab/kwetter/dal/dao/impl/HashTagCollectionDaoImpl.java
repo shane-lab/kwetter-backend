@@ -6,13 +6,13 @@ import nl.shanelab.kwetter.dal.domain.HashTag;
 import nl.shanelab.kwetter.dal.ejb.DummyData;
 import nl.shanelab.kwetter.dal.qualifiers.InMemoryDao;
 
-import javax.ejb.Stateless;
+import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import java.util.Collection;
 import java.util.concurrent.atomic.AtomicReference;
 
 @InMemoryDao
-@Stateless
+@ApplicationScoped
 @NoArgsConstructor
 public class HashTagCollectionDaoImpl extends BaseCollectionDao implements HashTagDao {
 

@@ -7,14 +7,16 @@ import nl.shanelab.kwetter.dal.domain.User;
 import nl.shanelab.kwetter.dal.ejb.DummyData;
 import nl.shanelab.kwetter.dal.qualifiers.InMemoryDao;
 
-import javax.ejb.Stateless;
+import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Set;
+import java.util.Iterator;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
 @InMemoryDao
-@Stateless
+@ApplicationScoped
 @NoArgsConstructor
 public class UserCollectionDaoImpl extends BaseCollectionDao implements UserDao {
 
@@ -60,6 +62,20 @@ public class UserCollectionDaoImpl extends BaseCollectionDao implements UserDao 
     }
 
     public void remove(User user) {
+        Iterator<User> userIterator = this.findAll().iterator();
+
+        for(;;) {
+            if (!userIterator.hasNext()) {
+                break;
+            }
+
+            User next = userIterator.next();
+
+            this.unFollow(next, user);
+
+            this.unFollow(user, next);
+        }
+
         data.getUsers().remove(user.getId());
     }
 
@@ -93,8 +109,10 @@ public class UserCollectionDaoImpl extends BaseCollectionDao implements UserDao 
         return isFollowing(b, a);
     }
 
-    public Set<Kweet> getNthLatestKweets(int nth) {
-        return null;
+    public Collection<Kweet> getNthLatestKweets(int nth, User user) {
+        List<Kweet> kweetList = new ArrayList<>(user.getKweets());
+
+        return kweetList.subList(Math.max(kweetList.size() - nth, 0), kweetList.size());
     }
 
     public void createFollow(User a, User b) {

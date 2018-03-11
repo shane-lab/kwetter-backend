@@ -37,9 +37,10 @@ public interface UserDao extends GenericDao<User, Long> {
      * Get a collection of a users latest Kweets
      *
      * @param nth The amount of Kweets to fetch
+     * @param user The author the Kweets
      * @return Collection<Kweet> Returns a collection of @{nth} Kweets
      */
-    Collection<Kweet> getNthLatestKweets(int nth);
+    Collection<Kweet> getNthLatestKweets(int nth, User user);
 
     /**
      * Sets a following from a user to another user

@@ -48,7 +48,7 @@ public class UserJPADaoImpl implements UserDao {
         return false;
     }
 
-    public Collection<Kweet> getNthLatestKweets(int nth) {
+    public Collection<Kweet> getNthLatestKweets(int nth, User user) {
         return null;
     }
 
