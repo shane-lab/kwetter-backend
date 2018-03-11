@@ -9,8 +9,7 @@ import nl.shanelab.kwetter.dal.qualifiers.InMemoryDao;
 
 import javax.ejb.Stateless;
 import javax.inject.Inject;
-import java.util.Collection;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 
 @InMemoryDao
@@ -93,8 +92,10 @@ public class UserCollectionDaoImpl extends BaseCollectionDao implements UserDao 
         return isFollowing(b, a);
     }
 
-    public Set<Kweet> getNthLatestKweets(int nth) {
-        return null;
+    public Collection<Kweet> getNthLatestKweets(int nth, User user) {
+        List<Kweet> kweetList = new ArrayList<>(user.getKweets());
+
+        return kweetList.subList(Math.max(kweetList.size() - nth, 0), kweetList.size());
     }
 
     public void createFollow(User a, User b) {
