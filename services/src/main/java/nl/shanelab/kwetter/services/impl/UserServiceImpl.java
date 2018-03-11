@@ -6,8 +6,8 @@ import nl.shanelab.kwetter.dal.domain.Role;
 import nl.shanelab.kwetter.dal.domain.User;
 import nl.shanelab.kwetter.dal.qualifiers.InMemoryDao;
 import nl.shanelab.kwetter.services.UserService;
-import nl.shanelab.kwetter.services.exceptions.user.UserAlreadyExistsException;
 import nl.shanelab.kwetter.services.exceptions.UserException;
+import nl.shanelab.kwetter.services.exceptions.user.UserAlreadyExistsException;
 import nl.shanelab.kwetter.services.exceptions.user.UserFollowException;
 import nl.shanelab.kwetter.services.exceptions.user.UserIncorrectCredentialsException;
 import nl.shanelab.kwetter.services.exceptions.user.UserNotFoundException;
@@ -18,6 +18,7 @@ import java.util.Collection;
 
 @Stateless
 @NoArgsConstructor
+//@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class UserServiceImpl implements UserService {
 
     @Inject

@@ -45,7 +45,7 @@ public class KweetingServiceImpl implements KweetingService {
 
         storedKweet.setMessage(kweet.getMessage());
 
-        return kweetDao.edit(kweet);
+        return kweetDao.edit(storedKweet);
     }
 
     public void removeKweet(Kweet kweet) throws KweetException {
@@ -91,7 +91,7 @@ public class KweetingServiceImpl implements KweetingService {
     }
 
     public Collection<Kweet> getKweetsWithHashTag(HashTag hashTag) {
-        return this.getKweetsWithHashTagName(hashTag.getName());
+        return hashTag == null ? null : this.getKweetsWithHashTagName(hashTag.getName());
     }
 
     public Collection<Kweet> getKweetsWithHashTagName(String name) {
@@ -106,7 +106,7 @@ public class KweetingServiceImpl implements KweetingService {
     public Collection<Kweet> getKweetsWithMention(User user) throws UserException {
         validateUser(user);
 
-        return this.getFavouritedKweetsByUserName(user.getUsername());
+        return kweetDao.getByMention(user.getUsername());
     }
 
     public Collection<Kweet> getKweetsWithMentionByUserName(String name) throws UserException {
