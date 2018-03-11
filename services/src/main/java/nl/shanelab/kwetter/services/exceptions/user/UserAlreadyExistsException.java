@@ -1,4 +1,6 @@
-package nl.shanelab.kwetter.services.exceptions;
+package nl.shanelab.kwetter.services.exceptions.user;
+
+import nl.shanelab.kwetter.services.exceptions.UserException;
 
 public class UserAlreadyExistsException extends UserException {
 

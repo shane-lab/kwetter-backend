@@ -6,10 +6,11 @@ import nl.shanelab.kwetter.dal.domain.Role;
 import nl.shanelab.kwetter.dal.domain.User;
 import nl.shanelab.kwetter.dal.qualifiers.InMemoryDao;
 import nl.shanelab.kwetter.services.UserService;
-import nl.shanelab.kwetter.services.exceptions.UserAlreadyExistsException;
+import nl.shanelab.kwetter.services.exceptions.user.UserAlreadyExistsException;
 import nl.shanelab.kwetter.services.exceptions.UserException;
-import nl.shanelab.kwetter.services.exceptions.UserIncorrectCredentialsException;
-import nl.shanelab.kwetter.services.exceptions.UserNotFoundException;
+import nl.shanelab.kwetter.services.exceptions.user.UserFollowException;
+import nl.shanelab.kwetter.services.exceptions.user.UserIncorrectCredentialsException;
+import nl.shanelab.kwetter.services.exceptions.user.UserNotFoundException;
 
 import javax.ejb.Stateless;
 import javax.inject.Inject;
@@ -89,6 +90,42 @@ public class UserServiceImpl implements UserService {
         userDao.remove(user);
     }
 
+    public boolean isUserFollowedBy(User a, User b) throws UserException {
+        validateUserFollowPair(a, b);
+
+        if (!userDao.isFollowedBy(a, b)) {
+            throw new UserFollowException(UserFollowException.FollowViolationType.NOT_FOLLOWED_BY);
+        }
+
+        return true;
+    }
+
+    public boolean isUserFollowing(User a, User b) throws UserException {
+        validateUserFollowPair(a, b);
+
+        if (!userDao.isFollowing(a, b)) {
+            throw new UserFollowException(UserFollowException.FollowViolationType.NOT_FOLLOWING);
+        }
+
+        return true;
+    }
+
+    public void followUser(User a, User b) throws UserException {
+        validateUserFollowPair(a, b);
+
+        if (a.equals(b)) {
+            throw new UserFollowException(UserFollowException.FollowViolationType.SELF_FOLLOWING);
+        }
+
+        userDao.createFollow(a, b);
+    }
+
+    public void unFollowUser(User a, User b) throws UserException {
+        validateUserFollowPair(a, b);
+
+        userDao.unFollow(a, b);
+    }
+
     public User getById(long id) {
         if (id < 0) {
             throw new IllegalArgumentException();
@@ -107,5 +144,17 @@ public class UserServiceImpl implements UserService {
 
     public Collection<User> getAllUsers() {
         return userDao.findAll();
+    }
+
+    private void validateUserFollowPair(User a, User b) throws UserException {
+        if (a == null || b == null) {
+            throw new IllegalArgumentException();
+        }
+        if (this.getById(a.getId()) == null) {
+            throw new UserNotFoundException(a.getId());
+        }
+        if (this.getById(b.getId()) == null) {
+            throw new UserNotFoundException(b.getId());
+        }
     }
 }

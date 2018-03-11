@@ -28,22 +28,6 @@ public class KweetingServiceImpl implements KweetingService {
     @Inject
     HashTagDao hashTagDao;
 
-    public boolean isUserFollowedBy(User a, User b) {
-        return userDao.isFollowedBy(a, b);
-    }
-
-    public boolean isUserFollowing(User a, User b) {
-        return userDao.isFollowing(a, b);
-    }
-
-    public void followUser(User a, User b) {
-        userDao.createFollow(a, b);
-    }
-
-    public void unFollowUser(User a, User b) {
-        userDao.unFollow(a, b);
-    }
-
     public Kweet createKweet(String message, User user) {
         return kweetDao.create(new Kweet(message, user));
     }

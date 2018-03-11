@@ -9,40 +9,6 @@ import java.util.Collection;
 public interface KweetingService {
 
     /**
-     * Checks if a user is following another user
-     *
-     * @param a The user who is following
-     * @param b The user who is being followed
-     * @return boolean Returns true if User A is following User B
-     */
-    boolean isUserFollowedBy(User a, User b);
-
-    /**
-     * Checks if a user is following another user
-     *
-     * @param a The user who is following
-     * @param b The user who is being followed
-     * @return boolean Returns true if User A is following User B
-     */
-    boolean isUserFollowing(User a, User b);
-
-    /**
-     * Makes a user follow another user
-     *
-     * @param a The user to follow
-     * @param b The user who is following
-     */
-    void followUser(User a, User b);
-
-    /**
-     * Makes a user undo the created following of another user
-     *
-     * @param a The user to un-follow
-     * @param b The user who is un-following
-     */
-    void unFollowUser(User a, User b);
-
-    /**
      * Creates a new Kweet from a message
      *
      * @param message The message of the Kweet

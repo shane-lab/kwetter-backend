@@ -59,6 +59,20 @@ public class UserCollectionDaoImpl extends BaseCollectionDao implements UserDao 
     }
 
     public void remove(User user) {
+        Iterator<User> userIterator = this.findAll().iterator();
+
+        for(;;) {
+            if (!userIterator.hasNext()) {
+                break;
+            }
+
+            User next = userIterator.next();
+
+            this.unFollow(next, user);
+
+            this.unFollow(user, next);
+        }
+
         data.getUsers().remove(user.getId());
     }
 

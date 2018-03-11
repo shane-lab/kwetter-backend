@@ -2,13 +2,17 @@ package nl.shanelab.kwetter.services.tests;
 
 import nl.shanelab.kwetter.dal.domain.User;
 import nl.shanelab.kwetter.services.UserService;
-import nl.shanelab.kwetter.services.exceptions.UserAlreadyExistsException;
 import nl.shanelab.kwetter.services.exceptions.UserException;
-import nl.shanelab.kwetter.services.exceptions.UserIncorrectCredentialsException;
-import nl.shanelab.kwetter.services.exceptions.UserNotFoundException;
+import nl.shanelab.kwetter.services.exceptions.user.UserAlreadyExistsException;
+import nl.shanelab.kwetter.services.exceptions.user.UserFollowException;
+import nl.shanelab.kwetter.services.exceptions.user.UserIncorrectCredentialsException;
+import nl.shanelab.kwetter.services.exceptions.user.UserNotFoundException;
+import nl.shanelab.kwetter.services.tests.matcher.UserFollowExceptionMatcher;
 import nl.shanelab.kwetter.util.WeldJUnit4Runner;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 
 import javax.inject.Inject;
@@ -18,6 +22,9 @@ import static com.google.common.truth.Truth.assertWithMessage;
 
 @RunWith(WeldJUnit4Runner.class)
 public class UserServiceTest {
+
+    @Rule
+    public ExpectedException thrown = ExpectedException.none();
 
     @Inject
     UserService userService;
@@ -116,5 +123,95 @@ public class UserServiceTest {
 
         // remove the user again. Should throw an UserNotFoundException
         userService.remove(user);
+    }
+
+    @Test
+    public void shouldBeAbleToFollowUser() throws UserException {
+        User userA = userService.register("shouldBeAbleToFollowUser_A", "password");
+        User userB = userService.register("shouldBeAbleToFollowUser_B", "password");
+
+        userService.followUser(userA, userB);
+
+        assertWithMessage("User B is not followed by User A")
+                .that(userService.isUserFollowedBy(userB, userA))
+                .isTrue();
+    }
+
+    @Test(expected = UserNotFoundException.class)
+    public void shouldNotBeAbleToFollowUser() throws UserException {
+        User userA = userService.register("shouldNotBeAbleToFollowUser_A", "password");
+        User userB = userService.register("shouldNotBeAbleToFollowUser_B", "password");
+
+        userService.remove(userB);
+
+        // user to follow is removed. Should thrown an UserNotFoundException
+        userService.followUser(userA, userB);
+    }
+
+    @Test
+    public void shouldNotBeAbleToSelfFollow() throws UserException {
+        thrown.expect(UserFollowExceptionMatcher.of(UserFollowException.FollowViolationType.SELF_FOLLOWING));
+
+        User user = userService.register("shouldNotBeAbleToSelfFollow", "password");
+
+        // user to follow is removed. Should thrown an UserFollowExceptionException with type SELF_FOLLOWING
+        userService.followUser(user, user);
+    }
+
+    @Test
+    public void shouldNotBeFollowingOtherUser() throws UserException {
+        User userA = userService.register("shouldNotBeFollowingOtherUser_A", "password");
+        User userB = userService.register("shouldNotBeFollowingOtherUser_B", "password");
+        User userC = userService.register("shouldNotBeFollowingOtherUser_C", "password");
+
+        userService.followUser(userA, userB);
+
+        assertWithMessage("User B is not followed by User A")
+                .that(userService.isUserFollowedBy(userB, userA))
+                .isTrue();
+
+        assertWithMessage("User A is not following User B")
+                .that(userService.isUserFollowing(userA, userB))
+                .isTrue();
+
+        userService.followUser(userC, userA);
+
+        assertWithMessage("User C is not following User A")
+                .that(userService.isUserFollowing(userC, userA))
+                .isTrue();
+
+        thrown.expect(UserFollowExceptionMatcher.of(UserFollowException.FollowViolationType.NOT_FOLLOWING));
+
+        // user B has followers, but user C is not following user B. Should throw an UserFollowExceptionException with type NOT_FOLLOWING
+        userService.isUserFollowing(userC, userB);
+    }
+
+    @Test
+    public void shouldNotBeFollowedByOtherUser() throws UserException {
+        // same test as UserServiceTest::shouldNotBeFollowingOtherUser, but checking for different FollowViolationType
+        User userA = userService.register("shouldNotBeFollowedByOtherUser_A", "password");
+        User userB = userService.register("shouldNotBeFollowedByOtherUser_B", "password");
+        User userC = userService.register("shouldNotBeFollowedByOtherUser_C", "password");
+
+        userService.followUser(userA, userB);
+
+        assertWithMessage("User B is not followed by User A")
+                .that(userService.isUserFollowedBy(userB, userA))
+                .isTrue();
+
+        assertWithMessage("User A is not following User B")
+                .that(userService.isUserFollowing(userA, userB))
+                .isTrue();
+
+        userService.followUser(userC, userA);
+
+        assertWithMessage("User C is not following User A")
+                .that(userService.isUserFollowing(userC, userA))
+                .isTrue();
+
+        thrown.expect(UserFollowExceptionMatcher.of(UserFollowException.FollowViolationType.NOT_FOLLOWED_BY));
+
+        // user B has followers, but user C is not following user B. Should throw an UserFollowExceptionException with type NOT_FOLLOWING
+        userService.isUserFollowedBy(userB, userC);
     }
 }
