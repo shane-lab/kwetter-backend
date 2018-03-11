@@ -23,7 +23,7 @@ import javax.inject.Inject;
 import static com.google.common.truth.Truth.assertWithMessage;
 
 @RunWith(WeldJUnit4Runner.class)
-public class KweetServiceTest {
+public class KweetingServiceTest {
 
     @Rule
     public ExpectedException thrown = ExpectedException.none();

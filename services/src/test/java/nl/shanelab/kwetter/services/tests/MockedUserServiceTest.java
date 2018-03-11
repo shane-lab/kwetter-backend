@@ -1,7 +1,5 @@
 package nl.shanelab.kwetter.services.tests;
 
-import nl.shanelab.kwetter.dal.dao.UserDao;
-import nl.shanelab.kwetter.dal.domain.Role;
 import nl.shanelab.kwetter.dal.domain.User;
 import nl.shanelab.kwetter.services.exceptions.UserException;
 import nl.shanelab.kwetter.services.impl.UserServiceImpl;
@@ -9,25 +7,18 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Map;
 
 import static com.google.common.truth.Truth.assertWithMessage;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.Silent.class)
-public class MockedUserServiceTest {
-
-    @Mock
-    UserDao userDaoMock;
+public class MockedUserServiceTest extends BaseMockedServiceTest {
 
     @InjectMocks
     UserServiceImpl userService;
@@ -36,25 +27,11 @@ public class MockedUserServiceTest {
 
     @Before
     public void onSetup() {
-        users = new HashMap<>();
-
-        User u = new User("AnonymousUser", "password", Role.USER);
-        u.setId(0);
-        users.put( u.getId(), u);
-
-        MockitoAnnotations.initMocks(this);
+        super.onSetup();
 
         assertWithMessage("The service was not mocked/injected")
                 .that(userService)
                 .isNotNull();
-    }
-
-    private void mocks() {
-        when(userDaoMock.create(any(User.class))).thenReturn(users.get((long) 0));
-        when(userDaoMock.edit(any(User.class))).thenReturn(users.get((long) 0));
-        when(userDaoMock.getByUsername(anyString())).thenReturn(users.get((long) 0));
-        when(userDaoMock.find(anyLong())).thenReturn(users.get((long) 0));
-        when(userDaoMock.findAll()).thenReturn(users.values());
     }
 
     @Test
