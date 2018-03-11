@@ -22,8 +22,14 @@ public class UserServiceImpl implements UserService {
     }
 
     public User register(String name, String password, Role role) {
-//        User user = getByUserName(name); throw (custom?) error, user already exist
+//        User user = this.getByUserName(name); throw (custom?) error when username already exist
         return userDao.create(new User(name, password, role));
+    }
+
+    public User signIn(String name, String password) {
+        User user = this.getByUserName(name); // throw (custom?) error when no such user exists
+
+        return user != null && user.getPassword().equals(password) ? user : null;
     }
 
     public User edit(User user) {
