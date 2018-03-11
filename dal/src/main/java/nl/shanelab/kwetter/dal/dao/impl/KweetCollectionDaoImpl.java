@@ -9,7 +9,7 @@ import nl.shanelab.kwetter.dal.ejb.DummyData;
 import nl.shanelab.kwetter.dal.qualifiers.InMemoryDao;
 import nl.shanelab.kwetter.util.Patterns;
 
-import javax.ejb.Stateless;
+import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import java.time.LocalDateTime;
 import java.util.Collection;
@@ -20,7 +20,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 @InMemoryDao
-@Stateless
+@ApplicationScoped
 @NoArgsConstructor
 public class KweetCollectionDaoImpl extends BaseCollectionDao implements KweetDao {
 

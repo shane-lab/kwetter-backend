@@ -3,6 +3,8 @@ package nl.shanelab.kwetter.services;
 import nl.shanelab.kwetter.dal.domain.HashTag;
 import nl.shanelab.kwetter.dal.domain.Kweet;
 import nl.shanelab.kwetter.dal.domain.User;
+import nl.shanelab.kwetter.services.exceptions.KweetException;
+import nl.shanelab.kwetter.services.exceptions.UserException;
 
 import java.util.Collection;
 
@@ -15,7 +17,7 @@ public interface KweetingService {
      * @param user The author of the Kweet
      * @return Kweet Returns a newly created Kweet
      */
-    Kweet createKweet(String message, User user);
+    Kweet createKweet(String message, User user) throws UserException;
 
     /**
      * Persists changes to a Kweet
@@ -23,21 +25,21 @@ public interface KweetingService {
      * @param kweet The Kweet to edit
      * @return Kweet Returns the additions made to the Kweet
      */
-    Kweet editKweet(Kweet kweet);
+    Kweet editKweet(Kweet kweet) throws KweetException;
 
     /**
      * Removes a Kweet
      *
      * @param kweet The Kweet to remove
      */
-    void removeKweet(Kweet kweet);
+    void removeKweet(Kweet kweet) throws KweetException;
 
     /**
      * Removes a Kweet by its discriminator value
      *
      * @param id The discriminator value of the Kweet to remove
      */
-    void removeKweet(long id);
+    void removeKweet(long id) throws KweetException;
 
     /**
      * Find a Kweet by its discriminator value
@@ -62,7 +64,7 @@ public interface KweetingService {
      * @param user The author of the Kweets
      * @return Collection<Kweet> Returns a collection of @{nth} Kweets
      */
-    Collection<Kweet> getNthLatestKweetsByUser(int nth, User user);
+    Collection<Kweet> getNthLatestKweetsByUser(int nth, User user) throws UserException;
 
     /**
      * Get a collection of Kweets associated by the given user
@@ -70,7 +72,7 @@ public interface KweetingService {
      * @param user The author associated with the Kweet
      * @return Collection<Kweet> Returns a collection of Kweets associcated with the given user name
      */
-    Collection<Kweet> getKweetsByUser(User user);
+    Collection<Kweet> getKweetsByUser(User user) throws UserException;
 
     /**
      * Get a collection of Kweets associated by the given user name
@@ -78,7 +80,7 @@ public interface KweetingService {
      * @param name The name of the author associated with the Kweet
      * @return Collection<Kweet> Returns a collection of Kweets associcated with the given user name
      */
-    Collection<Kweet> getKweetsByUserName(String name);
+    Collection<Kweet> getKweetsByUserName(String name) throws UserException;
 
     /**
      * Get a collection of Kweets associated by the given user identifier
@@ -86,7 +88,7 @@ public interface KweetingService {
      * @param id The identifier of the author associated with the Kweet
      * @return Collection<Kweet> Returns a collection of Kweets associated with the gieven user identifier
      */
-    Collection<Kweet> getKweetsByUserId(long id);
+    Collection<Kweet> getKweetsByUserId(long id) throws UserException;
 
     /**
      * Get a collection of Kweets with the given hashtag
@@ -118,7 +120,7 @@ public interface KweetingService {
      * @param user The user mentioned in the message of the Kweet
      * @return Collection<Kweet> Returns a collection of Kweets mentioning the username in the message of the Kweet
      */
-    Collection<Kweet> getKweetsWithMention(User user);
+    Collection<Kweet> getKweetsWithMention(User user) throws UserException;
 
     /**
      * Get a collection of Kweets mentioning a username
@@ -126,7 +128,7 @@ public interface KweetingService {
      * @param name The name of user mentioned in the message of the Kweet
      * @return Collection<Kweet> Returns a collection of Kweets mentioning the username in the message of the Kweet
      */
-    Collection<Kweet> getKweetsWithMentionByUserName(String name);
+    Collection<Kweet> getKweetsWithMentionByUserName(String name) throws UserException;
 
     /**
      * Get a collection of Kweets mentioning a username
@@ -134,7 +136,7 @@ public interface KweetingService {
      * @param id The identifier of user mentioned in the message of the Kweet
      * @return Collection<Kweet> Returns a collection of Kweets mentioning the username in the message of the Kweet
      */
-    Collection<Kweet> getKweetsWithMentionByUserId(long id);
+    Collection<Kweet> getKweetsWithMentionByUserId(long id) throws UserException;
 
     /**
      * Get a collection of Kweets favorited by a user
@@ -142,7 +144,7 @@ public interface KweetingService {
      * @param user The the user who has favourited the Kweet
      * @return Collection<Kweet> Returns a collection of Kweets favourited by a user
      */
-    Collection<Kweet> getFavouritedKweets(User user);
+    Collection<Kweet> getFavouritedKweets(User user) throws UserException;
 
     /**
      * Get a collection of Kweets favorited by a username
@@ -150,7 +152,7 @@ public interface KweetingService {
      * @param name The name of the user who has favourited the Kweet
      * @return Collection<Kweet> Returns a collection of Kweets favourited by a user
      */
-    Collection<Kweet> getFavouritedKweetsByUserName(String name);
+    Collection<Kweet> getFavouritedKweetsByUserName(String name) throws UserException;
 
     /**
      * Get a collection of Kweets favorited by a user id
@@ -158,7 +160,7 @@ public interface KweetingService {
      * @param id The identifier of the user who has favourited the Kweet
      * @return Collection<Kweet> Returns a collection of Kweets favourited by a user
      */
-    Collection<Kweet> getFavouritedKweetsByUserId(long id);
+    Collection<Kweet> getFavouritedKweetsByUserId(long id) throws UserException;
 
     /**
      * Checks if a user is mentioned in the given Kweet
@@ -167,7 +169,7 @@ public interface KweetingService {
      * @param user The user to check with
      * @return Boolean Returns true if the user exists and was mentioned in the Kweet
      */
-    boolean isUserMentionedInKweet(Kweet kweet, User user);
+    boolean isUserMentionedInKweet(Kweet kweet, User user) throws KweetException, UserException;
 
     /**
      * Checks if a user favourited the given Kweet
@@ -176,7 +178,18 @@ public interface KweetingService {
      * @param user The user to check with
      * @return Boolean Returns true if the user exists and favourited the Kweet
      */
-    boolean isKweetFavoritedByUser(Kweet kweet, User user);
+    boolean isKweetFavoritedByUser(Kweet kweet, User user) throws KweetException, UserException;
+
+    /**
+     * Checks if a Kweet belongs to a user
+     *
+     * @param kweet The Kweet to check
+     * @param user The user to check
+     * @return Boolean Returns true if the Kweet belongs to the User
+     * @throws KweetException Throws an KweetException if the Kweet was not found
+     * @throws UserException Throws an UserException if the user is not found or not the owner of the Kweet
+     */
+    boolean isKweetOwnedByUser(Kweet kweet, User user) throws KweetException, UserException;
 
     /**
      * Favourites a kweet
@@ -184,7 +197,7 @@ public interface KweetingService {
      * @param kweet The Kweet to favourite
      * @param user The user who favourites the Kweet
      */
-    void favouriteKweet(Kweet kweet, User user);
+    void favouriteKweet(Kweet kweet, User user) throws KweetException, UserException;
 
     /**
      * Un-favourites a Kweet
@@ -192,7 +205,7 @@ public interface KweetingService {
      * @param kweet The Kweet to un-favourite
      * @param user The user who un-favourites the Kweet
      */
-    void unFavouriteKweet(Kweet kweet, User user);
+    void unFavouriteKweet(Kweet kweet, User user) throws KweetException, UserException;
 
     /**
      * Find a hashtag by its discriminator value

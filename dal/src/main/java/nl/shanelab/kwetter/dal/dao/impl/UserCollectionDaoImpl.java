@@ -7,13 +7,16 @@ import nl.shanelab.kwetter.dal.domain.User;
 import nl.shanelab.kwetter.dal.ejb.DummyData;
 import nl.shanelab.kwetter.dal.qualifiers.InMemoryDao;
 
-import javax.ejb.Stateless;
+import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
 @InMemoryDao
-@Stateless
+@ApplicationScoped
 @NoArgsConstructor
 public class UserCollectionDaoImpl extends BaseCollectionDao implements UserDao {
 
