@@ -3,6 +3,7 @@ package nl.shanelab.kwetter.api.dto;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import javax.validation.constraints.NotBlank;
 import java.io.Serializable;
 import java.util.Collection;
 
@@ -30,6 +31,7 @@ public class UserDto implements Serializable {
      *
      * @see nl.shanelab.kwetter.dal.domain.Role
      */
+    @NotBlank(message = "Role may not be blank")
     private String role;
 
     /**

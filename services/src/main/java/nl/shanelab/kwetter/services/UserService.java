@@ -37,7 +37,7 @@ public interface UserService {
      * @return User Returns the user matching the given credentials
      * @throws UserException Throws an exception when no user was found with the given name or credentials mismatched
      */
-    User signIn(String name, String password) throws UserException;
+    User authenticate(String name, String password) throws UserException;
 
     /**
      * Sets a new username for the user
