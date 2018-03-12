@@ -315,6 +315,7 @@ public class KweetCollectionDaoImpl extends BaseCollectionDao implements KweetDa
 
         for (String hashTagName : hashTagNames) {
             HashTag hashTag = new HashTag(hashTagName);
+            hashTag.setId(data.getHashTags().size());
 
             data.getHashTags().put((long) data.getHashTags().size(), hashTag);
 
