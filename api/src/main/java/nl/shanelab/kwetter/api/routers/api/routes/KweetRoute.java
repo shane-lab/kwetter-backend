@@ -10,6 +10,7 @@ import nl.shanelab.kwetter.services.KweetingService;
 import nl.shanelab.kwetter.services.UserService;
 import nl.shanelab.kwetter.services.exceptions.KweetException;
 import nl.shanelab.kwetter.services.exceptions.UserException;
+import nl.shanelab.kwetter.services.exceptions.kweet.KweetNotFoundException;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -58,8 +59,12 @@ public class KweetRoute extends BaseRoute {
 
     @GET
     @Path("/{id}")
-    public Response getKweetById(@Valid @PathParam("id") long id) throws KweetException {
+    public Response getKweetById(@Valid @PathParam("id") long id) throws KweetNotFoundException {
         Kweet kweet = kweetingService.getKweetById(id);
+
+        if (kweet == null) {
+            throw new KweetNotFoundException(id);
+        }
 
         KweetDto kweetDto = KweetMapper.INSTANCE.kweetToDto(kweet);
 

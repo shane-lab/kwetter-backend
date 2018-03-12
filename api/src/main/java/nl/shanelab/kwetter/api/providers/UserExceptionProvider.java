@@ -37,7 +37,7 @@ public class UserExceptionProvider implements ExceptionMapper<UserException> {
         ALREADY_EXISTS(UserAlreadyExistsException.class, Response.Status.CONFLICT),
         NOT_FOUND(UserNotFoundException.class, Response.Status.NOT_FOUND),
         INCORRECT_CREDENTIALS(UserIncorrectCredentialsException.class, Response.Status.NOT_FOUND),
-        FOLLOW_RELATED(UserFollowException.class, Response.Status.METHOD_NOT_ALLOWED);
+        FOLLOW_RELATED(UserFollowException.class, Response.Status.BAD_GATEWAY);
 
         private final Class<? extends UserException> klass;
 

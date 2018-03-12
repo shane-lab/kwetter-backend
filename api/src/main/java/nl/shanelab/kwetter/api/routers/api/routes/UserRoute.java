@@ -98,6 +98,37 @@ public class UserRoute extends BaseRoute {
         return Response.ok().build();
     }
 
+    @POST
+    @Path("/{id}/follow/{id1}")
+    public Response followUser(@Valid @PathParam("id") long id, @Valid @PathParam("id1") long id1) throws UserException {
+        User userA = userService.getById(id);
+        User userB = userService.getById(id1);
+
+        userService.followUser(userA, userB);
+
+        return Response.ok().build();
+    }
+
+    @DELETE
+    @Path("/{id}/follow/{id1}")
+    public Response unFollowUser(@Valid @PathParam("id") long id, @Valid @PathParam("id1") long id1) throws UserException {
+        User userA = userService.getById(id);
+        User userB = userService.getById(id1);
+
+        userService.unFollowUser(userA, userB);
+
+        return Response.ok().build();
+    }
+
+    @GET
+    @Path("/{id}/follows/{id1}")
+    public Response follows(@Valid @PathParam("id") long id, @Valid @PathParam("id1") long id1) throws UserException {
+        User userA = userService.getById(id);
+        User userB = userService.getById(id1);
+
+        return Response.ok().status(userService.isUserFollowing(userA, userB) ? Response.Status.OK : Response.Status.BAD_REQUEST).build();
+    }
+
     @NoArgsConstructor
     public static class UserCredentials {
         @Pattern(regexp = Patterns.NO_SPACES_PATTERN)

@@ -2,6 +2,7 @@ package nl.shanelab.kwetter.api.routers.api;
 
 import io.swagger.jaxrs2.integration.resources.OpenApiResource;
 import nl.shanelab.kwetter.api.providers.*;
+import nl.shanelab.kwetter.api.routers.api.routes.HashTagRoute;
 import nl.shanelab.kwetter.api.routers.api.routes.KweetRoute;
 import nl.shanelab.kwetter.api.routers.api.routes.UserRoute;
 import org.glassfish.jersey.jackson.JacksonFeature;
@@ -24,6 +25,7 @@ public class ApiRouter extends Application {
         // routes
         resources.add(UserRoute.class);
         resources.add(KweetRoute.class);
+        resources.add(HashTagRoute.class);
 
         // extensions
         resources.add(OpenApiResource.class);
