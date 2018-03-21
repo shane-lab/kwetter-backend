@@ -12,6 +12,8 @@ import javax.annotation.PostConstruct;
 import javax.ejb.Singleton;
 import javax.ejb.Startup;
 import javax.inject.Inject;
+import java.util.HashSet;
+import java.util.Set;
 
 @Startup
 @Singleton
@@ -38,7 +40,13 @@ public class ServicesStartup {
         userDao.createFollow(userShane, userAdmin);
         userDao.createFollow(userShane, userMod);
 
-        kweetDao.create(new Kweet("First Kweet, Hello World!", userAdmin));
-        kweetDao.create(new Kweet("Anyone else on this platform? @admin", userShane));
+        kweetDao.create(new Kweet("First Kweet, Hello World! #JEA6", userAdmin));
+        Kweet kweetWithMention = kweetDao.create(new Kweet("Anyone else on this platform? @admin", userShane));
+
+        Set<User> mentions = new HashSet<>();
+        mentions.add(userAdmin);
+
+        kweetWithMention.setMentions(mentions);
+        kweetDao.edit(kweetWithMention);
     }
 }

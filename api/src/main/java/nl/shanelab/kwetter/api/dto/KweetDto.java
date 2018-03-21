@@ -33,6 +33,11 @@ public class KweetDto implements Serializable {
     private String author;
 
     /**
+     * The creation date of the kweet
+     */
+    private String createdAt;
+
+    /**
      * The mapping from a collection of user entities to a list of mentioned usernames in the kweet
      *
      * @see nl.shanelab.kwetter.dal.domain.User

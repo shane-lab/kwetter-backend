@@ -8,11 +8,14 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
 import java.util.Set;
 
+import static nl.shanelab.kwetter.util.Patterns.NO_SPACES_PATTERN;
+
 @Data
 @Entity
 @EqualsAndHashCode(exclude = {"kweets", "favoriteKweets", "followers", "following"})
 @NoArgsConstructor
 @RequiredArgsConstructor
+@ToString(exclude = {"kweets", "favoriteKweets", "followers", "following"})
 public class User {
 
     @Id
@@ -23,7 +26,7 @@ public class User {
     private long id;
 
     @NotBlank(message = "The username may not be set as empty")
-    @Pattern(regexp = "/[^\\s+]/g", message = "The username may not contain any whitespaces")
+    @Pattern(regexp = NO_SPACES_PATTERN, message = "The username may not contain any whitespaces")
     @Column(unique = true)
     @NonNull
     /**
@@ -32,7 +35,7 @@ public class User {
     private String username;
 
     @NotBlank(message = "The password may not be set as empty")
-    @Pattern(regexp = "/[^\\s+]/g", message = "The password may not contain any whitespaces")
+    @Pattern(regexp = NO_SPACES_PATTERN, message = "The password may not contain any whitespaces")
     @Column
     @NonNull
     /**

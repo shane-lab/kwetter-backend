@@ -7,6 +7,7 @@ import nl.shanelab.kwetter.services.exceptions.KweetException;
 import nl.shanelab.kwetter.services.exceptions.UserException;
 
 import java.util.Collection;
+import java.util.Date;
 
 public interface KweetingService {
 
@@ -229,4 +230,12 @@ public interface KweetingService {
      * @return Collection<HashTag> Returns all hashtags
      */
     Collection<HashTag> getAllHashTags();
+
+    /**
+     * Find all trending hashtags by date
+     *
+     * @param date The date in which the hashtag was trending
+     * @return Collection<HashTag> Returns all trending hashtags of the given week
+     */
+    Collection<HashTag> getTrendingHashTags(Date date);
 }

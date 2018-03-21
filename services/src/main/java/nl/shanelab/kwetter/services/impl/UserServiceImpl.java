@@ -40,7 +40,7 @@ public class UserServiceImpl implements UserService {
         return userDao.create(new User(name, password, role));
     }
 
-    public User signIn(String name, String password) throws UserException {
+    public User authenticate(String name, String password) throws UserException {
         if (name == null || password == null) {
             throw new IllegalArgumentException();
         }
@@ -76,6 +76,8 @@ public class UserServiceImpl implements UserService {
         if (this.getById(user.getId()) == null) {
             throw new UserNotFoundException(user.getId());
         }
+
+        user.setBio(bio);
 
         return userDao.edit(user);
     }

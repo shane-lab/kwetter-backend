@@ -55,7 +55,7 @@ public class UserServiceTest {
     public void shouldSignInSuccessfully() throws UserException {
         User user = userService.register("shouldSignInSuccessfully", "password");
 
-        User signedInUser = userService.signIn(user.getUsername(), user.getPassword());
+        User signedInUser = userService.authenticate(user.getUsername(), user.getPassword());
 
         assertThat(user).isEqualTo(signedInUser);
     }
@@ -63,7 +63,7 @@ public class UserServiceTest {
     @Test(expected = UserNotFoundException.class)
     public void shouldNotSignInWithNonExistingUser() throws UserException {
         // sign in with a non exisiting user. Should throw an UserNotFoundException
-        userService.signIn("shouldNotSignInWithNonExistingUser", "password");
+        userService.authenticate("shouldNotSignInWithNonExistingUser", "password");
     }
 
     @Test(expected = UserIncorrectCredentialsException.class)
@@ -71,7 +71,7 @@ public class UserServiceTest {
         User user = userService.register("shouldNotSignInWithWrongCredentials", "password");
 
         // sign in with an existing username, but with the wrong password. Should throw an UserIncorrectCredentialsException
-        userService.signIn(user.getUsername(), "indifferentPassword");
+        userService.authenticate(user.getUsername(), "indifferentPassword");
     }
 
     @Test

@@ -6,6 +6,7 @@ import nl.shanelab.kwetter.dal.qualifiers.JPADao;
 
 import javax.ejb.Stateless;
 import java.util.Collection;
+import java.util.Date;
 
 @JPADao
 @Stateless
@@ -36,6 +37,11 @@ public class HashTagJPADaoImpl implements HashTagDao {
     }
 
     public HashTag getByName(String name) {
+        return null;
+    }
+
+    @Override
+    public Collection<HashTag> getTrending(Date date) {
         return null;
     }
 }
