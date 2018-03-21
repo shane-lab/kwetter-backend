@@ -23,6 +23,7 @@ import javax.ws.rs.core.Response;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Path("/kweets")
 @Produces(MediaType.APPLICATION_JSON)
@@ -38,11 +39,10 @@ public class KweetRoute extends BaseRoute {
     @GET
     @Path("/")
     public Response getAllKweets() {
-        Set<KweetDto> kweetDtos = new HashSet<>();
 
-        kweetingService.getAllKweets().forEach(kweet -> kweetDtos.add(KweetMapper.INSTANCE.kweetToDto(kweet)));
-
-        return ok(kweetDtos);
+        return ok(kweetingService.getAllKweets().stream()
+                .map(kweet -> KweetMapper.INSTANCE.kweetToDto(kweet))
+                .collect(Collectors.toSet()));
     }
 
     @POST
@@ -86,7 +86,9 @@ public class KweetRoute extends BaseRoute {
 
         Collection<Kweet> kweets = kweetingService.getKweetsByUserId(id);
         if (kweets != null) {
-            kweets.forEach(kweet -> kweetDtos.add(KweetMapper.INSTANCE.kweetToDto(kweet)));
+            kweets.stream()
+                    .map(kweet -> KweetMapper.INSTANCE.kweetToDto(kweet))
+                    .forEach(kweetDtos::add);
         }
 
         return ok(kweetDtos);

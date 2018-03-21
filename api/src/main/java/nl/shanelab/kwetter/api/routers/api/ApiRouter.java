@@ -37,6 +37,7 @@ public class ApiRouter extends Application {
         resources.add(CrossOriginProvider.class);
         resources.add(UnrecognizedPropertyProvider.class);
         resources.add(UserExceptionProvider.class);
+        resources.add(WebExceptionProvider.class);
 
         // TODO set self as resource
 //        resources.add(ApiRouter.class);

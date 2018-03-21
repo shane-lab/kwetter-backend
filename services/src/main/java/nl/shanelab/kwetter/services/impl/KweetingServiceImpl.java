@@ -11,12 +11,14 @@ import nl.shanelab.kwetter.dal.qualifiers.InMemoryDao;
 import nl.shanelab.kwetter.services.KweetingService;
 import nl.shanelab.kwetter.services.exceptions.KweetException;
 import nl.shanelab.kwetter.services.exceptions.UserException;
-import nl.shanelab.kwetter.services.exceptions.kweet.*;
+import nl.shanelab.kwetter.services.exceptions.kweet.KweetFavouriteException;
+import nl.shanelab.kwetter.services.exceptions.kweet.KweetNotFoundException;
 import nl.shanelab.kwetter.services.exceptions.user.UserNotFoundException;
 
 import javax.ejb.Stateless;
 import javax.inject.Inject;
 import java.util.Collection;
+import java.util.Date;
 
 @Stateless
 @NoArgsConstructor
@@ -190,6 +192,10 @@ public class KweetingServiceImpl implements KweetingService {
 
     public Collection<HashTag> getAllHashTags() {
         return hashTagDao.findAll();
+    }
+
+    public Collection<HashTag> getTrendingHashTags(Date date) {
+        return hashTagDao.getTrending(date);
     }
 
     /**

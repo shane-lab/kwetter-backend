@@ -1,5 +1,6 @@
 package nl.shanelab.kwetter.api.routers.api.routes;
 
+import lombok.Getter;
 import nl.shanelab.kwetter.api.dto.HashTagDto;
 import nl.shanelab.kwetter.api.routers.BaseRoute;
 import nl.shanelab.kwetter.dal.domain.HashTag;
@@ -8,14 +9,16 @@ import nl.shanelab.kwetter.services.KweetingService;
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
 import javax.validation.Valid;
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
+import javax.validation.constraints.NotBlank;
+import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.util.HashSet;
-import java.util.Set;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.LinkedHashSet;
+import java.util.stream.Collectors;
 
 @Path("/hashtags")
 @Produces(MediaType.APPLICATION_JSON)
@@ -28,11 +31,10 @@ public class HashTagRoute extends BaseRoute {
     @GET
     @Path("/")
     public Response getAllHashTags() {
-        Set<HashTagDto> hashTagDtos = new HashSet<>();
 
-        kweetingService.getAllHashTags().forEach(hashTag -> hashTagDtos.add(mapHashTag(hashTag)));
-
-        return ok(hashTagDtos);
+        return ok(kweetingService.getAllHashTags().stream()
+                .map(hashTag -> mapHashTag(hashTag))
+                .collect(Collectors.toSet()));
     }
 
     @GET
@@ -45,12 +47,36 @@ public class HashTagRoute extends BaseRoute {
         return ok(hashTagDto);
     }
 
+    @GET
+    @Path("/trending/{date}")
+    public Response getTrendingHashTags(@Valid @PathParam("date") DateParam date) {
+
+        return ok(kweetingService.getTrendingHashTags(date.getDate()).stream()
+                .map(hashTag -> mapHashTag(hashTag))
+                .collect(Collectors.toCollection(LinkedHashSet::new)));
+    }
+
     private HashTagDto mapHashTag(HashTag hashTag) {
         HashTagDto hashTagDto = new HashTagDto();
         hashTagDto.setId(hashTag.getId());
         hashTagDto.setName(hashTag.getName());
 
         return hashTagDto;
+    }
+
+    @Getter
+    public static class DateParam {
+        private final Date date;
+
+        public DateParam(@NotBlank(message = "No date time was given") String date) {
+            final DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+            try {
+                this.date = dateFormat.parse(date);
+            } catch (ParseException e) {
+                throw new WebApplicationException(String.format("The given date '%s' does not satisfy the expected date format", date));
+            }
+        }
+
     }
 
 }

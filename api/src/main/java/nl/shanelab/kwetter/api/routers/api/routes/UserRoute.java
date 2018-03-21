@@ -19,8 +19,7 @@ import javax.validation.constraints.Size;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.stream.Collectors;
 
 @Path("/users")
 @Produces(MediaType.APPLICATION_JSON)
@@ -33,11 +32,10 @@ public class UserRoute extends BaseRoute {
     @GET
     @Path("/")
     public Response getUsers() {
-        Set<UserDto> usersDtos = new HashSet<>();
 
-        userService.getAllUsers().forEach(user -> usersDtos.add(UserMapper.INSTANCE.userAsDTO(user)));
-
-        return ok(usersDtos);
+        return ok(userService.getAllUsers().stream()
+                .map(user -> UserMapper.INSTANCE.userAsDTO(user))
+                .collect(Collectors.toSet()));
     }
 
     @POST

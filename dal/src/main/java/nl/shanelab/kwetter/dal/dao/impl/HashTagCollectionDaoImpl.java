@@ -8,8 +8,11 @@ import nl.shanelab.kwetter.dal.qualifiers.InMemoryDao;
 
 import javax.ejb.Stateless;
 import javax.inject.Inject;
-import java.util.Collection;
+import java.time.temporal.TemporalField;
+import java.time.temporal.WeekFields;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.stream.Collectors;
 
 @InMemoryDao
 @Stateless
@@ -75,5 +78,39 @@ public class HashTagCollectionDaoImpl extends BaseCollectionDao implements HashT
         });
 
         return hashTagRef.get();
+    }
+
+    public Collection<HashTag> getTrending(Date date) {
+        AtomicReference<Map<String, Integer>> hashTagsRef = new AtomicReference<>(new TreeMap<>());
+
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(date);
+
+        int year = calendar.getWeekYear();
+        int week = calendar.get(Calendar.WEEK_OF_YEAR);
+
+        TemporalField woy = WeekFields.of(Locale.getDefault()).weekOfWeekBasedYear();
+
+        this.data.getKweets().values().stream()
+                .filter(kweet -> kweet.getHashTags() != null && kweet.getHashTags().size() > 0
+                        && kweet.getCreatedAt().getYear() == year && kweet.getCreatedAt().get(woy) == week)
+                .forEach(kweet -> {
+                    Map<String, Integer> hashTags = hashTagsRef.get();
+
+                    kweet.getHashTags().forEach(hashTag -> {
+                        int occurences = 0;
+                        if (hashTags.keySet().contains(hashTag.getName())) {
+                            occurences = hashTags.get(hashTag.getName());
+                        }
+                        hashTags.put(hashTag.getName(), ++occurences);
+                    });
+
+                    hashTagsRef.set(hashTags);
+                });
+
+        return hashTagsRef.get().entrySet().stream()
+                .sorted((o1, o2) -> o2.getValue() == o1.getValue() ? 0 : o2.getValue() > o1.getValue() ? 1 : -1)
+                .map(stringIntegerEntry -> this.getByName(stringIntegerEntry.getKey()))
+                .collect(Collectors.toCollection(LinkedHashSet::new));
     }
 }

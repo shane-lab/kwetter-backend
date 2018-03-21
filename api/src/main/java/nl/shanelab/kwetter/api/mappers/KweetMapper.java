@@ -8,6 +8,8 @@ import org.mapstruct.Mapping;
 import org.mapstruct.Mappings;
 import org.mapstruct.factory.Mappers;
 
+import java.time.LocalDateTime;
+
 @Mapper
 /**
  * Creates a DTO mapping for the Kweet class
@@ -25,6 +27,7 @@ public interface KweetMapper {
     @Mappings({
             @Mapping(source = "author", target = "author", resultType = String.class),
             @Mapping(source = "mentions", target = "mentions"),
+            @Mapping(source = "createdAt", target = "createdAt", resultType = String.class)
     })
     /**
      * Creates a mapping from Kweet to KweetDTO
@@ -42,5 +45,9 @@ public interface KweetMapper {
      */
     default String mapUserToUsername(User user) {
         return user != null ? user.getUsername() : null;
+    }
+
+    default String mapLocalDateTimeToString(LocalDateTime dateTime) {
+        return dateTime.toString();
     }
 }
