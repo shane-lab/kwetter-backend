@@ -8,11 +8,13 @@ import nl.shanelab.kwetter.dal.domain.User;
 
 import javax.annotation.PostConstruct;
 import javax.ejb.Singleton;
+import javax.enterprise.context.ApplicationScoped;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+@ApplicationScoped
 @Singleton
 @Getter
 /**

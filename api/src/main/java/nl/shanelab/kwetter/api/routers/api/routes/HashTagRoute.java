@@ -5,7 +5,7 @@ import nl.shanelab.kwetter.api.routers.BaseRoute;
 import nl.shanelab.kwetter.dal.domain.HashTag;
 import nl.shanelab.kwetter.services.KweetingService;
 
-import javax.enterprise.context.ApplicationScoped;
+import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
 import javax.validation.Valid;
 import javax.ws.rs.GET;
@@ -19,7 +19,7 @@ import java.util.Set;
 
 @Path("/hashtags")
 @Produces(MediaType.APPLICATION_JSON)
-@ApplicationScoped
+@RequestScoped
 public class HashTagRoute extends BaseRoute {
 
     @Inject

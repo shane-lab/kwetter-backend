@@ -11,7 +11,7 @@ import nl.shanelab.kwetter.services.exceptions.UserException;
 import nl.shanelab.kwetter.services.exceptions.user.UserNotFoundException;
 import nl.shanelab.kwetter.util.Patterns;
 
-import javax.enterprise.context.ApplicationScoped;
+import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
 import javax.validation.Valid;
 import javax.validation.constraints.Pattern;
@@ -24,7 +24,7 @@ import java.util.Set;
 
 @Path("/users")
 @Produces(MediaType.APPLICATION_JSON)
-@ApplicationScoped
+@RequestScoped
 public class UserRoute extends BaseRoute {
 
     @Inject

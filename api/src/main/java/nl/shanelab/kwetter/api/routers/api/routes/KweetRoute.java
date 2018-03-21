@@ -12,7 +12,7 @@ import nl.shanelab.kwetter.services.exceptions.KweetException;
 import nl.shanelab.kwetter.services.exceptions.UserException;
 import nl.shanelab.kwetter.services.exceptions.kweet.KweetNotFoundException;
 
-import javax.enterprise.context.ApplicationScoped;
+import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
@@ -26,7 +26,7 @@ import java.util.Set;
 
 @Path("/kweets")
 @Produces(MediaType.APPLICATION_JSON)
-@ApplicationScoped
+@RequestScoped
 public class KweetRoute extends BaseRoute {
 
     @Inject
