@@ -8,7 +8,9 @@ import org.mapstruct.Mapping;
 import org.mapstruct.Mappings;
 import org.mapstruct.factory.Mappers;
 
-@Mapper(uses = KweetMapper.class)
+import java.util.Collection;
+
+@Mapper
 /**
  * Creates a DTO mapping for the User class
  *
@@ -24,8 +26,7 @@ public interface UserMapper {
 
     @Mappings({
             @Mapping(source = "role", target = "role", resultType = String.class),
-            @Mapping(source = "role", target = "roleId", resultType = Integer.class),
-            @Mapping(source = "kweets", target = "kweets")
+            @Mapping(source = "role", target = "roleId", resultType = Integer.class)
     })
     /**
      * Creates a mapping from User to UserDto
@@ -43,5 +44,15 @@ public interface UserMapper {
      */
     default Integer mapRoleToInt(Role role) {
         return role.getId();
+    }
+
+    /**
+     * Auto-accessible mapper method to map rom a collection to the amount of records in the collection
+     *
+     * @param collection The collection to check
+     * @return Integer Returns the amount of records in the collection
+     */
+    default Integer mapCollectionToInt(Collection<?> collection) {
+        return collection != null ? collection.size() : 0;
     }
 }

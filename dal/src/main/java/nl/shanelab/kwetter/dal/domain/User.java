@@ -1,6 +1,7 @@
 package nl.shanelab.kwetter.dal.domain;
 
 import lombok.*;
+import nl.shanelab.kwetter.dal.jpa.RoleConverter;
 
 import javax.persistence.*;
 import javax.validation.constraints.Max;
@@ -16,10 +17,18 @@ import static nl.shanelab.kwetter.util.Patterns.NO_SPACES_PATTERN;
 @NoArgsConstructor
 @RequiredArgsConstructor
 @ToString(exclude = {"kweets", "favoriteKweets", "followers", "following"})
+@NamedQueries({
+        @NamedQuery(name = "User.findByName", query = "SELECT DISTINCT u FROM User u WHERE u.username = :username"),
+//        @NamedQuery(name = "User.followedBy", query = "SELECT COUNT(u) FROM User u WHERE u.id = :id AND :follower_id IN(u.followers)")
+})
+//@NamedNativeQueries({
+//        @NamedNativeQuery(name = "User.followedBy", query = "SELECT COUNT(*) FROM follower_following ff WHERE following_id = :following_id AND follower_id = :follower_id")
+//})
 public class User {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+//    @Column(unique = true, nullable = false)
     /**
      * The user identifier
      */
@@ -43,14 +52,18 @@ public class User {
      */
     private String password;
 
-    @Enumerated(value = EnumType.ORDINAL)
+    @Convert(converter = RoleConverter.class)
+    @Column(name = "role_id")
     @NonNull
     /**
      * The restricted user role, used grants permission for certain actions
      */
     private Role role;
 
-    @OneToMany(mappedBy = "author",fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "author",fetch = FetchType.LAZY, orphanRemoval = true, cascade = CascadeType.ALL)
+    @JoinTable(name = "user_kweet", joinColumns = {
+            @JoinColumn(name="kweet_id", referencedColumnName = "id", nullable = false)
+    })
     /**
      * A collection of Kweets posted by a user
      */
@@ -63,12 +76,18 @@ public class User {
     private Set<Kweet> favoriteKweets;
 
     @ManyToMany(mappedBy = "following", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinTable(name = "follower_following", inverseJoinColumns = {
+            @JoinColumn(name = "following_id", referencedColumnName = "id", nullable = false)
+    })
     /**
      * A collection of Users who follow the user
      */
     private Set<User> followers;
 
     @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(name = "follower_following", joinColumns = {
+            @JoinColumn(name = "follower_id", referencedColumnName = "id", nullable = false)
+    })
     /**
      * A collection of Users who the user is following
      */

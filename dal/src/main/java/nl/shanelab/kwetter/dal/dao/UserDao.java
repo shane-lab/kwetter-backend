@@ -58,4 +58,20 @@ public interface UserDao extends GenericDao<User, Long> {
      */
     void unFollow(User a, User b);
 
+    default boolean validateUserPair(User a, User b) {
+        if (a == null || b == null) {
+            return false;
+        }
+        if (a.equals(b)) {
+            return false; // cant follow same person
+        }
+        User foundA = this.find(a.getId());
+        User foundB = this.find(b.getId());
+        if (!a.equals(foundA) || !b.equals(foundB)) {
+            return false; // not in repository
+        }
+
+        return true;
+    }
+
 }

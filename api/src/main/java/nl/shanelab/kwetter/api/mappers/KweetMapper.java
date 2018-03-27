@@ -9,6 +9,7 @@ import org.mapstruct.Mappings;
 import org.mapstruct.factory.Mappers;
 
 import java.time.LocalDateTime;
+import java.util.Collection;
 
 @Mapper
 /**
@@ -27,7 +28,8 @@ public interface KweetMapper {
     @Mappings({
             @Mapping(source = "author", target = "author", resultType = String.class),
             @Mapping(source = "mentions", target = "mentions"),
-            @Mapping(source = "createdAt", target = "createdAt", resultType = String.class)
+            @Mapping(source = "createdAt", target = "createdAt", resultType = String.class),
+            @Mapping(source = "favoritedBy", target = "favorites", resultType = Integer.class)
     })
     /**
      * Creates a mapping from Kweet to KweetDTO
@@ -47,7 +49,23 @@ public interface KweetMapper {
         return user != null ? user.getUsername() : null;
     }
 
+    /**
+     * Auto-accessible mapped method to map from LocalDateTime to a string representation of the date
+     *
+     * @param dateTime The date to map
+     * @return String Returns a representation of the date in standard date format
+     */
     default String mapLocalDateTimeToString(LocalDateTime dateTime) {
         return dateTime.toString();
+    }
+
+    /**
+     * Auto-accessible mapper method to map rom a collection to the amount of records in the collection
+     *
+     * @param collection The collection to check
+     * @return Integer Returns the amount of records in the collection
+     */
+    default Integer mapCollectionToInt(Collection<?> collection) {
+        return collection != null ? collection.size() : 0;
     }
 }

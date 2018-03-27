@@ -5,7 +5,6 @@ import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.NotBlank;
 import java.io.Serializable;
-import java.util.Collection;
 
 @Data
 @NoArgsConstructor
@@ -42,9 +41,19 @@ public class UserDto implements Serializable {
     private int roleId;
 
     /**
-     * A collection of kweets posted by a user
+     * The amount of kweets posted by a user
      */
-    private Collection<KweetDto> kweets;
+    private int kweets;
+
+    /**
+     * The amount of users the user is following
+     */
+    private int following;
+
+    /**
+     * The amount of followings the user has
+     */
+    private int followers;
 
     /**
      * The biographical description of a user

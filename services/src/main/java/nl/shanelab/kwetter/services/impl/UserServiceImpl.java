@@ -4,7 +4,7 @@ import lombok.NoArgsConstructor;
 import nl.shanelab.kwetter.dal.dao.UserDao;
 import nl.shanelab.kwetter.dal.domain.Role;
 import nl.shanelab.kwetter.dal.domain.User;
-import nl.shanelab.kwetter.dal.qualifiers.InMemoryDao;
+import nl.shanelab.kwetter.dal.qualifiers.JPADao;
 import nl.shanelab.kwetter.services.UserService;
 import nl.shanelab.kwetter.services.exceptions.UserException;
 import nl.shanelab.kwetter.services.exceptions.user.UserAlreadyExistsException;
@@ -16,13 +16,15 @@ import javax.ejb.Stateless;
 import javax.inject.Inject;
 import java.util.Collection;
 
+import static nl.shanelab.kwetter.services.util.UserFollowHelper.with;
+
 @Stateless
 @NoArgsConstructor
 //@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class UserServiceImpl implements UserService {
 
     @Inject
-    @InMemoryDao
+    @JPADao
     UserDao userDao;
 
     public User register(String name, String password) throws UserException {
@@ -96,7 +98,7 @@ public class UserServiceImpl implements UserService {
     public boolean isUserFollowedBy(User a, User b) throws UserException {
         validateUserFollowPair(a, b);
 
-        if (!userDao.isFollowedBy(a, b)) {
+        if (!with(userDao).is(a).followedBy(b)) {
             throw new UserFollowException(UserFollowException.FollowViolationType.NOT_FOLLOWED_BY);
         }
 
@@ -106,7 +108,7 @@ public class UserServiceImpl implements UserService {
     public boolean isUserFollowing(User a, User b) throws UserException {
         validateUserFollowPair(a, b);
 
-        if (!userDao.isFollowing(a, b)) {
+        if (!with(userDao).is(a).following(b)) {
             throw new UserFollowException(UserFollowException.FollowViolationType.NOT_FOLLOWING);
         }
 
@@ -120,13 +122,13 @@ public class UserServiceImpl implements UserService {
             throw new UserFollowException(UserFollowException.FollowViolationType.SELF_FOLLOWING);
         }
 
-        userDao.createFollow(a, b);
+        with(userDao).make(a).follow(b);
     }
 
     public void unFollowUser(User a, User b) throws UserException {
         validateUserFollowPair(a, b);
 
-        userDao.unFollow(a, b);
+        with(userDao).make(a).unFollow(b);
     }
 
     public User getById(long id) {

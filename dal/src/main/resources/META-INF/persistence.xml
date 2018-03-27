@@ -2,12 +2,15 @@
     <persistence-unit name="kwetter_pu" transaction-type="JTA">
         <jta-data-source>jdbc/kwetter_db</jta-data-source>
 
-        <class>nl.shanelab.kwetter.dal.domain.HashTag</class>
-        <class>nl.shanelab.kwetter.dal.domain.Kweet</class>
-        <class>nl.shanelab.kwetter.dal.domain.User</class>
-
         <properties>
+            <property name="openjpa.jdbc.SynchronizeMappings" value="buildSchema(ForeignKeys=true)"/>
+
             <property name="javax.persistence.schema-generation.database.action" value="drop-and-create"/>
+
+            <property name="com.acme.persistence.sql-logging" value="on"/>
+
+            <!--<property name="javax.persistence.schema-generation.drop-source" value="script"/>-->
+            <!--<property name="javax.persistence.schema-generation.drop-script-source" value="META-INF/drop.sql"/>-->
         </properties>
     </persistence-unit>
 </persistence>

@@ -26,7 +26,6 @@ public class BaseRoute {
     @RequiredArgsConstructor
     protected static class ResultEntity {
 
-        @NonNull
         protected int statusCode = Response.Status.OK.getStatusCode();
 
         @NonNull
@@ -38,7 +37,6 @@ public class BaseRoute {
     @RequiredArgsConstructor
     protected static class ErrorEntity {
 
-        @NonNull
         protected int statusCode = Response.Status.BAD_REQUEST.getStatusCode();
 
         private boolean error = true;
