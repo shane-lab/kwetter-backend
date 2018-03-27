@@ -7,7 +7,7 @@ import nl.shanelab.kwetter.dal.dao.UserDao;
 import nl.shanelab.kwetter.dal.domain.HashTag;
 import nl.shanelab.kwetter.dal.domain.Kweet;
 import nl.shanelab.kwetter.dal.domain.User;
-import nl.shanelab.kwetter.dal.qualifiers.InMemoryDao;
+import nl.shanelab.kwetter.dal.qualifiers.JPADao;
 import nl.shanelab.kwetter.services.KweetingService;
 import nl.shanelab.kwetter.services.exceptions.KweetException;
 import nl.shanelab.kwetter.services.exceptions.UserException;
@@ -24,15 +24,15 @@ import java.util.Date;
 @NoArgsConstructor
 public class KweetingServiceImpl implements KweetingService {
 
-    @InMemoryDao
+    @JPADao
     @Inject
     UserDao userDao;
 
-    @InMemoryDao
+    @JPADao
     @Inject
     KweetDao kweetDao;
 
-    @InMemoryDao
+    @JPADao
     @Inject
     HashTagDao hashTagDao;
 

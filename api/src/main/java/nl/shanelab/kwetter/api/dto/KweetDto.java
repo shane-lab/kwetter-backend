@@ -49,4 +49,9 @@ public class KweetDto implements Serializable {
      */
     private Collection<HashTagDto> hashTags;
 
+    /**
+     * The amount of times the Kweet was favourited
+     */
+    private int favorites;
+
 }

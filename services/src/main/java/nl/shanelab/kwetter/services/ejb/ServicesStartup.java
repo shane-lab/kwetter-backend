@@ -1,52 +1,51 @@
 package nl.shanelab.kwetter.services.ejb;
 
-import nl.shanelab.kwetter.dal.dao.HashTagDao;
 import nl.shanelab.kwetter.dal.dao.KweetDao;
 import nl.shanelab.kwetter.dal.dao.UserDao;
 import nl.shanelab.kwetter.dal.domain.Kweet;
 import nl.shanelab.kwetter.dal.domain.Role;
 import nl.shanelab.kwetter.dal.domain.User;
-import nl.shanelab.kwetter.dal.qualifiers.InMemoryDao;
+import nl.shanelab.kwetter.dal.qualifiers.JPADao;
 
 import javax.annotation.PostConstruct;
 import javax.ejb.Singleton;
 import javax.ejb.Startup;
+import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
-import java.util.HashSet;
-import java.util.Set;
 
 @Startup
 @Singleton
+@ApplicationScoped
 public class ServicesStartup {
 
     @Inject
-    @InMemoryDao
+    @JPADao
     UserDao userDao;
 
     @Inject
-    @InMemoryDao
+    @JPADao
     KweetDao kweetDao;
-
-    @Inject
-    @InMemoryDao
-    HashTagDao hashTagDao;
 
     @PostConstruct
     private void onPostConstruct() {
-        User userShane = userDao.create(new User("shane", "password", Role.USER));
-        User userMod = userDao.create(new User("mod", "password", Role.MODERATOR));
-        User userAdmin = userDao.create(new User("admin", "password", Role.ADMINISTRATOR));
+        try {
+            this.createInitialEntities();
+        } catch (Exception e) {
+//            e.printStackTrace();
+        }
+    }
 
-        userDao.createFollow(userShane, userAdmin);
-        userDao.createFollow(userShane, userMod);
+    private void createInitialEntities() throws Exception {
+        User user = userDao.create(new User("der_benutzer", "password", Role.USER));
+        User mod = userDao.create(new User("das_moderator", "password", Role.MODERATOR));
+        User admin = userDao.create(new User("die_administrator", "password", Role.ADMINISTRATOR));
 
-        kweetDao.create(new Kweet("First Kweet, Hello World! #JEA6", userAdmin));
-        Kweet kweetWithMention = kweetDao.create(new Kweet("Anyone else on this platform? @admin", userShane));
+        assert userDao.count() == 3;
 
-        Set<User> mentions = new HashSet<>();
-        mentions.add(userAdmin);
+        userDao.createFollow(user, admin);
+        userDao.createFollow(user, mod);
 
-        kweetWithMention.setMentions(mentions);
-        kweetDao.edit(kweetWithMention);
+        kweetDao.create(new Kweet("First Kweet, Hello World! #JEA6", admin));
+        kweetDao.create(new Kweet("Anyone else on this platform? @die_administrator", mod));
     }
 }
