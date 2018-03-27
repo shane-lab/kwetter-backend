@@ -13,10 +13,10 @@
         <module>services</module>
         <module>dal</module>
         <module>util</module>
+        <module>web</module>
     </modules>
 
     <build>
-        <finalName>kwetter-app</finalName>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>

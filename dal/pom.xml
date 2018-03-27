@@ -11,6 +11,10 @@
 
     <artifactId>dal</artifactId>
 
+    <build>
+        <finalName>dal</finalName>
+    </build>
+
     <dependencies>
         <!--<dependency>-->
             <!--<groupId>javax.persistence</groupId>-->

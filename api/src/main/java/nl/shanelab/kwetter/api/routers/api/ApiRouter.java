@@ -9,13 +9,15 @@ import org.glassfish.jersey.jackson.JacksonFeature;
 
 import javax.ws.rs.ApplicationPath;
 import javax.ws.rs.GET;
+import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Application;
 import javax.ws.rs.core.MediaType;
 import java.util.HashSet;
 import java.util.Set;
 
-@ApplicationPath(value = "/api/v1")
+@ApplicationPath(value = "/v1")
+@Path("/")
 public class ApiRouter extends Application {
 
     @Override
@@ -32,15 +34,14 @@ public class ApiRouter extends Application {
         resources.add(JacksonFeature.class);
 
         // providers
-        resources.add(AnyExceptionProvider.class); // hide other exceptions from 'users'
+        resources.add(AnyExceptionProvider.class); // hide other exceptions from visitors, returns a generic 400 bad request response
         resources.add(ConstraintViolationProvider.class);
         resources.add(CrossOriginProvider.class);
         resources.add(UnrecognizedPropertyProvider.class);
         resources.add(UserExceptionProvider.class);
         resources.add(WebExceptionProvider.class);
 
-        // TODO set self as resource
-//        resources.add(ApiRouter.class);
+        resources.add(ApiRouter.class);
 
         return resources;
     }
