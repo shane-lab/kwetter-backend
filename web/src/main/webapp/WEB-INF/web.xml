@@ -13,6 +13,6 @@
     </servlet>
     <servlet-mapping>
         <servlet-name>Kwetter admin panel</servlet-name>
-        <url-pattern>/*</url-pattern>
+        <url-pattern>/webapi/*</url-pattern>
     </servlet-mapping>
 </web-app>
