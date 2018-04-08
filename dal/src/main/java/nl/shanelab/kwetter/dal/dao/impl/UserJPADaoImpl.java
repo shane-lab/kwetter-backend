@@ -4,6 +4,7 @@ import nl.shanelab.kwetter.dal.dao.UserDao;
 import nl.shanelab.kwetter.dal.domain.Kweet;
 import nl.shanelab.kwetter.dal.domain.User;
 import nl.shanelab.kwetter.dal.qualifiers.JPADao;
+import nl.shanelab.kwetter.util.Sha256;
 
 import javax.ejb.*;
 import javax.persistence.Query;
@@ -20,11 +21,17 @@ public class UserJPADaoImpl extends BaseJPADao<User, Long> implements UserDao {
             return null;
         }
 
+        user.setPassword(Sha256.hash(user.getPassword()));
+
         return super.create(user);
     }
 
     public User edit(User user) {
-        if (this.find(user.getId()) != null) {
+        User found = this.find(user.getId());
+        if (found != null) {
+            if (user.getPassword() != found.getPassword()) {
+                user.setPassword(Sha256.hash(user.getPassword()));
+            }
             return super.edit(user);
         }
 

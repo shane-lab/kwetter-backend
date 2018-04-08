@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+<f:view>
+    <form method="post" action="j_security_check" name="loginForm">
+        <div class="row">
+            <div class="input-field col s12 center">
+                <!--<img src="images/login-logo.png" alt="" class="circle responsive-img valign profile-image-login" />-->
+                <p class="center login-form-text">Sign in to the Kwetter admin panel</p>
+            </div>
+        </div>
+        <div class="row margin">
+            <div class="input-field col s12">
+                <i class="mdi-social-person-outline prefix"></i>
+                <h:inputText id="j_username" value="#{authServlet.username}" autocomplete="off" />
+                <h:outputLabel id="userNameLabel" for="j_username" value="username"/>
+            </div>
+        </div>
+        <div class="row margin">
+            <div class="input-field col s12">
+                <i class="mdi-action-lock-outline prefix"></i>
+                <h:inputSecret id="j_password" value="#{authServlet.password}" autocomplete="off"/>
+                <h:outputLabel id="passwordLabel" for="j_password" value="password"/>
+            </div>
+        </div>
+        <div class="row">
+            <div class="input-field col s12 m12 l12  login-text">
+                <input id="remember-me" type="checkbox" />
+                <label for="remember-me">Remember me</label>
+            </div>
+        </div>
+        <div class="row">
+            <div class="input-field col s12">
+                <h:commandButton class="btn waves-effect waves-light col s12" type="submit" value="Login"/>
+            </div>
+        </div>
+    </form>
+</f:view>
+</html>

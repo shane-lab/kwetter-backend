@@ -11,6 +11,7 @@ import nl.shanelab.kwetter.services.exceptions.user.UserAlreadyExistsException;
 import nl.shanelab.kwetter.services.exceptions.user.UserFollowException;
 import nl.shanelab.kwetter.services.exceptions.user.UserIncorrectCredentialsException;
 import nl.shanelab.kwetter.services.exceptions.user.UserNotFoundException;
+import nl.shanelab.kwetter.util.Sha256;
 
 import javax.ejb.Stateless;
 import javax.inject.Inject;
@@ -51,7 +52,7 @@ public class UserServiceImpl implements UserService {
         if (user == null) {
             throw new UserNotFoundException(name);
         }
-        if (!user.getPassword().equals(password)) {
+        if (!user.getPassword().equals(Sha256.hash(password))) {
             throw new UserIncorrectCredentialsException(name);
         }
 

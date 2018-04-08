@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html
+        PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:mp="http://primefaces.org/ui/material"
+      xmlns:p="http://primefaces.org/ui">
+
+<h:head>
+</h:head>
+<h:head>
+    <h:outputStylesheet library="css" name="fonts.css"/>
+    <h:outputStylesheet library="css" name="error.css"/>
+    <h:outputStylesheet library="material-prime" name="libs/materialize.css"/>
+    <h:outputStylesheet library="material-prime" name="libs/material-icons.css"/>
+    <h:outputStylesheet library="material-prime" name="core/material-prime.css"/>
+    <title>403 Forbidden</title>
+</h:head>
+
+<h:body>
+    <div class="cover">
+        <h1>Access denied <small>Error 403</small></h1>
+        <p class="lead">The requested resource requires an <h:link outcome="/auth/login.xhtml" value="authentication" />. <small>If you're already authenticated, you might not be obliged to view the page</small></p>
+    </div>
+</h:body>
+
+</html>
