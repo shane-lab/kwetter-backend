@@ -22,9 +22,17 @@
 </h:head>
 
 <h:body>
+    <h:panelGroup layout="block" rendered="#{authServlet.isSignedIn()}" styleClass="sign-out">
+        <p class="text-white">
+            <h:form>
+                <i class="material-icons">power_settings_new</i><h:commandLink styleClass="sign-out-text" action="${logoutServlet.logout}" value="sign out" />
+            </h:form>
+        </p>
+    </h:panelGroup>
     <div class="cover">
-        <h1>Resource not found <small>Error 403</small></h1>
+        <h1>Resource not found <small>Error 404</small></h1>
         <p class="lead">The requested resource could not be found. <small>It may be available again in the future.</small></p>
+        <p class="lead"><small>Back to <i class="material-icons">home</i><h:outputLink value="${routesServlet.home()}">home</h:outputLink></small></p>
     </div>
 </h:body>
 

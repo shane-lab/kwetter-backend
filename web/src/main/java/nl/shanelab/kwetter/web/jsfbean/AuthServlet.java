@@ -13,4 +13,16 @@ public class AuthServlet implements JsfBeanServlet {
     private String username;
 
     private String password;
+
+    public boolean isModerator() {
+        return isSignedIn() && getRequest().isUserInRole("Moderator");
+    }
+
+    public boolean isAdministrator() {
+        return isSignedIn() && getRequest().isUserInRole("Administrator");
+    }
+
+    public boolean isSignedIn() {
+        return getRequest().getUserPrincipal() != null;
+    }
 }

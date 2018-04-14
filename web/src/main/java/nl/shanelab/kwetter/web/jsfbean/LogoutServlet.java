@@ -9,7 +9,7 @@ import javax.servlet.ServletException;
 public class LogoutServlet implements JsfBeanServlet {
 
     public String logout() {
-        String destination = "/index";
+        String destination = "/";
 
         try {
             getRequest().logout();

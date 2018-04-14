@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:h="http://xmlns.jcp.org/jsf/html"
       xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
@@ -13,12 +13,7 @@
 <ui:composition template="/WEB-INF/private/layout.xhtml">
     <ui:define name="page">
         <div class="text-center">
-            <h1>Dashboard</h1>
-            <div class="row flow-text">
-                <div class="col s12">
-                    <p>You are <strong><h:outputLabel value="${authServlet.isAdministrator() ? 'si' : 'no' }" /></strong></p>
-                </div>
-            </div>
+            <h1>Profile management</h1>
         </div>
     </ui:define>
 </ui:composition>

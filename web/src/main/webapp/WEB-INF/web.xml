@@ -17,6 +17,16 @@
         <servlet-name>Faces Servlet</servlet-name>
         <url-pattern>*.xhtml</url-pattern>
     </servlet-mapping>
+    <filter>
+        <filter-name>AuthFilter</filter-name>
+        <filter-class>nl.shanelab.kwetter.web.filters.AuthFilter</filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>AuthFilter</filter-name>
+        <url-pattern>/</url-pattern>
+        <url-pattern>/index.xhtml</url-pattern>
+        <url-pattern>/auth/*</url-pattern>
+    </filter-mapping>
     <session-config>
         <session-timeout>
             30
@@ -44,6 +54,7 @@
         <auth-constraint>
             <description/>
             <role-name>Administrator</role-name>
+            <role-name>Moderator</role-name>
         </auth-constraint>
         <!--<user-data-constraint>-->
             <!--<description>ssl enabled</description>-->
@@ -55,7 +66,7 @@
         <realm-name>kwetter_realm</realm-name>
         <form-login-config>
             <form-login-page>/auth/login.xhtml</form-login-page>
-            <form-error-page>/auth/login_error.xhtml</form-error-page>
+            <form-error-page>/WEB-INF/private/login_error.xhtml</form-error-page>
         </form-login-config>
     </login-config>
     <security-role>

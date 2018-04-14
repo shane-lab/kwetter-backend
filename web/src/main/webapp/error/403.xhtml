@@ -22,9 +22,17 @@
 </h:head>
 
 <h:body>
+    <h:panelGroup layout="block" rendered="#{authServlet.isSignedIn()}" styleClass="sign-out">
+        <p class="text-white">
+            <h:form>
+                <i class="material-icons">power_settings_new</i><h:commandLink styleClass="sign-out-text" action="${logoutServlet.logout}" value="sign out" />
+            </h:form>
+        </p>
+    </h:panelGroup>
     <div class="cover">
         <h1>Access denied <small>Error 403</small></h1>
-        <p class="lead">The requested resource requires an <h:link outcome="/auth/login.xhtml" value="authentication" />. <small>If you're already authenticated, you might not be obliged to view the page</small></p>
+        <p class="lead">The requested resource requires an <h:outputLink value="#{routesServlet.login()}">authentication</h:outputLink>. <small>If you're already authenticated, you might not be obliged to view the page</small></p>
+        <p class="lead"><small>Back to <i class="material-icons">home</i><h:outputLink value="${routesServlet.home()}">home</h:outputLink></small></p>
     </div>
 </h:body>
 

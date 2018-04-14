@@ -11,7 +11,15 @@ public interface JsfBeanServlet extends Serializable {
     }
 
     default String redirect(String location, boolean flag) {
-        return String.format("%s?faces-redirect=%b", location, flag);
+        String root = getRequest().getContextPath();
+        if (location == null) {
+            return "/";
+        }
+        if (location.startsWith("/")) {
+            location = location.replaceFirst("/","");
+        }
+
+        return String.format("%s/%s?faces-redirect=%b", root, location, flag);
     }
 
     default HttpServletRequest getRequest() {
