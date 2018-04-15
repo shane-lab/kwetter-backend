@@ -18,7 +18,10 @@ import static nl.shanelab.kwetter.util.Patterns.NO_SPACES_PATTERN;
 @RequiredArgsConstructor
 @ToString(exclude = {"kweets", "favoriteKweets", "followers", "following"})
 @NamedQueries({
+        @NamedQuery(name = "User.getAmountOfFollowers", query = "SELECT size(u.followers) FROM User u WHERE u.id = :id"),
+        @NamedQuery(name = "User.getAmountOfFollowings", query = "SELECT size(u.following) FROM User u WHERE u.id = :id"),
         @NamedQuery(name = "User.findByName", query = "SELECT DISTINCT u FROM User u WHERE u.username = :username"),
+        @NamedQuery(name = "User.getMostFollowed", query = "SELECT u FROM User u WHERE size(u.followers) > 0 ORDER BY u.id")
 //        @NamedQuery(name = "User.followedBy", query = "SELECT COUNT(u) FROM User u WHERE u.id = :id AND :follower_id IN(u.followers)")
 })
 //@NamedNativeQueries({

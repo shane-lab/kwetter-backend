@@ -9,6 +9,7 @@
       xmlns:mp="http://primefaces.org/ui/material">
 <h:head>
     <h:outputStylesheet library="css" name="fonts.css"/>
+    <h:outputStylesheet library="css" name="global.css"/>
     <h:outputStylesheet library="material-prime" name="libs/materialize.css"/>
     <h:outputStylesheet library="material-prime" name="libs/material-icons.css"/>
     <h:outputStylesheet library="material-prime" name="core/material-prime.css"/>
@@ -24,7 +25,7 @@
 </h:head>
 <h:body>
     <div class="navbar-fixed">
-        <div class="green darken-2" style="width:100%; min-height: 10px;" />
+        <div class="green darken-2 hide-on-med-and-down" style="width:100%; min-height: 10px;" />
         <nav>
             <div class="nav-wrapper green">
                 <a href="#!" data-target="mobile-demo" class="sidenav-trigger left hide-on-large-only"><i class="material-icons">menu</i></a>
@@ -42,8 +43,8 @@
         </nav>
     </div>
     <ul class="side-nav" id="mobile-menu">
-        <li class="text-bold"><h:outputLink action="#{routesServlet.kweets()}" >Kweets</h:outputLink></li>
-        <li class="text-bold"><h:outputLink action="#{routesServlet.profiles()}">Profile</h:outputLink></li>
+        <li class="text-bold"><h:outputLink value="#{routesServlet.kweets()}" >Kweets</h:outputLink></li>
+        <li class="text-bold"><h:outputLink value="#{routesServlet.profiles()}">Profile</h:outputLink></li>
         <li class="text-bold">
             <h:form>
                 <h:commandLink action="#{logoutServlet.logout}" value="Logout" />

@@ -26,7 +26,15 @@ public class RoutesServlet implements JsfBeanServlet {
         return fromRoute(Routes.KWEETS);
     }
 
+    public String kweets(long id) {
+        return fromRoute(Routes.KWEETS);
+    }
+
     public String profiles() {
+        return fromRoute(Routes.PROFILES);
+    }
+
+    public String profiles(long id) {
         return fromRoute(Routes.PROFILES);
     }
 

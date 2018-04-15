@@ -45,7 +45,8 @@ public class ServicesStartup {
         userDao.createFollow(user, admin);
         userDao.createFollow(user, mod);
 
-        kweetDao.create(new Kweet("First Kweet, Hello World! #JEA6", admin));
+        Kweet kweet = kweetDao.create(new Kweet("First Kweet, Hello World! #JEA6", admin));
         kweetDao.create(new Kweet("Anyone else on this platform? @die_administrator", mod));
+        kweetDao.favourite(kweet, user);
     }
 }

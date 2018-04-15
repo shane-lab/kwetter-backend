@@ -1,0 +1,7 @@
+a.k-link {
+    color: initial;
+    text-decoration: none;
+}
+a.k-link:hover {
+    border-bottom: 1px dashed #4CAF50 !important;
+}

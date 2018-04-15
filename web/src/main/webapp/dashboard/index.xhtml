@@ -13,10 +13,51 @@
 <ui:composition template="/WEB-INF/private/layout.xhtml">
     <ui:define name="page">
         <div class="text-center">
-            <h1>Dashboard</h1>
+            <h1 class="hide-on-med-and-down">Dashboard</h1>
             <div class="row flow-text">
-                <div class="col s12">
-                    <p>You are <strong><h:outputLabel value="${authServlet.isAdministrator() ? 'si' : 'no' }" /></strong></p>
+                <div class="col s6">
+                    <div style="padding: 35px;" class="card" align="center">
+                        <div class="row">
+                            <div class="card-title">
+                                <b>Kweet Management</b>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <h:outputLink value="#{routesServlet.kweets()}">
+                                <div style="padding: 30px;width: 100%;" class="grey lighten-3 col s5 waves-effect">
+                                    <i class="green-text text-darken-3 large material-icons">message</i>
+                                    <span class="green-text text-lighten-1"><h5><h:outputText value="#{kweetServlet.count()}" /></h5></span>
+                                </div>
+                            </h:outputLink>
+                        </div>
+                        <h:panelGroup styleClass="row hide-on-med-and-down" rendered="#{dashboardViewServlet.mostFavouritedKweet != null}">
+                            <div style="text-align: initial;font-size: initial;" class="grey-text text-darken-2">
+                                <p>Most popular: <h:outputLink styleClass="k-link" value="#{routesServlet.kweets(dashboardViewServlet.mostFavouritedKweet.id)}"><i><h:outputText value="#{dashboardViewServlet.mostFavouritedKweet.message}" /></i></h:outputLink>&nbsp;&mdash;&nbsp;by <strong class="green-text"><h:outputLink styleClass="k-link" value="#{routesServlet.profiles(dashboardViewServlet.mostFavouritedKweet.author.id)}"><h:outputText value="#{dashboardViewServlet.mostFavouritedKweet.author.username}" /></h:outputLink></strong></p>
+                            </div>
+                        </h:panelGroup>
+                    </div>
+                </div>
+                <div class="col s6">
+                    <div style="padding: 35px;" class="card" align="center">
+                        <div class="row">
+                            <div class="card-title">
+                                <b>Profile Management</b>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <h:outputLink value="#{routesServlet.profiles()}">
+                                <div style="padding: 30px;width: 100%;" class="grey lighten-3 col s5 waves-effect">
+                                    <i class="green-text text-darken-3 large material-icons">person</i>
+                                    <span class="green-text text-lighten-1"><h5><h:outputText value="#{userServlet.count()}" /></h5></span>
+                                </div>
+                            </h:outputLink>
+                        </div>
+                        <h:panelGroup styleClass="row hide-on-med-and-down" rendered="#{dashboardViewServlet.mostFollowedUser != null}">
+                            <div style="text-align: initial;font-size: initial;" class="grey-text text-darken-2">
+                                <p>Most popular: <h:outputLink styleClass="k-link" value="#{routesServlet.profiles(dashboardViewServlet.mostFollowedUser.id)}"><i><h:outputText value="#{dashboardViewServlet.mostFollowedUser.username}" /></i></h:outputLink>&nbsp;&mdash;&nbsp;<strong><h:outputText value="#{userServlet.getFollowers(dashboardViewServlet.mostFollowedUser.id)}" /></strong> follower(s)</p>
+                            </div>
+                        </h:panelGroup>
+                    </div>
                 </div>
             </div>
         </div>

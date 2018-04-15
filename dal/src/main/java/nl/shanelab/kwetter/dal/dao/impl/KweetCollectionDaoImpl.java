@@ -2,6 +2,7 @@ package nl.shanelab.kwetter.dal.dao.impl;
 
 import lombok.NoArgsConstructor;
 import nl.shanelab.kwetter.dal.dao.KweetDao;
+import nl.shanelab.kwetter.dal.dao.Pagination;
 import nl.shanelab.kwetter.dal.domain.HashTag;
 import nl.shanelab.kwetter.dal.domain.Kweet;
 import nl.shanelab.kwetter.dal.domain.User;
@@ -22,7 +23,7 @@ import java.util.regex.Pattern;
 @InMemoryDao
 @Stateless
 @NoArgsConstructor
-public class KweetCollectionDaoImpl extends BaseCollectionDao implements KweetDao {
+public class KweetCollectionDaoImpl extends BaseCollectionDao<Kweet, Long> implements KweetDao {
 
     @Inject
     public KweetCollectionDaoImpl(DummyData data) {
@@ -84,6 +85,10 @@ public class KweetCollectionDaoImpl extends BaseCollectionDao implements KweetDa
         data.getKweets().remove(kweet.getId());
     }
 
+    public int getAmountOfKweets(User user) {
+        return user != null && user.getKweets() != null ? user.getKweets().size() : 0;
+    }
+
     public Collection<Kweet> getByUserName(String name) {
         AtomicReference<Collection<Kweet>> kweetsRef = new AtomicReference<>(new HashSet<>());
 
@@ -100,6 +105,11 @@ public class KweetCollectionDaoImpl extends BaseCollectionDao implements KweetDa
         return kweetsRef.get();
     }
 
+    @Override
+    public Pagination<Kweet> getByUserName(String name, int page, int size) {
+        return null;
+    }
+
     public Collection<Kweet> getByUserId(Long id) {
         AtomicReference<Collection<Kweet>> kweetsRef = new AtomicReference<>(new HashSet<>());
 
@@ -114,6 +124,11 @@ public class KweetCollectionDaoImpl extends BaseCollectionDao implements KweetDa
         });
 
         return kweetsRef.get();
+    }
+
+    @Override
+    public Pagination<Kweet> getByUserId(Long id, int page, int size) {
+        return null;
     }
 
     public Collection<Kweet> getByHashTagName(String name) {
@@ -136,6 +151,11 @@ public class KweetCollectionDaoImpl extends BaseCollectionDao implements KweetDa
         return kweetsRef.get();
     }
 
+    @Override
+    public Pagination<Kweet> getByHashTagName(String name, int page, int size) {
+        return null;
+    }
+
     public Collection<Kweet> getByHashTagId(Long id) {
         AtomicReference<Collection<Kweet>> kweetsRef = new AtomicReference<>(new HashSet<>());
 
@@ -154,6 +174,11 @@ public class KweetCollectionDaoImpl extends BaseCollectionDao implements KweetDa
         });
 
         return kweetsRef.get();
+    }
+
+    @Override
+    public Pagination<Kweet> getByHashTagId(Long id, int page, int size) {
+        return null;
     }
 
     public Collection<Kweet> getByMention(String name) {
@@ -176,6 +201,11 @@ public class KweetCollectionDaoImpl extends BaseCollectionDao implements KweetDa
         return kweetsRef.get();
     }
 
+    @Override
+    public Pagination<Kweet> getByMention(String name, int page, int size) {
+        return null;
+    }
+
     public Collection<Kweet> getByFavoritedBy(String name) {
         AtomicReference<Collection<Kweet>> kweetsRef = new AtomicReference<>(new HashSet<>());
 
@@ -194,6 +224,11 @@ public class KweetCollectionDaoImpl extends BaseCollectionDao implements KweetDa
         });
 
         return kweetsRef.get();
+    }
+
+    @Override
+    public Pagination<Kweet> getByFavoritedBy(String name, int page, int size) {
+        return null;
     }
 
     public boolean isFavoritedBy(Kweet kweet, User user) {
@@ -268,6 +303,10 @@ public class KweetCollectionDaoImpl extends BaseCollectionDao implements KweetDa
             user.getFavoriteKweets().remove(kweet);
             edit(kweet);
         }
+    }
+
+    public Kweet getMostFavourited() {
+        return null;
     }
 
     private void handleMentions(Kweet kweet) {

@@ -3,7 +3,8 @@ package nl.shanelab.kwetter.api.routers.api.routes;
 import lombok.NoArgsConstructor;
 import nl.shanelab.kwetter.api.dto.KweetDto;
 import nl.shanelab.kwetter.api.mappers.KweetMapper;
-import nl.shanelab.kwetter.api.routers.BaseRoute;
+import nl.shanelab.kwetter.api.BaseRoute;
+import nl.shanelab.kwetter.dal.dao.Pagination;
 import nl.shanelab.kwetter.dal.domain.Kweet;
 import nl.shanelab.kwetter.dal.domain.User;
 import nl.shanelab.kwetter.services.KweetingService;
@@ -38,11 +39,17 @@ public class KweetRoute extends BaseRoute {
 
     @GET
     @Path("/")
-    public Response getAllKweets() {
+    public Response getAllKweets(@QueryParam("page") int page, @QueryParam("size") int size) {
+        Pagination<Kweet> pagination = kweetingService.getAllKweets(page, size);
 
-        return ok(kweetingService.getAllKweets().stream()
-                .map(kweet -> KweetMapper.INSTANCE.kweetToDto(kweet))
-                .collect(Collectors.toSet()));
+        return paginated(
+                pagination.getPage(),
+                pagination.getRequestedSize(),
+                pagination.getPage(),
+                pagination.hasPrevious(),
+                pagination.hasNext(), pagination.getCollection().stream()
+                .map(KweetMapper.INSTANCE::kweetToDto)
+                .collect(Collectors.toList()));
     }
 
     @POST
@@ -81,7 +88,7 @@ public class KweetRoute extends BaseRoute {
 
     @GET
     @Path("/user/{id}/")
-    public Response getKweetsByUserId(@Valid @PathParam("id") long id) throws UserException {
+    public Response getKweetsByUserId(@Valid @PathParam("id") long id, @QueryParam("page") int page, @QueryParam("size") int size) throws UserException {
         Set<KweetDto> kweetDtos = new HashSet<>();
 
         Collection<Kweet> kweets = kweetingService.getKweetsByUserId(id);

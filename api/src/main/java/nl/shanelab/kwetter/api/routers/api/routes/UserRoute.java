@@ -4,7 +4,8 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.NoArgsConstructor;
 import nl.shanelab.kwetter.api.dto.UserDto;
 import nl.shanelab.kwetter.api.mappers.UserMapper;
-import nl.shanelab.kwetter.api.routers.BaseRoute;
+import nl.shanelab.kwetter.api.BaseRoute;
+import nl.shanelab.kwetter.dal.dao.Pagination;
 import nl.shanelab.kwetter.dal.domain.User;
 import nl.shanelab.kwetter.services.UserService;
 import nl.shanelab.kwetter.services.exceptions.UserException;
@@ -31,10 +32,16 @@ public class UserRoute extends BaseRoute {
 
     @GET
     @Path("/")
-    public Response getUsers() {
+    public Response getUsers(@QueryParam("page") int page, @QueryParam("size") int size) {
+        Pagination<User> pagination = userService.getAllUsers(page, size);
 
-        return ok(userService.getAllUsers().stream()
-                .map(user -> UserMapper.INSTANCE.userAsDTO(user))
+        return paginated(
+                pagination.getPage(),
+                pagination.getRequestedSize(),
+                pagination.pages(),
+                pagination.hasPrevious(),
+                pagination.hasNext(), pagination.getCollection().stream()
+                .map(UserMapper.INSTANCE::userAsDTO)
                 .collect(Collectors.toSet()));
     }
 
@@ -92,7 +99,6 @@ public class UserRoute extends BaseRoute {
             userService.remove(user);
         }
 
-        // TODO create success response object/model?
         return Response.ok().build();
     }
 

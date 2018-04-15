@@ -38,6 +38,20 @@ public class UserJPADaoImpl extends BaseJPADao<User, Long> implements UserDao {
         return this.create(user);
     }
 
+    public int getAmountOfFollowers(long id) {
+        Query query = manager.createNamedQuery("User.getAmountOfFollowers", User.class);
+        query.setParameter("id", id);
+
+        return (Integer) JPAResult.getSingleResultOrNull(query);
+    }
+
+    public int getAmountOfFollowings(long id) {
+        Query query = manager.createNamedQuery("User.getAmountOfFollowings", User.class);
+        query.setParameter("id", id);
+
+        return (Integer) JPAResult.getSingleResultOrNull(query);
+    }
+
     public User getByUsername(String name) {
         Query query = manager.createNamedQuery("User.findByName", User.class);
         query.setParameter("username", name);
@@ -63,12 +77,11 @@ public class UserJPADaoImpl extends BaseJPADao<User, Long> implements UserDao {
     }
 
     public Collection<Kweet> getNthLatestKweets(int nth, User user) {
-        return null;
-//        Query query = manager.createNamedQuery("Kweet.findByUserName", Kweet.class);
-//        query.setParameter("username", user.getUsername());
-//        query.setMaxResults(nth > 0 ? nth : 1);
-//
-//        return JPAResult.getSingleResultOrNull(query);
+        Query query = manager.createNamedQuery("Kweet.findByUserName", Kweet.class);
+        query.setParameter("username", user.getUsername());
+        query.setMaxResults(nth > 0 ? nth : 1);
+
+        return query.getResultList();
     }
 
     public void createFollow(User a, User b) {
@@ -93,5 +106,13 @@ public class UserJPADaoImpl extends BaseJPADao<User, Long> implements UserDao {
 
         manager.merge(a);
         manager.merge(b);
+    }
+
+    @Override
+    public User getMostFollowed() {
+        Query query = manager.createNamedQuery("User.getMostFollowed", User.class);
+        query.setMaxResults(1);
+
+        return JPAResult.getSingleResultOrNull(query);
     }
 }

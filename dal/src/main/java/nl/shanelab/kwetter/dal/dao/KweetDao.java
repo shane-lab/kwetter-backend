@@ -8,12 +8,28 @@ import java.util.Collection;
 public interface KweetDao extends GenericDao<Kweet, Long> {
 
     /**
+     * Get the amount of Kweets from a specific user
+     *
+     * @param user The user to check
+     * @return int Returns the amount of Kweets
+     */
+    int getAmountOfKweets(User user);
+
+    /**
      * Get a collection of Kweets associated by the given user name
      *
      * @param name The name of the author associated with the Kweet
      * @return Collection<Kweet> Returns a collection of Kweets associcated with the given user name
      */
-    Collection<Kweet> getByUserName(String name);
+    default Collection<Kweet> getByUserName(String name) {
+        return this.getByUserName(name, 0).getCollection();
+    }
+
+    default Pagination<Kweet> getByUserName(String name, int page) {
+        return this.getByUserName(name, page, defaultResults);
+    }
+
+    Pagination<Kweet> getByUserName(String name, int page, int size);
 
     /**
      * Get a collection of Kweets associated by the given user identifier
@@ -21,7 +37,15 @@ public interface KweetDao extends GenericDao<Kweet, Long> {
      * @param id The identifier of the author associated with the Kweet
      * @return Collection<Kweet> Returns a collection of Kweets associated with the gieven user identifier
      */
-    Collection<Kweet> getByUserId(Long id);
+    default Collection<Kweet> getByUserId(Long id) {
+        return getByUserId(id, 0).getCollection();
+    }
+
+    default Pagination<Kweet> getByUserId(Long id, int page) {
+        return getByUserId(id, page, defaultResults);
+    }
+
+    Pagination<Kweet> getByUserId(Long id, int page, int size);
 
     // shouldn't the below rather be in the service layer?
     // -> added to dao, because it is faster to filter the objects with direct db operations
@@ -32,7 +56,15 @@ public interface KweetDao extends GenericDao<Kweet, Long> {
      * @param name The name of the hashtag
      * @return Collection<Kweet> Returns a collection of Kweets using the hashtag name in the message
      */
-    Collection<Kweet> getByHashTagName(String name);
+    default Collection<Kweet> getByHashTagName(String name) {
+        return getByHashTagName(name, 0).getCollection();
+    }
+
+    default Pagination<Kweet> getByHashTagName(String name, int page) {
+        return getByHashTagName(name, defaultResults);
+    }
+
+    Pagination<Kweet> getByHashTagName(String name, int page, int size);
 
     /**
      * Get a collection of Kweets with the given hashtag id
@@ -40,7 +72,15 @@ public interface KweetDao extends GenericDao<Kweet, Long> {
      * @param id The identifier of the hashtag
      * @return Collection<Kweet> Returns a collection of Kweets associated with the identifier of the hashtag
      */
-    Collection<Kweet> getByHashTagId(Long id);
+    default Collection<Kweet> getByHashTagId(Long id) {
+        return getByHashTagId(id, 0).getCollection();
+    }
+
+    default Pagination<Kweet> getByHashTagId(Long id, int page) {
+        return getByUserId(id, page, defaultResults);
+    }
+
+    Pagination<Kweet> getByHashTagId(Long id, int page, int size);
 
     /**
      * Get a collection of Kweets mentioning a username
@@ -48,7 +88,15 @@ public interface KweetDao extends GenericDao<Kweet, Long> {
      * @param name The name of user mentioned in the message of the Kweet
      * @return Collection<Kweet> Returns a collection of Kweets mentioning the username in the message of the Kweet
      */
-    Collection<Kweet> getByMention(String name);
+    default Collection<Kweet> getByMention(String name) {
+        return getByMention(name, 0).getCollection();
+    }
+
+    default Pagination<Kweet> getByMention(String name, int page) {
+        return getByMention(name, page, defaultResults);
+    }
+
+    Pagination<Kweet> getByMention(String name, int page, int size);
 
     /**
      * Get a collection of Kweets favorited by a user
@@ -56,7 +104,15 @@ public interface KweetDao extends GenericDao<Kweet, Long> {
      * @param name The name of the user who has favourited the Kweet
      * @return Collection<Kweet> Returns a collection of Kweets favourited by a user
      */
-    Collection<Kweet> getByFavoritedBy(String name);
+    default Collection<Kweet> getByFavoritedBy(String name) {
+        return getByFavoritedBy(name, 0).getCollection();
+    }
+
+    default Pagination<Kweet> getByFavoritedBy(String name, int page) {
+        return getByFavoritedBy(name, page, defaultResults);
+    }
+
+    Pagination<Kweet> getByFavoritedBy(String name, int page, int size);
 
     /**
      * Checks if a user favourited the given Kweet
@@ -91,4 +147,11 @@ public interface KweetDao extends GenericDao<Kweet, Long> {
      * @param user The user who un-favourites the Kweet
      */
     void unFavourite(Kweet kweet, User user);
+
+    /**
+     * Get the most favourited Kweet
+     *
+     * @return Kweet Returns the most favourited Kweet
+     */
+    Kweet getMostFavourited();
 }

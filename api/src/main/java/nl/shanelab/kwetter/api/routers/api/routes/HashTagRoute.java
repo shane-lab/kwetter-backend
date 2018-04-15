@@ -1,8 +1,9 @@
 package nl.shanelab.kwetter.api.routers.api.routes;
 
 import lombok.Getter;
+import nl.shanelab.kwetter.api.BaseRoute;
 import nl.shanelab.kwetter.api.dto.HashTagDto;
-import nl.shanelab.kwetter.api.routers.BaseRoute;
+import nl.shanelab.kwetter.dal.dao.Pagination;
 import nl.shanelab.kwetter.dal.domain.HashTag;
 import nl.shanelab.kwetter.services.KweetingService;
 
@@ -30,11 +31,17 @@ public class HashTagRoute extends BaseRoute {
 
     @GET
     @Path("/")
-    public Response getAllHashTags() {
+    public Response getAllHashTags(@QueryParam("page") int page, @QueryParam("size") int size) {
+        Pagination<HashTag> pagination = kweetingService.getAllHashTags(page, size);
 
-        return ok(kweetingService.getAllHashTags().stream()
-                .map(hashTag -> mapHashTag(hashTag))
-                .collect(Collectors.toSet()));
+        return paginated(
+                pagination.getPage(),
+                pagination.getRequestedSize(),
+                pagination.pages(),
+                pagination.hasPrevious(),
+                pagination.hasNext(), pagination.getCollection().stream()
+                        .map(this::mapHashTag)
+                        .collect(Collectors.toSet()));
     }
 
     @GET
@@ -52,7 +59,7 @@ public class HashTagRoute extends BaseRoute {
     public Response getTrendingHashTags(@Valid @PathParam("date") DateParam date) {
 
         return ok(kweetingService.getTrendingHashTags(date.getDate()).stream()
-                .map(hashTag -> mapHashTag(hashTag))
+                .map(this::mapHashTag)
                 .collect(Collectors.toCollection(LinkedHashSet::new)));
     }
 
