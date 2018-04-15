@@ -1,9 +1,9 @@
 package nl.shanelab.kwetter.api.routers.api.routes;
 
 import lombok.NoArgsConstructor;
+import nl.shanelab.kwetter.api.BaseRoute;
 import nl.shanelab.kwetter.api.dto.KweetDto;
 import nl.shanelab.kwetter.api.mappers.KweetMapper;
-import nl.shanelab.kwetter.api.BaseRoute;
 import nl.shanelab.kwetter.dal.dao.Pagination;
 import nl.shanelab.kwetter.dal.domain.Kweet;
 import nl.shanelab.kwetter.dal.domain.User;
@@ -94,7 +94,22 @@ public class KweetRoute extends BaseRoute {
         Collection<Kweet> kweets = kweetingService.getKweetsByUserId(id);
         if (kweets != null) {
             kweets.stream()
-                    .map(kweet -> KweetMapper.INSTANCE.kweetToDto(kweet))
+                    .map(KweetMapper.INSTANCE::kweetToDto)
+                    .forEach(kweetDtos::add);
+        }
+
+        return ok(kweetDtos);
+    }
+
+    @GET
+    @Path("/hashtag/{name}/")
+    public Response getKweetsWithHashTagName(@Valid @PathParam("name") String name, @QueryParam("page") int page, @QueryParam("size") int size) {
+        Set<KweetDto> kweetDtos = new HashSet<>();
+
+        Collection<Kweet> kweets = kweetingService.getKweetsWithHashTagName(name);
+        if (kweets != null) {
+            kweets.stream()
+                    .map(KweetMapper.INSTANCE::kweetToDto)
                     .forEach(kweetDtos::add);
         }
 

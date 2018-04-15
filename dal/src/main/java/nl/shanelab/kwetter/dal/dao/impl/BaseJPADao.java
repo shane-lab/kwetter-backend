@@ -85,8 +85,9 @@ public abstract class BaseJPADao<T, Id extends Serializable> implements GenericD
         if (size > maxResults) {
             size = maxResults;
         }
+
         Collection collection = Collections.EMPTY_SET;
-        if (count <= 0) {
+        if (count > 0) {
             query.setFirstResult(page <= 0 ? 0 : page * size);
             query.setMaxResults(size);
 

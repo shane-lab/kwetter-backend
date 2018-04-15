@@ -38,6 +38,5 @@ public class DashboardViewServlet implements JsfBeanServlet {
         mostFollowedUser = userService.getMostFollowed();
         mostFavouritedKweet = kweetingService.getMostFavouritedKweet();
         trendingHashtags = kweetingService.getTrendingHashTags(Date.valueOf(LocalDateTime.now().toLocalDate()));
-        System.out.println("");
     }
 }
