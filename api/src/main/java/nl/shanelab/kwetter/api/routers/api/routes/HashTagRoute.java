@@ -40,8 +40,8 @@ public class HashTagRoute extends BaseRoute {
                 pagination.pages(),
                 pagination.hasPrevious(),
                 pagination.hasNext(), pagination.getCollection().stream()
-                        .map(this::mapHashTag)
-                        .collect(Collectors.toSet()));
+                .map(this::mapHashTag)
+                .collect(Collectors.toSet()));
     }
 
     @GET

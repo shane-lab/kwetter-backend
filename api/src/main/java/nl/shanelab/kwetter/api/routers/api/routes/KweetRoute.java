@@ -21,9 +21,6 @@ import javax.validation.constraints.Size;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 @Path("/kweets")
@@ -45,7 +42,7 @@ public class KweetRoute extends BaseRoute {
         return paginated(
                 pagination.getPage(),
                 pagination.getRequestedSize(),
-                pagination.getPage(),
+                pagination.pages(),
                 pagination.hasPrevious(),
                 pagination.hasNext(), pagination.getCollection().stream()
                 .map(KweetMapper.INSTANCE::kweetToDto)
@@ -87,33 +84,33 @@ public class KweetRoute extends BaseRoute {
     }
 
     @GET
-    @Path("/user/{id}/")
+    @Path("/user/{id}")
     public Response getKweetsByUserId(@Valid @PathParam("id") long id, @QueryParam("page") int page, @QueryParam("size") int size) throws UserException {
-        Set<KweetDto> kweetDtos = new HashSet<>();
+        Pagination<Kweet> pagination = kweetingService.getKweetsByUserId(id, page, size);
 
-        Collection<Kweet> kweets = kweetingService.getKweetsByUserId(id);
-        if (kweets != null) {
-            kweets.stream()
-                    .map(KweetMapper.INSTANCE::kweetToDto)
-                    .forEach(kweetDtos::add);
-        }
-
-        return ok(kweetDtos);
+        return paginated(
+                pagination.getPage(),
+                pagination.getRequestedSize(),
+                pagination.pages(),
+                pagination.hasPrevious(),
+                pagination.hasNext(), pagination.getCollection().stream()
+                .map(KweetMapper.INSTANCE::kweetToDto)
+                .collect(Collectors.toList()));
     }
 
     @GET
-    @Path("/hashtag/{name}/")
+    @Path("/hashtag/{name}")
     public Response getKweetsWithHashTagName(@Valid @PathParam("name") String name, @QueryParam("page") int page, @QueryParam("size") int size) {
-        Set<KweetDto> kweetDtos = new HashSet<>();
+        Pagination<Kweet> pagination = kweetingService.getKweetsWithHashTagName(name, page, size);
 
-        Collection<Kweet> kweets = kweetingService.getKweetsWithHashTagName(name);
-        if (kweets != null) {
-            kweets.stream()
-                    .map(KweetMapper.INSTANCE::kweetToDto)
-                    .forEach(kweetDtos::add);
-        }
-
-        return ok(kweetDtos);
+        return paginated(
+                pagination.getPage(),
+                pagination.getRequestedSize(),
+                pagination.pages(),
+                pagination.hasPrevious(),
+                pagination.hasNext(), pagination.getCollection().stream()
+                .map(KweetMapper.INSTANCE::kweetToDto)
+                .collect(Collectors.toList()));
     }
 
     @NoArgsConstructor

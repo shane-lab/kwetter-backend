@@ -22,11 +22,7 @@ import static nl.shanelab.kwetter.util.Patterns.NO_SPACES_PATTERN;
         @NamedQuery(name = "User.getAmountOfFollowings", query = "SELECT size(u.following) FROM User u WHERE u.id = :id"),
         @NamedQuery(name = "User.findByName", query = "SELECT DISTINCT u FROM User u WHERE u.username = :username"),
         @NamedQuery(name = "User.getMostFollowed", query = "SELECT u FROM User u WHERE size(u.followers) > 0 ORDER BY u.id")
-//        @NamedQuery(name = "User.followedBy", query = "SELECT COUNT(u) FROM User u WHERE u.id = :id AND :follower_id IN(u.followers)")
 })
-//@NamedNativeQueries({
-//        @NamedNativeQuery(name = "User.followedBy", query = "SELECT COUNT(*) FROM follower_following ff WHERE following_id = :following_id AND follower_id = :follower_id")
-//})
 public class User {
 
     @Id

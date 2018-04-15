@@ -31,7 +31,7 @@ public class BaseRoute {
 
         private int page;
 
-        private int size;
+        private int perPage;
 
         private int pages;
 
