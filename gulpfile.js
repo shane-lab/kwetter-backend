@@ -3,6 +3,7 @@ const exec = util.promisify(require('child_process').exec);
 const gulp = require('gulp');
 const shell = require('gulp-shell');
 const prompt = require('gulp-prompt');
+const mysql = require('mysql');
 
 let config;
 
@@ -10,28 +11,50 @@ try {
    config = require('./config.json');
 } catch (e) { }
 
-const database = 'kwetter'
+let database = 'kwetter'
 
-const createdb = (username, password, done) => {
-    const command = `mysql -u ${username} -p ${password || ''} -e "CREATE DATABASE ${database}"`;
+const createdb = (user, password, done) => {
+    const mysqlPool = mysql.createPool({
+        host: process.env.HOST || '127.0.0.1',
+        user,
+        password,
+        multipleStatements: true
+    });
 
-    return gulp.src('').pipe(shell([command], () => {
-        console.log('\x1b[32m%s\x1b[0m', 'Database created');
+    mysqlPool.getConnection((err, connection) => {
+        if (err) {
+            return done(err);
+        }
 
-        done();
-    }));
+        connection.query(`DROP DATABASE IF EXISTS ${database}; CREATE DATABASE IF NOT EXISTS ${database}`, (err, results) => {
+            connection.release();
+
+            if (err) {
+                return done(err);
+            }
+
+            mysqlPool.end(done);
+        });
+    });
 }
 
-gulp.task('db:create', (done) => {
+gulp.task('db:create', done => {
     if (config) {
-        const {username, password} = config || {};
+        if (config['database']) {
+            database = config['database'];
+        }
+        const {username, password} = config;
+
+        if (!username) {
+            throw new Error('No mysql root username defined in the configuration file');
+        }
 
         return createdb(username, password, done);
     }
 
-    console.log('No configuration file was found, requires prompt for credential');
+    console.log('No configuration file was found, requires prompt for mysql credentials');
 
-    return gulp.src('').pipe(prompt.prompt([{
+    gulp.src('').pipe(prompt.prompt([{
         type: 'input',
         name: 'username',
         message: 'Please enter your mysql root username'
@@ -39,7 +62,7 @@ gulp.task('db:create', (done) => {
         type: 'password',
         name: 'password',
         message: 'Please enter your mysql root password'
-    }], function(response) {
+    }], response => {
         const {username, password} = response;
 
         createdb(username, password, done);
