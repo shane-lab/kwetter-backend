@@ -10,6 +10,7 @@ import nl.shanelab.kwetter.util.Sha256;
 import javax.ejb.Stateless;
 import javax.persistence.Query;
 import java.util.Collection;
+import java.util.Collections;
 
 @JPADao
 @Stateless
@@ -37,6 +38,17 @@ public class UserJPADaoImpl extends BaseJPADao<User, Long> implements UserDao {
         }
 
         return this.create(user);
+    }
+
+    @Override
+    public void remove(Long id) {
+        Query query = manager.createQuery("DELETE FROM Kweet k WHERE k.author.id = :id");
+        query.setParameter("id", id).executeUpdate();
+
+        User user = find(id);
+        user.setKweets(Collections.EMPTY_SET);
+
+        super.remove(id);
     }
 
     public int getAmountOfFollowers(long id) {
