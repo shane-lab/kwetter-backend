@@ -2,6 +2,7 @@ package nl.shanelab.kwetter.dal.domain;
 
 import lombok.*;
 import nl.shanelab.kwetter.dal.jpa.RoleConverter;
+import org.hibernate.annotations.Cascade;
 
 import javax.persistence.*;
 import javax.validation.constraints.Max;
@@ -59,22 +60,19 @@ public class User {
      */
     private Role role;
 
-    @OneToMany(mappedBy = "author",fetch = FetchType.LAZY, orphanRemoval = true, cascade = CascadeType.ALL)
-    @JoinTable(name = "user_kweet", joinColumns = {
-            @JoinColumn(name="kweet_id", referencedColumnName = "id", nullable = false)
-    })
+    @OneToMany(mappedBy = "author",fetch = FetchType.LAZY, orphanRemoval = true, cascade = {CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
     /**
      * A collection of Kweets posted by a user
      */
     private Set<Kweet> kweets;
 
-    @ManyToMany(mappedBy = "favoritedBy", cascade = CascadeType.ALL)
+    @ManyToMany(mappedBy = "favoritedBy", cascade = {CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
     /**
      * A collection of Kweets favorited by a user
      */
     private Set<Kweet> favoriteKweets;
 
-    @ManyToMany(mappedBy = "following", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @ManyToMany(mappedBy = "following", fetch = FetchType.LAZY, cascade = {CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
     @JoinTable(name = "follower_following", inverseJoinColumns = {
             @JoinColumn(name = "following_id", referencedColumnName = "id", nullable = false)
     })
@@ -83,7 +81,7 @@ public class User {
      */
     private Set<User> followers;
 
-    @ManyToMany(fetch = FetchType.LAZY)
+    @ManyToMany(fetch = FetchType.LAZY, cascade = {CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
     @JoinTable(name = "follower_following", joinColumns = {
             @JoinColumn(name = "follower_id", referencedColumnName = "id", nullable = false)
     })

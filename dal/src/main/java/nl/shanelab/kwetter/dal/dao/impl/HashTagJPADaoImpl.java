@@ -27,7 +27,7 @@ public class HashTagJPADaoImpl extends BaseJPADao<HashTag, Long> implements Hash
     }
 
     @Override
-    public void remove(HashTag entity) {
+    public void remove(Long id) {
         // TODO dont remove if a kweet with this hashtag exists
 //        super.remove(entity);
     }

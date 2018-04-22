@@ -36,7 +36,43 @@ public class KweetJPADaoImpl extends BaseJPADao<Kweet, Long> implements KweetDao
         Query query = manager.createNamedQuery("Kweet.getAmountByUserId", Kweet.class);
         query.setParameter("id", user.getId());
 
-        return (Integer) JPAResult.getSingleResultOrNull(query);
+        return ((Long) JPAResult.getSingleResultOrNull(query)).intValue();
+    }
+
+    public int getAmountOfFavourites(long id) {
+        Query query = manager.createNamedQuery("Kweet.getAmountOfFavourites", Kweet.class);
+        query.setParameter("id", id);
+
+        Object size = JPAResult.getSingleResultOrNull(query);
+        if (size == null) {
+            return 0;
+        }
+
+        return (Integer) size;
+    }
+
+    public int getAmountOfHashTags(long id) {
+        Query query = manager.createNamedQuery("Kweet.getAmountOfHashTags", Kweet.class);
+        query.setParameter("id", id);
+
+        Object size = JPAResult.getSingleResultOrNull(query);
+        if (size == null) {
+            return 0;
+        }
+
+        return (Integer) size;
+    }
+
+    public int getAmountOfMentions(long id) {
+        Query query = manager.createNamedQuery("Kweet.getAmountOfMentions", Kweet.class);
+        query.setParameter("id", id);
+
+        Object size = JPAResult.getSingleResultOrNull(query);
+        if (size == null) {
+            return 0;
+        }
+
+        return (Integer) size;
     }
 
     public Pagination<Kweet> getByUserName(String name, int page, int size) {
@@ -236,7 +272,7 @@ public class KweetJPADaoImpl extends BaseJPADao<Kweet, Long> implements KweetDao
     }
 
     private HashTag findHashTag(String name) {
-        Query query = manager.createNamedQuery("HashTag.findByName", User.class);
+        Query query = manager.createNamedQuery("HashTag.findByName", HashTag.class);
         query.setParameter("name", name);
 
         return JPAResult.getSingleResultOrNull(query);

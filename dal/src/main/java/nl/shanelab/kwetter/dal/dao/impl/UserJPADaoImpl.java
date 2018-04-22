@@ -1,12 +1,13 @@
 package nl.shanelab.kwetter.dal.dao.impl;
 
+
 import nl.shanelab.kwetter.dal.dao.UserDao;
 import nl.shanelab.kwetter.dal.domain.Kweet;
 import nl.shanelab.kwetter.dal.domain.User;
 import nl.shanelab.kwetter.dal.qualifiers.JPADao;
 import nl.shanelab.kwetter.util.Sha256;
 
-import javax.ejb.*;
+import javax.ejb.Stateless;
 import javax.persistence.Query;
 import java.util.Collection;
 
@@ -42,14 +43,24 @@ public class UserJPADaoImpl extends BaseJPADao<User, Long> implements UserDao {
         Query query = manager.createNamedQuery("User.getAmountOfFollowers", User.class);
         query.setParameter("id", id);
 
-        return (Integer) JPAResult.getSingleResultOrNull(query);
+        Object size = JPAResult.getSingleResultOrNull(query);
+        if (size == null) {
+            return 0;
+        }
+
+        return (Integer) size;
     }
 
     public int getAmountOfFollowings(long id) {
         Query query = manager.createNamedQuery("User.getAmountOfFollowings", User.class);
         query.setParameter("id", id);
 
-        return (Integer) JPAResult.getSingleResultOrNull(query);
+        Object size = JPAResult.getSingleResultOrNull(query);
+        if (size == null) {
+            return 0;
+        }
+
+        return (Integer) size;
     }
 
     public User getByUsername(String name) {

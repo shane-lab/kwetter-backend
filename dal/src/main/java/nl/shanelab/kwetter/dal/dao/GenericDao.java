@@ -79,7 +79,7 @@ public interface GenericDao<T, Id extends Serializable> {
     /**
      * Remove an existing entity
      *
-     * @param arg entity instance of target class type The entity to remove
+     * @param id The id of the entity of the targeted target class type
      */
-    void remove(T arg);
+    void remove(Id id);
 }

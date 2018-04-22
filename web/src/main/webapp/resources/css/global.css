@@ -5,3 +5,13 @@ a.k-link {
 a.k-link:hover {
     border-bottom: 1px dashed #4CAF50 !important;
 }
+.editable {
+    border-bottom: 1px solid #4CAF50 !important;
+}
+.editable:hover {
+    color: #4CAF50 !important;
+    cursor: pointer;
+}
+.pointer {
+    cursor: pointer;
+}

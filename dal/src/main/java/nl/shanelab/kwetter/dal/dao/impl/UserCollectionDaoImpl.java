@@ -58,7 +58,11 @@ public class UserCollectionDaoImpl extends BaseCollectionDao<User, Long> impleme
         return data.getUsers().values();
     }
 
-    public void remove(User user) {
+    public void remove(Long id) {
+        User user = this.find(id);
+        if (user == null) {
+            return;
+        }
         Iterator<User> userIterator = this.findAll().iterator();
 
         for(;;) {
@@ -73,7 +77,7 @@ public class UserCollectionDaoImpl extends BaseCollectionDao<User, Long> impleme
             this.unFollow(user, next);
         }
 
-        data.getUsers().remove(user.getId());
+        data.getUsers().remove(id);
     }
 
     public int getAmountOfFollowers(long id) {

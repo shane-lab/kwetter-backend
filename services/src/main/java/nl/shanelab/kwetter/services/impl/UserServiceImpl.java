@@ -132,7 +132,7 @@ public class UserServiceImpl implements UserService {
             throw new UserNotFoundException(user.getId());
         }
 
-        userDao.remove(user);
+        userDao.remove(user.getId());
     }
 
     public boolean isUserFollowedBy(User a, User b) throws UserException {

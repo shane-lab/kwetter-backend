@@ -17,6 +17,9 @@ import java.util.Set;
 @NoArgsConstructor
 @RequiredArgsConstructor
 @NamedQueries({
+        @NamedQuery(name = "Kweet.getAmountOfFavourites", query = "SELECT size(k.favoritedBy) FROM Kweet k WHERE k.id = :id"),
+        @NamedQuery(name = "Kweet.getAmountOfHashTags", query = "SELECT size(k.hashTags) FROM Kweet k WHERE k.id = :id"),
+        @NamedQuery(name = "Kweet.getAmountOfMentions", query = "SELECT size(k.mentions) FROM Kweet k WHERE k.id = :id"),
         @NamedQuery(name = "Kweet.getAmountByUserId", query = "SELECT COUNT(k) FROM Kweet k WHERE k.author.id = :id"),
         @NamedQuery(name = "Kweet.findByUserId", query = Kweet.findByUserId+" ORDER BY k.createdAt DESC"),
         @NamedQuery(name = "Kweet.findByUserId.count", query = "SELECT COUNT(k) FROM Kweet k WHERE k IN("+Kweet.findByUserId+")"),
@@ -51,7 +54,6 @@ public class Kweet {
     private long id;
 
     @NotBlank(message = "The Kweet message may not be set as empty")
-//    @Max(value = 144, message = "Exceeding the character length limit of {value} of a Kweet is not allowed")
     @Column
     @NonNull
     /**
@@ -59,17 +61,14 @@ public class Kweet {
      */
     private String message;
 
-    @ManyToOne(cascade = {CascadeType.MERGE, CascadeType.REMOVE})
+    @ManyToOne(cascade = {CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
     @NonNull
-    @JoinTable(name = "user_kweet", inverseJoinColumns = {
-            @JoinColumn(name="user_id", referencedColumnName = "id", nullable = false)
-    })
     /**
      * The user who posted the Kweet
      */
     private User author;
 
-    @ManyToMany(fetch = FetchType.LAZY)
+    @ManyToMany(fetch = FetchType.LAZY, cascade = {CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
     @JoinTable(name = "mentioned_kweet",
             joinColumns = @JoinColumn(name="kweet_id", referencedColumnName = "id", nullable = false),
             inverseJoinColumns = @JoinColumn(name="user_id", referencedColumnName = "id", nullable = false))
@@ -78,7 +77,7 @@ public class Kweet {
      */
     private Set<User> mentions;
 
-    @ManyToMany(fetch = FetchType.LAZY)
+    @ManyToMany(fetch = FetchType.LAZY, cascade = {CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
     @JoinTable(name = "favorited_kweet",
             joinColumns = @JoinColumn(name="kweet_id", referencedColumnName = "id", nullable = false),
             inverseJoinColumns = @JoinColumn(name="user_id", referencedColumnName = "id", nullable = false))
@@ -87,7 +86,7 @@ public class Kweet {
      */
     private Set<User> favoritedBy;
 
-    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @ManyToMany(fetch = FetchType.LAZY, cascade = {CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
     @JoinTable(name = "kweet_hashtag",
             joinColumns = @JoinColumn(name="kweet_id", referencedColumnName = "id", nullable = false),
             inverseJoinColumns = @JoinColumn(name="hashtag_id", referencedColumnName = "id", nullable = false))
@@ -99,7 +98,6 @@ public class Kweet {
     @Convert(converter = LocalDateTimeConverter.class)
     @PastOrPresent(message = "The creation date of a Kweet may not exceed the present. Timetraveling is not allowed")
     @Column(nullable = false)
-//    @Temporal(TemporalType.TIMESTAMP)
     /**
      * The date and timestamp of when the Kweet was posted
      */

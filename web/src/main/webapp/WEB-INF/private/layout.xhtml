@@ -44,7 +44,7 @@
     </div>
     <ul class="side-nav" id="mobile-menu">
         <li class="text-bold"><h:outputLink value="#{routesServlet.kweets()}" >Kweets</h:outputLink></li>
-        <li class="text-bold"><h:outputLink value="#{routesServlet.profiles()}">Profile</h:outputLink></li>
+        <li class="text-bold"><h:outputLink value="#{routesServlet.profiles()}">Profiles</h:outputLink></li>
         <li class="text-bold">
             <h:form>
                 <h:commandLink action="#{logoutServlet.logout}" value="Logout" />
@@ -58,5 +58,20 @@
             </h:form>
         </div>
     </div>
+    <script type="application/javascript">
+        (function ($) {
+            if (!$) {
+                return;
+            }
+
+            $(document).ready(function () {
+                var mdpf = window['M'] || undefined;
+                if (!mdpf) {
+                    return;
+                }
+                mdpf.init();
+            });
+        })(window.$ || window.jQuery || undefined)
+    </script>
 </h:body>
 </html>

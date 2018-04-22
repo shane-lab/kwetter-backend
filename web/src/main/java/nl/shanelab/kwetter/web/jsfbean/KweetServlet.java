@@ -22,6 +22,51 @@ public class KweetServlet implements JsfBeanServlet {
         return kweetingService.getAmountOfKweets();
     }
 
+    public int getFavouriteCount(long id) {
+        Kweet kweet = kweetingService.getKweetById(id);
+
+        if (kweet == null) {
+            return 0;
+        }
+
+        int size = 0;
+        try {
+            size = kweetingService.getAmountOfFavourites(kweet);
+        } catch (KweetException e) { }
+
+        return size;
+    }
+
+    public int getMentionCount(long id) {
+        Kweet kweet = kweetingService.getKweetById(id);
+
+        if (kweet == null) {
+            return 0;
+        }
+
+        int size = 0;
+        try {
+            size = kweetingService.getAmountOfMentions(kweet);
+        } catch (KweetException e) { }
+
+        return size;
+    }
+
+    public int getHashTagCount(long id) {
+        Kweet kweet = kweetingService.getKweetById(id);
+
+        if (kweet == null) {
+            return 0;
+        }
+
+        int size = 0;
+        try {
+            size = kweetingService.getAmountOfHashtags(kweet);
+        } catch (KweetException e) { }
+
+        return size;
+    }
+
     @RolesAllowed({"Administrator"})
     public boolean delete(long id) {
         Kweet kweet = kweetingService.getKweetById(id);

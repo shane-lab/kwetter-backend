@@ -17,6 +17,6 @@ public class LogoutServlet implements JsfBeanServlet {
             destination = "/login_error";
         }
 
-        return redirect(destination);
+        return appRouteUri(destination);
     }
 }

@@ -74,8 +74,11 @@ public abstract class BaseJPADao<T, Id extends Serializable> implements GenericD
         return fromQuery(page, size, this.count(), manager.createQuery(criteriaQuery));
     }
 
-    public void remove(T entity) {
-        manager.remove(entity);
+    public void remove(Id id) {
+        T entity = find(id);
+        if (entity != null) {
+            manager.remove(entity);
+        }
     }
 
     protected Pagination<T> fromQuery(int page, int size, int count, Query query) {
@@ -107,7 +110,7 @@ public abstract class BaseJPADao<T, Id extends Serializable> implements GenericD
     protected static class JPAResult {
         public static <T> T getSingleResultOrNull(Query query) {
             List results = query.getResultList();
-            if (results.isEmpty()) {
+            if (results == null || results.isEmpty()) {
                 return null;
             }
             if (results.size() == 1) {

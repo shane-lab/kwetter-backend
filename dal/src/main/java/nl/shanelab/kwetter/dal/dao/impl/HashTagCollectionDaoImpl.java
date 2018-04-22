@@ -63,7 +63,8 @@ public class HashTagCollectionDaoImpl extends BaseCollectionDao<HashTag, Long> i
         return data.getHashTags().values();
     }
 
-    public void remove(HashTag hashTag) {
+    public void remove(Long id) {
+        HashTag hashTag = this.find(id);
         data.getHashTags().remove(hashTag);
     }
 

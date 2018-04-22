@@ -16,6 +16,30 @@ public interface KweetDao extends GenericDao<Kweet, Long> {
     int getAmountOfKweets(User user);
 
     /**
+     * Get the amount of favourites of a Kweet
+     *
+     * @param id The id of the Kweet to fetch
+     * @return int Returns the amount of favourites of the given Kweet
+     */
+    int getAmountOfFavourites(long id);
+
+    /**
+     * Get the amount of hashtags of a Kweet
+     *
+     * @param id The id of the Kweet to fetch
+     * @return int Returns the amount of hashtags of the given Kweet
+     */
+    int getAmountOfHashTags(long id);
+
+    /**
+     * Get the amount of mentions of a Kweet
+     *
+     * @param id The id of the Kweet to fetch
+     * @return int Returns the amount of mentions of the given Kweet
+     */
+    int getAmountOfMentions(long id);
+
+    /**
      * Get a collection of Kweets associated by the given user name
      *
      * @param name The name of the author associated with the Kweet

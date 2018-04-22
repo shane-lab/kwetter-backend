@@ -1,6 +1,7 @@
 package nl.shanelab.kwetter.web.jsfbean;
 
 import lombok.Data;
+import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
@@ -27,7 +28,7 @@ public class RoutesServlet implements JsfBeanServlet {
     }
 
     public String kweets(long id) {
-        return fromRoute(Routes.KWEETS);
+        return String.format("%s&id=%d",fromRoute(Routes.KWEET), id);
     }
 
     public String profiles() {
@@ -35,7 +36,7 @@ public class RoutesServlet implements JsfBeanServlet {
     }
 
     public String profiles(long id) {
-        return fromRoute(Routes.PROFILES);
+        return String.format("%s&id=%d", fromRoute(Routes.PROFILE), id);
     }
 
     public String login() {
@@ -43,13 +44,15 @@ public class RoutesServlet implements JsfBeanServlet {
     }
 
     private String fromRoute(Routes route) {
-        return redirect(route.path, false);
+        return appRouteUri(route.path, false);
     }
 
     @RequiredArgsConstructor
     public enum Routes {
         HOME("home", "/"),
+        KWEET("kweet", "/dashboard/kweet.xhtml"),
         KWEETS("kweets", "/dashboard/kweets.xhtml"),
+        PROFILE("profile", "/dashboard/profile.xhtml"),
         PROFILES("profiles", "/dashboard/profiles.xhtml"),
         DASHBOARD("dashboard", "/dashboard"),
         LOGIN("login", "/auth/login.xhtml");
@@ -58,6 +61,7 @@ public class RoutesServlet implements JsfBeanServlet {
         private String key;
 
         @NonNull
+        @Getter
         private String path;
 
         private static final Map<String, Routes> ROUTES_LOOKUP_TABLE = new HashMap<>();

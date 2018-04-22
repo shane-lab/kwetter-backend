@@ -41,8 +41,28 @@ public class KweetingServiceImpl implements KweetingService {
         return kweetDao.count();
     }
 
-    public int getAmountOfKweets(User user) {
+    public int getAmountOfKweets(User user) throws UserException {
+        validateUser(user);
+
         return kweetDao.getAmountOfKweets(user);
+    }
+
+    public int getAmountOfFavourites(Kweet kweet) throws KweetException {
+        validateKweet(kweet);
+
+        return kweetDao.getAmountOfFavourites(kweet.getId());
+    }
+
+    public int getAmountOfHashtags(Kweet kweet) throws KweetException {
+        validateKweet(kweet);
+
+        return kweetDao.getAmountOfHashTags(kweet.getId());
+    }
+
+    public int getAmountOfMentions(Kweet kweet) throws KweetException {
+        validateKweet(kweet);
+
+        return kweetDao.getAmountOfMentions(kweet.getId());
     }
 
     public int getAmountOfHashtags() {
@@ -52,7 +72,7 @@ public class KweetingServiceImpl implements KweetingService {
     public Kweet createKweet(String message, User user) throws UserException {
         validateUser(user);
 
-        return kweetDao.create(new Kweet(message, user));
+        return kweetDao.create(new Kweet(message, userDao.find(user.getId())));
     }
 
     public Kweet editKweet(Kweet kweet) throws KweetException {
@@ -66,7 +86,7 @@ public class KweetingServiceImpl implements KweetingService {
     public void removeKweet(Kweet kweet) throws KweetException {
         validateKweet(kweet);
 
-        kweetDao.remove(kweet);
+        kweetDao.remove(kweet.getId());
     }
 
     public void removeKweet(long id) throws KweetException {

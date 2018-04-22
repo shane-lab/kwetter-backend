@@ -13,8 +13,41 @@
 <ui:composition template="/WEB-INF/private/layout.xhtml">
     <ui:define name="page">
         <div class="text-center">
-            <h1>Kweet management</h1>
+            <h1><h:outputLink styleClass="k-link" action="#{routesServlet.kweets()}">Kweet management</h:outputLink></h1>
         </div>
+
+        <div class="row">
+            <h:dataTable styleClass="responsive-table highlight" var="kweet" value="#{kweetViewServlet.pagination.collection}" headerClass="grey-text text-darken-3">
+                <h:column>
+                    <f:facet name="header">Id</f:facet>
+                    <h:outputLink styleClass="waves-effect" value="#{routesServlet.kweets(kweet.id)}"><h:outputText value="#{kweet.id}" /></h:outputLink>
+                </h:column>
+                <h:column>
+                    <f:facet name="header">Author</f:facet>
+                    <h:outputLink styleClass="waves-effect" value="#{routesServlet.profiles(kweet.author.id)}"><h:outputText value="#{kweet.author.username}" /></h:outputLink>
+                </h:column>
+                <h:column>
+                    <f:facet name="header">Kweet</f:facet>
+                    <h:outputText value="#{kweet.message}" />
+                </h:column>
+                <h:column rendered="#{authServlet.administrator}">
+                    <h:commandLink styleClass="btn-floating halfway-fab waves-effect waves-light red right" action="#{kweetServlet.delete(kweet.id)}" onclick="return confirm('Are you sure you want to delete this Kweet?')"><f:actionListener binding="#{kweetViewServlet.onDelete()}" /><i class="material-icons">delete</i></h:commandLink>
+                </h:column>
+            </h:dataTable>
+        </div>
+        <h:panelGroup rendered="${kweetViewServlet.pagination.pages() > 1}" styleClass="row">
+            <ul class="pagination">
+                <ui:fragment rendered="${kweetViewServlet.pagination.hasPrevious()}">
+                    <li class="waves-effect"><a href="#!"><i class="material-icons">chevron_right</i></a></li>
+                </ui:fragment>
+                <ui:repeat var="page" value="#{kweetViewServlet.pagination.pages()}" >
+                    <li class="waves-effect"><a href="#!"><h:outputText value="${page}" /></a></li>
+                </ui:repeat>
+                <ui:fragment rendered="${kweetViewServlet.pagination.hasNext()}">
+                    <li class="waves-effect"><a href="#!"><i class="material-icons">chevron_right</i></a></li>
+                </ui:fragment>
+            </ul>
+        </h:panelGroup>
     </ui:define>
 </ui:composition>
 </html>

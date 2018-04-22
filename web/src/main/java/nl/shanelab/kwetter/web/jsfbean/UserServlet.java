@@ -4,6 +4,7 @@ import lombok.Data;
 import nl.shanelab.kwetter.dal.dao.Pagination;
 import nl.shanelab.kwetter.dal.domain.Role;
 import nl.shanelab.kwetter.dal.domain.User;
+import nl.shanelab.kwetter.services.KweetingService;
 import nl.shanelab.kwetter.services.UserService;
 import nl.shanelab.kwetter.services.exceptions.UserException;
 
@@ -19,6 +20,9 @@ public class UserServlet implements JsfBeanServlet {
 
     @Inject
     private UserService userService;
+
+    @Inject
+    private KweetingService kweetingService;
 
     public int count() {
         return userService.count();
@@ -36,8 +40,12 @@ public class UserServlet implements JsfBeanServlet {
         return userService.getAllUsers(page, size);
     }
 
-    public int getFollowers(long id) {
+    public int getFollowerCount(long id) {
         User user = userService.getById(id);
+
+        if (user == null) {
+            return 0;
+        }
 
         int size = 0;
         try {
@@ -47,8 +55,12 @@ public class UserServlet implements JsfBeanServlet {
         return size;
     }
 
-    public int getFollowings(long id) {
+    public int getFollowingCount(long id) {
         User user = userService.getById(id);
+
+        if (user == null) {
+            return 0;
+        }
 
         int size = 0;
         try {
@@ -56,6 +68,25 @@ public class UserServlet implements JsfBeanServlet {
         } catch (UserException e) { }
 
         return size;
+    }
+
+    public int getKweetsCount(long id) {
+        User user = userService.getById(id);
+
+        if (user == null) {
+            return 0;
+        }
+
+        int size = 0;
+        try {
+            size = kweetingService.getAmountOfKweets(user);
+        } catch (UserException e) { }
+
+        return size;
+    }
+
+    public Role[] getRoles() {
+        return Role.values();
     }
 
     @RolesAllowed({"Administrator"})

@@ -25,14 +25,31 @@ public interface KweetingService {
      * @param user The user to check
      * @return int Returns the amount of Kweets
      */
-    int getAmountOfKweets(User user);
+    int getAmountOfKweets(User user) throws UserException;
 
     /**
-     * Get the amount of created hashtags
+     * Get the amount of favourites from a specific Kweet
      *
+     * @param kweet The Kweet to check
+     * @return int Returns the amount of favourites
+     */
+    int getAmountOfFavourites(Kweet kweet) throws KweetException;
+
+    /**
+     * Get the amount of used hashtags in a specific Kweet
+     *
+     * @param kweet The Kweet to check
      * @return int Returns the amount of hashtags
      */
-    int getAmountOfHashtags();
+    int getAmountOfHashtags(Kweet kweet) throws KweetException;
+
+    /**
+     * Get the amount of mentions in a specific Kweet
+     *
+     * @param kweet The Kweet to check
+     * @return int Returns the amount of mentions
+     */
+    int getAmountOfMentions(Kweet kweet) throws KweetException;
 
     /**
      * Creates a new Kweet from a message

@@ -81,12 +81,36 @@ public class KweetCollectionDaoImpl extends BaseCollectionDao<Kweet, Long> imple
         return data.getKweets().values();
     }
 
-    public void remove(Kweet kweet) {
-        data.getKweets().remove(kweet.getId());
+    public void remove(Long id) {
+        data.getKweets().remove(id);
     }
 
     public int getAmountOfKweets(User user) {
         return user != null && user.getKweets() != null ? user.getKweets().size() : 0;
+    }
+
+    public int getAmountOfFavourites(long id) {
+        Kweet kweet = this.find(id);
+        if (kweet == null) {
+            return 0;
+        }
+        return kweet.getFavoritedBy() != null ? kweet.getFavoritedBy().size() : 0;
+    }
+
+    public int getAmountOfHashTags(long id) {
+        Kweet kweet = this.find(id);
+        if (kweet == null) {
+            return 0;
+        }
+        return kweet.getHashTags() != null ? kweet.getHashTags().size() : 0;
+    }
+
+    public int getAmountOfMentions(long id) {
+        Kweet kweet = this.find(id);
+        if (kweet == null) {
+            return 0;
+        }
+        return kweet.getMentions() != null ? kweet.getMentions().size() : 0;
     }
 
     public Collection<Kweet> getByUserName(String name) {
