@@ -1,13 +1,16 @@
 package nl.shanelab.kwetter.dal.domain;
 
 import lombok.*;
+import nl.shanelab.kwetter.dal.jpa.LocalDateTimeConverter;
 import nl.shanelab.kwetter.dal.jpa.RoleConverter;
 import org.hibernate.annotations.Cascade;
 
 import javax.persistence.*;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.PastOrPresent;
 import javax.validation.constraints.Pattern;
+import java.time.LocalDateTime;
 import java.util.Set;
 
 import static nl.shanelab.kwetter.util.Patterns.NO_SPACES_PATTERN;
@@ -28,7 +31,6 @@ public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-//    @Column(unique = true, nullable = false)
     /**
      * The user identifier
      */
@@ -90,10 +92,36 @@ public class User {
      */
     private Set<User> following;
 
+    @Convert(converter = LocalDateTimeConverter.class)
+    @PastOrPresent(message = "The creation date of a User may not exceed the present. Timetraveling is not allowed")
+    @Column(nullable = false)
+    /**
+     * The date and timestamp of when the Kweet was posted
+     */
+    private LocalDateTime createdAt = LocalDateTime.now();
+
     @Max(value = 160, message = "Exceeding the biography limit of {value} is not allowed")
     @Column
     /**
      * A brief description about the user
      */
     private String bio;
+
+    @Column
+    /**
+     * The personal domain or work domain of the user
+     */
+    private String website;
+
+    @Column
+    /**
+     * The payload of the uploaded profile picture of the user
+     */
+    private byte[] profilePicture;
+
+    @Column
+    /**
+     * The location of the user
+     */
+    private String location;
 }

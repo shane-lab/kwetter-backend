@@ -30,7 +30,7 @@
                     <p title="favourites"><i class="material-icons green-text text-darken-2">favorite</i>&nbsp;<h:outputText value="#{kweetServlet.getFavouriteCount(updateKweetViewServlet.kweet.id)}" /></p>
                     <p title="mentions"><i class="material-icons green-text text-darken-2" style="font-weight: bold;margin-top: -10px;margin-bottom: 10px;">@</i>&nbsp;<h:outputText value="#{kweetServlet.getMentionCount(updateKweetViewServlet.kweet.id)}" /></p>
                     <p title="hashtags"><i class="material-icons green-text text-darken-2">local_offer</i>&nbsp;<h:outputText value="${kweetServlet.getHashTagCount(updateKweetViewServlet.kweet.id)}"/></p>
-                    <p title="create at"><i class="material-icons green-text text-darken-2">insert_invitation</i>&nbsp;<h:outputText value="#{updateKweetViewServlet.kweet.createdAt.toString()}" /></p>
+                    <p title="create at"><i class="material-icons green-text text-darken-2">insert_invitation</i>&nbsp;<h:outputText value="#{localeServlet.formatDate(updateKweetViewServlet.kweet.createdAt)}" /></p>
                 </div>
             </div>
         </div>

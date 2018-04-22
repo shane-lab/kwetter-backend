@@ -108,9 +108,9 @@
                     <p title="kweets"><i class="material-icons green-text text-darken-2">message</i>&nbsp;<h:outputText value="#{userServlet.getKweetsCount(updateUserViewServlet.user.id)}" /></p>
                     <p title="followers"><i class="material-icons green-text text-darken-2">people</i>&nbsp;<h:outputText value="#{userServlet.getFollowerCount(updateUserViewServlet.user.id)}" /></p>
                     <p title="following"><i class="material-icons green-text text-darken-2">favorite</i>&nbsp;<h:outputText value="${userServlet.getFollowingCount(updateUserViewServlet.user.id)}"/></p>
-                    <p title="website"><i class="material-icons green-text text-darken-2">language</i>&nbsp;example.domain.com</p>
-                    <p title="join date"><i class="material-icons green-text text-darken-2">insert_invitation</i>&nbsp;18/03/2018</p>
-                    <p title="location"><i class="material-icons green-text text-darken-2">location_on</i>&nbsp;The Netherlands</p>
+                    <p title="website"><i class="material-icons green-text text-darken-2">language</i>&nbsp;<h:outputText value="${updateUserViewServlet.user.website != null ? updateUserViewServlet.user.website : '-'}" /></p>
+                    <p title="join date"><i class="material-icons green-text text-darken-2">insert_invitation</i>&nbsp;${localeServlet.formatDate(updateUserViewServlet.user.createdAt)}</p>
+                    <p title="location"><i class="material-icons green-text text-darken-2">location_on</i>&nbsp;${updateUserViewServlet.user.location != null ? updateUserViewServlet.user.location : '-'}</p>
                 </div>
             </div>
         </div>

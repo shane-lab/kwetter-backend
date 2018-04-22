@@ -59,4 +59,19 @@ public class UserDto implements Serializable {
      * The biographical description of a user
      */
     private String bio;
+
+    /**
+     * The creation date of the user
+     */
+    private String createdAt;
+
+    /**
+     * The personal domain of the user
+     */
+    private String website;
+
+    /**
+     * The geographical location of the user
+     */
+    private String location;
 }
