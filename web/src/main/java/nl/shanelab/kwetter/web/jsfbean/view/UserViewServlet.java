@@ -21,6 +21,11 @@ public class UserViewServlet extends PaginatedViewServlet {
     @Inject
     private UserService userService;
 
+    @Override
+    public int pages() {
+        return pagination != null ? pagination.pages() : 0;
+    }
+
     @PostConstruct
     private void onPostConstruct() {
         pagination = userService.getAllUsers(page, perPage);

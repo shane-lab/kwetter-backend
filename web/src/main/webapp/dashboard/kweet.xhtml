@@ -13,15 +13,13 @@
 <ui:composition template="/WEB-INF/private/layout.xhtml">
     <ui:define name="page">
         <div class="text-center hide-on-med-and-down">
-            <h1>Kweet by <h:outputLink value="${routesServlet.profiles(updateKweetViewServlet.kweet.author.id)}" ><h:outputText value="#{updateKweetViewServlet.kweet.author.username}" /></h:outputLink></h1>
+            <h1>Kweet by <h:outputLink value="${routesServlet.profile(updateKweetViewServlet.kweet.author.id)}" ><h:outputText value="#{updateKweetViewServlet.kweet.author.username}" /></h:outputLink></h1>
         </div>
 
         <div class="row">
             <div id="profile-page-header" class="card">
                 <div class="card-content">
                     <p>
-                        <!--<span class="card-title grey-text text-darken-4">Posted by <h:outputText value="#{updateKweetViewServlet.kweet.author.username}" /></span>-->
-                        <!--<span><i class="material-icons green-text text-darken-2">perm_identity</i> <h:outputText value="#{updateUserViewServlet.user.role.toString()}" /></span>-->
                         <h:commandLink rendered="#{authServlet.administrator}" styleClass="btn-floating halfway-fab waves-effect waves-light red right" action="#{kweetServlet.delete(updateKweetViewServlet.kweet.id)}" onclick="return confirm('Are you sure you want to delete this Kweet?')"><f:actionListener binding="#{kweetViewServlet.onDelete()}" /><i class="material-icons">delete</i></h:commandLink>
                     </p>
 

@@ -32,7 +32,7 @@
                         </div>
                         <h:panelGroup styleClass="row hide-on-med-and-down" rendered="#{dashboardViewServlet.mostFavouritedKweet != null}">
                             <div style="text-align: initial;font-size: initial;" class="grey-text text-darken-2">
-                                <p>Most popular: <h:outputLink styleClass="k-link" value="#{routesServlet.kweets(dashboardViewServlet.mostFavouritedKweet.id)}"><i><h:outputText value="#{dashboardViewServlet.mostFavouritedKweet.message}" /></i></h:outputLink>&nbsp;&mdash;&nbsp;by <strong class="green-text"><h:outputLink styleClass="k-link" value="#{routesServlet.profiles(dashboardViewServlet.mostFavouritedKweet.author.id)}"><h:outputText value="#{dashboardViewServlet.mostFavouritedKweet.author.username}" /></h:outputLink></strong></p>
+                                <p>Most popular: <h:outputLink styleClass="k-link" value="#{routesServlet.kweet(dashboardViewServlet.mostFavouritedKweet.id)}"><i><h:outputText value="#{dashboardViewServlet.mostFavouritedKweet.message}" /></i></h:outputLink>&nbsp;&mdash;&nbsp;by <strong class="green-text"><h:outputLink styleClass="k-link" value="#{routesServlet.profile(dashboardViewServlet.mostFavouritedKweet.author.id)}"><h:outputText value="#{dashboardViewServlet.mostFavouritedKweet.author.username}" /></h:outputLink></strong></p>
                             </div>
                         </h:panelGroup>
                     </div>
@@ -54,7 +54,7 @@
                         </div>
                         <h:panelGroup styleClass="row hide-on-med-and-down" rendered="#{dashboardViewServlet.mostFollowedUser != null}">
                             <div style="text-align: initial;font-size: initial;" class="grey-text text-darken-2">
-                                <p>Most popular: <h:outputLink styleClass="k-link" value="#{routesServlet.profiles(dashboardViewServlet.mostFollowedUser.id)}"><i><h:outputText value="#{dashboardViewServlet.mostFollowedUser.username}" /></i></h:outputLink>&nbsp;&mdash;&nbsp;<strong><h:outputText value="#{userServlet.getFollowerCount(dashboardViewServlet.mostFollowedUser.id)}" /></strong> follower(s)</p>
+                                <p>Most popular: <h:outputLink styleClass="k-link" value="#{routesServlet.profile(dashboardViewServlet.mostFollowedUser.id)}"><i><h:outputText value="#{dashboardViewServlet.mostFollowedUser.username}" /></i></h:outputLink>&nbsp;&mdash;&nbsp;<strong><h:outputText value="#{userServlet.getFollowerCount(dashboardViewServlet.mostFollowedUser.id)}" /></strong> follower(s)</p>
                             </div>
                         </h:panelGroup>
                     </div>

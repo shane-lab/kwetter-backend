@@ -24,18 +24,26 @@ public class RoutesServlet implements JsfBeanServlet {
     }
 
     public String kweets() {
-        return fromRoute(Routes.KWEETS);
+        return this.kweets(0);
     }
 
-    public String kweets(long id) {
+    public String kweets(int page) {
+        return paginatedRoute(Routes.KWEETS, page);
+    }
+
+    public String kweet(long id) {
         return String.format("%s&id=%d",fromRoute(Routes.KWEET), id);
     }
 
     public String profiles() {
-        return fromRoute(Routes.PROFILES);
+        return this.profiles(0);
     }
 
-    public String profiles(long id) {
+    public String profiles(int page) {
+        return paginatedRoute(Routes.PROFILES, page);
+    }
+
+    public String profile(long id) {
         return String.format("%s&id=%d", fromRoute(Routes.PROFILE), id);
     }
 
@@ -45,6 +53,10 @@ public class RoutesServlet implements JsfBeanServlet {
 
     private String fromRoute(Routes route) {
         return appRouteUri(route.path, false);
+    }
+
+    private String paginatedRoute(Routes route, int page) {
+        return String.format("%s&page=%d", fromRoute(route), page);
     }
 
     @RequiredArgsConstructor

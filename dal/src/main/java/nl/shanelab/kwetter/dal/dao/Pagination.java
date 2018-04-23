@@ -46,7 +46,7 @@ public class Pagination<T> {
      * @return int Returns the amount of possible pages
      */
     public int pages() {
-        return requestedSize >= count ? 1 : count / requestedSize;
+        return this.isEmpty() ? 0 : requestedSize >= count ? 1 : (int) Math.ceil((double)count / (double)requestedSize);
     }
 
     /**

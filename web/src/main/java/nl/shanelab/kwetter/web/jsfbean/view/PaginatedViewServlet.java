@@ -12,9 +12,21 @@ public abstract class PaginatedViewServlet implements JsfBeanServlet {
 
     protected int perPage;
 
+    public abstract int pages();
+
     @PostConstruct
     private void onPostConstruct() {
-        page = 0;
-        perPage = 0;
+        String requestedPage = this.getRequest().getParameter("page");
+        if (requestedPage != null) {
+            try {
+                page = Integer.valueOf(requestedPage);
+            } catch (Exception e) { }
+        }
+        String requestedPerPage = this.getRequest().getParameter("size");
+        if (requestedPerPage != null) {
+            try {
+                perPage = Integer.valueOf(requestedPerPage);
+            } catch (Exception e) { }
+        }
     }
 }

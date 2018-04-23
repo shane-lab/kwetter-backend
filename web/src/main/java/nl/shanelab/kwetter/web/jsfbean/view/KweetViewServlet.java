@@ -21,6 +21,11 @@ public class KweetViewServlet extends PaginatedViewServlet {
     @Inject
     private KweetingService kweetingService;
 
+    @Override
+    public int pages() {
+        return pagination != null ? pagination.pages() : 0;
+    }
+
     @PostConstruct
     private void onPostConstruct() {
         pagination = kweetingService.getAllKweets(page, perPage);
