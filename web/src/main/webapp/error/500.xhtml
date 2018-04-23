@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html
+        PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:mp="http://primefaces.org/ui/material"
+      xmlns:p="http://primefaces.org/ui">
+
+<h:head>
+</h:head>
+<h:head>
+    <h:outputStylesheet library="css" name="fonts.css"/>
+    <h:outputStylesheet library="css" name="error.css"/>
+    <h:outputStylesheet library="material-prime" name="libs/materialize.css"/>
+    <h:outputStylesheet library="material-prime" name="libs/material-icons.css"/>
+    <h:outputStylesheet library="material-prime" name="core/material-prime.css"/>
+    <title>500 Internal server error</title>
+</h:head>
+
+<h:body>
+    <h:panelGroup layout="block" rendered="#{authServlet.isSignedIn()}" styleClass="sign-out">
+        <p class="text-white">
+            <h:form>
+                <i class="material-icons">power_settings_new</i><h:commandLink styleClass="sign-out-text" action="${logoutServlet.logout}" value="sign out" />
+            </h:form>
+        </p>
+    </h:panelGroup>
+    <div class="cover">
+        <h1>An unexpected error has occured. <small>Error 500</small></h1>
+        <p class="lead">Contact the service administrators.</p>
+        <p class="lead"><small>Back to <i class="material-icons">home</i><h:outputLink value="${routesServlet.home()}">home</h:outputLink></small></p>
+    </div>
+</h:body>
+
+</html>
