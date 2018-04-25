@@ -1,9 +1,12 @@
 package nl.shanelab.kwetter.web.jsfbean.view;
 
 import lombok.Data;
+import nl.shanelab.kwetter.dal.domain.Kweet;
 import nl.shanelab.kwetter.dal.domain.Role;
 import nl.shanelab.kwetter.dal.domain.User;
+import nl.shanelab.kwetter.services.KweetingService;
 import nl.shanelab.kwetter.services.UserService;
+import nl.shanelab.kwetter.services.exceptions.UserException;
 import nl.shanelab.kwetter.web.jsfbean.JsfBeanServlet;
 import nl.shanelab.kwetter.web.jsfbean.RoutesServlet;
 
@@ -14,6 +17,8 @@ import javax.faces.event.AjaxBehaviorEvent;
 import javax.faces.view.ViewScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
+import java.util.Collection;
+import java.util.Collections;
 
 @Named
 @ViewScoped
@@ -22,11 +27,16 @@ public class UpdateUserViewServlet implements JsfBeanServlet {
 
     private User user;
 
+    private Collection<Kweet> kweets;
+
     private int currentRoleId;
     private int pendingRoleId;
 
     @Inject
     private UserService userService;
+
+    @Inject
+    private KweetingService kweetingService;
 
     @PostConstruct
     private void onPostConstruct() {
@@ -46,6 +56,12 @@ public class UpdateUserViewServlet implements JsfBeanServlet {
 
         user = userService.getById(l);
         pendingRoleId = currentRoleId = user.getRole().getId();
+
+        try {
+            kweets = kweetingService.getNthLatestKweetsByUser(10, user);
+        } catch (UserException e) {
+            kweets = Collections.EMPTY_SET;
+        }
     }
 
     public void handleRoleChange(AjaxBehaviorEvent event) {

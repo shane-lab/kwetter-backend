@@ -255,6 +255,11 @@ public class KweetCollectionDaoImpl extends BaseCollectionDao<Kweet, Long> imple
         return null;
     }
 
+    @Override
+    public Pagination<Kweet> getTimeline(long id, int page, int size) {
+        return null;
+    }
+
     public boolean isFavoritedBy(Kweet kweet, User user) {
         if (kweet == null) {
             return false;

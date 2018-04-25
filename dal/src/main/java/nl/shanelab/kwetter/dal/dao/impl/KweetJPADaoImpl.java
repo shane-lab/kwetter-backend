@@ -147,6 +147,19 @@ public class KweetJPADaoImpl extends BaseJPADao<Kweet, Long> implements KweetDao
         return fromQuery(page, size, count, query);
     }
 
+    @Override
+    public Pagination<Kweet> getTimeline(long id, int page, int size) {
+        Query countQuery = manager.createNamedQuery("Kweet.getTimeline.count", Kweet.class);
+        countQuery.setParameter("id", id);
+
+        int count = ((Number)countQuery.getSingleResult()).intValue();
+
+        Query query = manager.createNamedQuery("Kweet.getTimeline", User.class);
+        query.setParameter("id", id);
+
+        return fromQuery(page, size, count, query);
+    }
+
     public boolean isFavoritedBy(Kweet kweet, User user) {
         Query query = manager.createNamedQuery("Kweet.isFavoritedBy", Kweet.class);
         query.setParameter("id", kweet.getId());

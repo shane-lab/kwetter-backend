@@ -35,7 +35,9 @@ import java.util.Set;
         @NamedQuery(name = "Kweet.findByFavoritedBy.count", query = "SELECT COUNT(k) FROM Kweet k WHERE k IN("+Kweet.findByFavoritedBy+")"),
         @NamedQuery(name = "Kweet.isMentionedIn", query = "SELECT COUNT(k) FROM Kweet k WHERE k.id = :id AND :username IN(SELECT u.username FROM k.mentions u)"),
         @NamedQuery(name = "Kweet.isFavoritedBy", query = "SELECT COUNT(k) FROM Kweet k WHERE k.id = :id AND :username IN(SELECT u.username FROM k.favoritedBy u)"),
-        @NamedQuery(name = "Kweet.getMostFavourited", query = "SELECT k FROM Kweet k WHERE size(k.favoritedBy) > 0 ORDER BY size(k.favoritedBy)")
+        @NamedQuery(name = "Kweet.getMostFavourited", query = "SELECT k FROM Kweet k WHERE size(k.favoritedBy) > 0 ORDER BY size(k.favoritedBy)"),
+        @NamedQuery(name = "Kweet.getTimeline", query = Kweet.getTimeline + " ORDER BY k.id DESC"),
+        @NamedQuery(name = "Kweet.getTimeline.count", query = "SELECT COUNT(k) FROM Kweet k WHERE k IN("+Kweet.getTimeline+")")
 })
 public class Kweet {
 
@@ -45,6 +47,7 @@ public class Kweet {
     static final String findByHashTagName = "SELECT k FROM Kweet k WHERE :name IN(SELECT h.name FROM k.hashTags h)";
     static final String findByMentioned = "SELECT k FROM Kweet k WHERE :username IN(SELECT u.username FROM k.mentions u)";
     static final String findByFavoritedBy = "SELECT k FROM Kweet k WHERE :username IN(SELECT u.username FROM k.favoritedBy u)";
+    static final String getTimeline = "SELECT k FROM Kweet k WHERE k.author.id = :id OR k.author IN (SELECT f FROM User u INNER JOIN u.following f WHERE u.id = :id)";
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

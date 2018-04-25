@@ -48,14 +48,11 @@
         <div id="pagination" data-pages="${userViewServlet.pages()}" data-page="${userViewServlet.page}" class="row"></div>
         <h:outputScript target="body">
             (function($) {
-                console.log('a')
                 if ($ === undefined) return;
-                console.log('b')
 
                 var pagination = document.getElementById('pagination') || undefined;
 
                 if (pagination === undefined) return;
-                console.log('c')
 
                 var pages = pagination.attributes['data-pages'].value || 0;
                 var page = pagination.attributes['data-page'].value || 0;
