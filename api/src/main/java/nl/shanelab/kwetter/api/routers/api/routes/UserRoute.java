@@ -2,9 +2,9 @@ package nl.shanelab.kwetter.api.routers.api.routes;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.NoArgsConstructor;
+import nl.shanelab.kwetter.api.BaseRoute;
 import nl.shanelab.kwetter.api.dto.UserDto;
 import nl.shanelab.kwetter.api.mappers.UserMapper;
-import nl.shanelab.kwetter.api.BaseRoute;
 import nl.shanelab.kwetter.dal.dao.Pagination;
 import nl.shanelab.kwetter.dal.domain.User;
 import nl.shanelab.kwetter.services.UserService;
@@ -13,6 +13,7 @@ import nl.shanelab.kwetter.services.exceptions.user.UserNotFoundException;
 import nl.shanelab.kwetter.util.Patterns;
 
 import javax.enterprise.context.RequestScoped;
+import javax.imageio.ImageIO;
 import javax.inject.Inject;
 import javax.validation.Valid;
 import javax.validation.constraints.Pattern;
@@ -20,6 +21,13 @@ import javax.validation.constraints.Size;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.awt.image.BufferedImage;
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.stream.Collectors;
 
 @Path("/users")
@@ -29,6 +37,10 @@ public class UserRoute extends BaseRoute {
 
     @Inject
     UserService userService;
+
+    private String getAvatarBaseURL() {
+        return String.format("%s/WEB-INF/resources/avatars", servletContext.getRealPath("/"));
+    }
 
     @GET
     @Path("/")
@@ -131,6 +143,90 @@ public class UserRoute extends BaseRoute {
         User userB = userService.getById(id1);
 
         return Response.ok().status(userService.isUserFollowing(userA, userB) ? Response.Status.OK : Response.Status.BAD_REQUEST).build();
+    }
+
+    @GET
+    @Path("/{id}/avatar")
+    @Produces({"image/png", "image/jpg"})
+    public Response getProfileImage(@Valid @PathParam("id") long id) throws UserException, IOException {
+        User user = userService.getById(id);
+        if (user == null) {
+            throw new UserNotFoundException(id);
+        }
+
+        BufferedImage image;
+        try {
+            image = ImageIO.read(new File(String.format("%s/%s/avatar", getAvatarBaseURL(), user.getUsername())));
+        } catch (IOException e) {
+            // if image is not set, load default
+            image = ImageIO.read(new File(String.format("%s/profile_default.png", getAvatarBaseURL())));
+        }
+
+        return Response.ok(image).build();
+    }
+
+    @POST
+    @Path("/{id}/avatar")
+    @Consumes({"image/png", "image/jpg"})
+    public Response uploadProfileImage(@Valid @PathParam("id") long id, BufferedImage image) throws UserException {
+        User user = userService.getById(id);
+        if (user == null) {
+            throw new UserNotFoundException(id);
+        }
+
+        File dir = new File(String.format("%s/%s", getAvatarBaseURL(), user.getUsername()));
+        try {
+            if (image == null) {
+                image = new BufferedImage(128, 128, BufferedImage.TYPE_INT_RGB);
+                int r = (int)(Math.random() * 256);
+                int g = (int)(Math.random() * 256);
+                int b = (int)(Math.random() * 256);
+                for (int y = 0; y < image.getHeight(); y++) {
+                    for (int x = 0; x < image.getWidth(); x++) {
+                        image.setRGB(x, y, (r << 16) | (g << 8) | b);
+                    }
+                }
+            }
+            if (!dir.exists()) {
+                dir.mkdir();
+            }
+            ImageIO.write(image, "png", new BufferedOutputStream(new FileOutputStream(new File(String.format("%s/avatar", dir.getAbsolutePath())))));
+        } catch (IOException e) {
+            dir.deleteOnExit();
+            return nok("Unable to save the uploaded image.");
+        }
+
+        return Response.ok().build();
+    }
+
+    @DELETE
+    @Path("/{id}/avatar")
+    public Response deleteProfileImage(@Valid @PathParam("id") long id) throws UserException {
+        User user = userService.getById(id);
+        if (user == null) {
+            throw new UserNotFoundException(id);
+        }
+
+        String basePath = String.format("%s/%s", getAvatarBaseURL(), user.getUsername());
+
+        java.nio.file.Path path = Paths.get(basePath);
+        if (Files.exists(path)) {
+            try {
+                Files.walk(path)
+                        .map(java.nio.file.Path::toFile)
+                        .sorted((o1, o2) -> -o1.compareTo(o2))
+                        .forEach(File::delete);
+
+            } catch (IOException e) {
+                return nok("Unable to remove the profile image.");
+            }
+        }
+
+        if (new File(String.format("%s/avatar", basePath)).exists()) {
+            return nok("The profile image was not removed");
+        }
+
+        return Response.ok().build();
     }
 
     @NoArgsConstructor

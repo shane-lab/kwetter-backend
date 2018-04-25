@@ -1,7 +1,10 @@
 package nl.shanelab.kwetter.api;
 
-import lombok.*;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
+import lombok.Value;
 
+import javax.servlet.ServletContext;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -12,6 +15,9 @@ public class BaseRoute {
 
     @Context
     protected UriInfo uriInfo;
+
+    @Context
+    protected ServletContext servletContext;
 
     protected Response ok(Object any) {
         return Response.ok(new ResultEntity(any), MediaType.APPLICATION_JSON_TYPE).build();

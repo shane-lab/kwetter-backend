@@ -115,12 +115,6 @@ public class User {
 
     @Column
     /**
-     * The payload of the uploaded profile picture of the user
-     */
-    private byte[] profilePicture;
-
-    @Column
-    /**
      * The location of the user
      */
     private String location;

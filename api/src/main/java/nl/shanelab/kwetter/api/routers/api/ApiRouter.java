@@ -35,6 +35,7 @@ public class ApiRouter extends Application {
 
         // providers
         resources.add(AnyExceptionProvider.class); // hide other exceptions from visitors, returns a generic 400 bad request response
+        resources.add(BufferedImageBodyProvider.class);
         resources.add(ConstraintViolationProvider.class);
         resources.add(CrossOriginProvider.class);
         resources.add(UnrecognizedPropertyProvider.class);

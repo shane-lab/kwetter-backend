@@ -80,6 +80,7 @@
         <div class="row">
             <div id="profile-page-header" class="card">
                 <div class="card-content">
+                    <img src="/api/v1/users/${updateUserViewServlet.user.id}/avatar" class="circle z-depth-1 responsive-img" width="64"/>
                     <!--<h:graphicImage library="img" value="profile_default.png" styleClass="circle z-depth-1 responsive-img" />-->
 
                     <div id="details">
@@ -116,7 +117,7 @@
         </div>
 
         <h:panelGroup rendered="${not empty updateUserViewServlet.kweets}">
-            <h3>Latests Kweets&nbsp;<small>(up to 10)</small></h3>
+            <h4>Latests Kweets&nbsp;<small class="grey-text">(up to 10)</small></h4>
             <h:dataTable styleClass="responsive-table highlight" var="kweet" value="#{updateUserViewServlet.kweets}" headerClass="grey-text text-darken-3">
                 <h:column>
                     <f:facet name="header">Id</f:facet>
