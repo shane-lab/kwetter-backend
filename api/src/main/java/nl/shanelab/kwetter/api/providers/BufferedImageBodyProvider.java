@@ -32,7 +32,7 @@ public class BufferedImageBodyProvider  implements MessageBodyWriter<BufferedIma
 
     @Override
     public long getSize(BufferedImage t, Class<?> type, Type type1, Annotation[] antns, MediaType mt) {
-        return -1; // not used in JAX-RS 2
+        return -1;
     }
 
     @Override
@@ -52,7 +52,7 @@ public class BufferedImageBodyProvider  implements MessageBodyWriter<BufferedIma
         int pos = payload.indexOf(",") + 1;
         payload = payload.substring(pos, payload.length());
 
-        byte[] bytes = Base64.getDecoder().decode(payload); //Base64.decodeBase64(payload);
+        byte[] bytes = Base64.getDecoder().decode(payload);
 
         BufferedImage image = ImageIO.read(new ByteArrayInputStream(bytes));
         return image;

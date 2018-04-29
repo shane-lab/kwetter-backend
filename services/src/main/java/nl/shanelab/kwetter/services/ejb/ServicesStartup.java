@@ -12,7 +12,6 @@ import javax.ejb.Singleton;
 import javax.ejb.Startup;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
-import java.util.Collection;
 
 @Startup
 @Singleton
@@ -31,9 +30,7 @@ public class ServicesStartup {
     private void onPostConstruct() {
         try {
             this.createInitialEntities();
-        } catch (Exception e) {
-//            e.printStackTrace();
-        }
+        } catch (Exception e) { }
     }
 
     private void createInitialEntities() throws Exception {
@@ -52,8 +49,5 @@ public class ServicesStartup {
         kweetDao.create(new Kweet("Hello @der_benutzer", mod));
         kweetDao.create(new Kweet("Wow! #bestsocialmediaplatformever", user));
         kweetDao.favourite(kweet, user);
-
-        Collection<Kweet> timeline = kweetDao.getTimeline(user.getId());
-        System.out.println("");
     }
 }
