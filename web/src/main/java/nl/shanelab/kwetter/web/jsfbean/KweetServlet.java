@@ -67,7 +67,7 @@ public class KweetServlet implements JsfBeanServlet {
         return size;
     }
 
-    @RolesAllowed({"Administrator"})
+    @RolesAllowed({"Moderator", "Administrator"})
     public boolean delete(long id) {
         Kweet kweet = kweetingService.getKweetById(id);
 
