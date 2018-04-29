@@ -1,6 +1,7 @@
 package nl.shanelab.kwetter.services.impl;
 
 import lombok.NoArgsConstructor;
+import nl.shanelab.kwetter.dal.dao.Pagination;
 import nl.shanelab.kwetter.dal.dao.UserDao;
 import nl.shanelab.kwetter.dal.domain.Role;
 import nl.shanelab.kwetter.dal.domain.User;
@@ -11,10 +12,10 @@ import nl.shanelab.kwetter.services.exceptions.user.UserAlreadyExistsException;
 import nl.shanelab.kwetter.services.exceptions.user.UserFollowException;
 import nl.shanelab.kwetter.services.exceptions.user.UserIncorrectCredentialsException;
 import nl.shanelab.kwetter.services.exceptions.user.UserNotFoundException;
+import nl.shanelab.kwetter.util.Sha256;
 
 import javax.ejb.Stateless;
 import javax.inject.Inject;
-import java.util.Collection;
 
 import static nl.shanelab.kwetter.services.util.UserFollowHelper.with;
 
@@ -26,6 +27,32 @@ public class UserServiceImpl implements UserService {
     @Inject
     @JPADao
     UserDao userDao;
+
+    public int count() {
+        return userDao.count();
+    }
+
+    public int getAmountOfFollowers(User user) throws UserException {
+        if (user == null) {
+            throw new IllegalArgumentException();
+        }
+        if (this.getById(user.getId()) == null) {
+            throw new UserNotFoundException(user.getId());
+        }
+
+        return userDao.getAmountOfFollowers(user.getId());
+    }
+
+    public int getAmountOfFollowings(User user) throws UserException {
+        if (user == null) {
+            throw new IllegalArgumentException();
+        }
+        if (this.getById(user.getId()) == null) {
+            throw new UserNotFoundException(user.getId());
+        }
+
+        return userDao.getAmountOfFollowings(user.getId());
+    }
 
     public User register(String name, String password) throws UserException {
         return this.register(name, password, Role.USER);
@@ -51,7 +78,7 @@ public class UserServiceImpl implements UserService {
         if (user == null) {
             throw new UserNotFoundException(name);
         }
-        if (!user.getPassword().equals(password)) {
+        if (!user.getPassword().equals(Sha256.hash(password))) {
             throw new UserIncorrectCredentialsException(name);
         }
 
@@ -84,6 +111,19 @@ public class UserServiceImpl implements UserService {
         return userDao.edit(user);
     }
 
+    public User setRole(Role role, User user) throws UserException {
+        if (user == null) {
+            throw new IllegalArgumentException();
+        }
+        if (this.getById(user.getId()) == null) {
+            throw new UserNotFoundException(user.getId());
+        }
+
+        user.setRole(role);
+
+        return userDao.edit(user);
+    }
+
     public void remove(User user) throws UserException {
         if (user == null) {
             throw new IllegalArgumentException();
@@ -92,7 +132,7 @@ public class UserServiceImpl implements UserService {
             throw new UserNotFoundException(user.getId());
         }
 
-        userDao.remove(user);
+        userDao.remove(user.getId());
     }
 
     public boolean isUserFollowedBy(User a, User b) throws UserException {
@@ -131,6 +171,10 @@ public class UserServiceImpl implements UserService {
         with(userDao).make(a).unFollow(b);
     }
 
+    public User getMostFollowed() {
+        return userDao.getMostFollowed();
+    }
+
     public User getById(long id) {
         if (id < 0) {
             throw new IllegalArgumentException();
@@ -147,8 +191,12 @@ public class UserServiceImpl implements UserService {
         return userDao.getByUsername(name);
     }
 
-    public Collection<User> getAllUsers() {
-        return userDao.findAll();
+    public Pagination<User> getAllUsers(int page) {
+        return userDao.findAll(page);
+    }
+
+    public Pagination<User> getAllUsers(int page, int size) {
+        return userDao.findAll(page, size);
     }
 
     private void validateUserFollowPair(User a, User b) throws UserException {

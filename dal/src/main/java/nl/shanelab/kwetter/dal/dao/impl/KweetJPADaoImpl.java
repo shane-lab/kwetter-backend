@@ -1,6 +1,7 @@
 package nl.shanelab.kwetter.dal.dao.impl;
 
 import nl.shanelab.kwetter.dal.dao.KweetDao;
+import nl.shanelab.kwetter.dal.dao.Pagination;
 import nl.shanelab.kwetter.dal.domain.HashTag;
 import nl.shanelab.kwetter.dal.domain.Kweet;
 import nl.shanelab.kwetter.dal.domain.User;
@@ -9,7 +10,6 @@ import nl.shanelab.kwetter.util.Patterns;
 
 import javax.ejb.Stateless;
 import javax.persistence.Query;
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.regex.Matcher;
@@ -19,12 +19,7 @@ import java.util.regex.Pattern;
 @Stateless
 public class KweetJPADaoImpl extends BaseJPADao<Kweet, Long> implements KweetDao {
 
-    @Override
     public Kweet create(Kweet kweet) {
-//        if (!manager.contains(kweet.getAuthor()) || manager.find(User.class, kweet.getAuthor().getId()) != null) {
-//            return null;
-//        }
-
         super.create(kweet);
 
         handleMentions(kweet);
@@ -37,46 +32,132 @@ public class KweetJPADaoImpl extends BaseJPADao<Kweet, Long> implements KweetDao
         return kweet;
     }
 
-    public Collection<Kweet> getByUserName(String name) {
+    public int getAmountOfKweets(User user) {
+        Query query = manager.createNamedQuery("Kweet.getAmountByUserId", Kweet.class);
+        query.setParameter("id", user.getId());
+
+        return ((Long) JPAResult.getSingleResultOrNull(query)).intValue();
+    }
+
+    public int getAmountOfFavourites(long id) {
+        Query query = manager.createNamedQuery("Kweet.getAmountOfFavourites", Kweet.class);
+        query.setParameter("id", id);
+
+        Object size = JPAResult.getSingleResultOrNull(query);
+        if (size == null) {
+            return 0;
+        }
+
+        return (Integer) size;
+    }
+
+    public int getAmountOfHashTags(long id) {
+        Query query = manager.createNamedQuery("Kweet.getAmountOfHashTags", Kweet.class);
+        query.setParameter("id", id);
+
+        Object size = JPAResult.getSingleResultOrNull(query);
+        if (size == null) {
+            return 0;
+        }
+
+        return (Integer) size;
+    }
+
+    public int getAmountOfMentions(long id) {
+        Query query = manager.createNamedQuery("Kweet.getAmountOfMentions", Kweet.class);
+        query.setParameter("id", id);
+
+        Object size = JPAResult.getSingleResultOrNull(query);
+        if (size == null) {
+            return 0;
+        }
+
+        return (Integer) size;
+    }
+
+    public Pagination<Kweet> getByUserName(String name, int page, int size) {
+        Query countQuery = manager.createNamedQuery("Kweet.findByUserName.count", Kweet.class);
+        countQuery.setParameter("username", name);
+
+        int count = ((Number)countQuery.getSingleResult()).intValue();
+
         Query query = manager.createNamedQuery("Kweet.findByUserName", Kweet.class);
         query.setParameter("username", name);
 
-        return query.getResultList();
+        return fromQuery(page, size, count, query);
     }
 
-    public Collection<Kweet> getByUserId(Long id) {
+    public Pagination<Kweet> getByUserId(Long id, int page, int size) {
+        Query countQuery = manager.createNamedQuery("Kweet.findByUserId.count", Kweet.class);
+        countQuery.setParameter("id", id);
+
+        int count = ((Number)countQuery.getSingleResult()).intValue();
+
         Query query = manager.createNamedQuery("Kweet.findByUserId", Kweet.class);
         query.setParameter("id", id);
 
-        return query.getResultList();
+        return fromQuery(page, size, count, query);
     }
 
-    public Collection<Kweet> getByHashTagName(String name) {
+    public Pagination<Kweet> getByHashTagName(String name, int page, int size) {
+        Query countQuery = manager.createNamedQuery("Kweet.findByHashTagName.count", Kweet.class);
+        countQuery.setParameter("name", name);
+
+        int count = ((Number)countQuery.getSingleResult()).intValue();
+
         Query query = manager.createNamedQuery("Kweet.findByHashTagName", Kweet.class);
         query.setParameter("name", name);
 
-        return query.getResultList();
+        return fromQuery(page, size, count, query);
     }
 
-    public Collection<Kweet> getByHashTagId(Long id) {
+    public Pagination<Kweet> getByHashTagId(Long id, int page, int size) {
+        Query countQuery = manager.createNamedQuery("Kweet.findByHashTagId.count", Kweet.class);
+        countQuery.setParameter("id", id);
+
+        int count = ((Number)countQuery.getSingleResult()).intValue();
+
         Query query = manager.createNamedQuery("Kweet.findByHashTagId", Kweet.class);
         query.setParameter("id", id);
 
-        return query.getResultList();
+        return fromQuery(page, size, count, query);
     }
 
-    public Collection<Kweet> getByMention(String name) {
+    public Pagination<Kweet> getByMention(String name, int page, int size) {
+        Query countQuery = manager.createNamedQuery("Kweet.findByMentioned.count", Kweet.class);
+        countQuery.setParameter("username", name);
+
+        int count = ((Number)countQuery.getSingleResult()).intValue();
+
         Query query = manager.createNamedQuery("Kweet.findByMentioned", Kweet.class);
         query.setParameter("username", name);
 
-        return query.getResultList();
+        return fromQuery(page, size, count, query);
     }
 
-    public Collection<Kweet> getByFavoritedBy(String name) {
-        Query query = manager.createNamedQuery("Kweet.findByMentioned", Kweet.class);
+    public Pagination<Kweet> getByFavoritedBy(String name, int page, int size) {
+        Query countQuery = manager.createNamedQuery("Kweet.findByFavoritedBy.count", Kweet.class);
+        countQuery.setParameter("username", name);
+
+        int count = ((Number)countQuery.getSingleResult()).intValue();
+
+        Query query = manager.createNamedQuery("Kweet.findByFavoritedBy", Kweet.class);
         query.setParameter("username", name);
 
-        return query.getResultList();
+        return fromQuery(page, size, count, query);
+    }
+
+    @Override
+    public Pagination<Kweet> getTimeline(long id, int page, int size) {
+        Query countQuery = manager.createNamedQuery("Kweet.getTimeline.count", Kweet.class);
+        countQuery.setParameter("id", id);
+
+        int count = ((Number)countQuery.getSingleResult()).intValue();
+
+        Query query = manager.createNamedQuery("Kweet.getTimeline", User.class);
+        query.setParameter("id", id);
+
+        return fromQuery(page, size, count, query);
     }
 
     public boolean isFavoritedBy(Kweet kweet, User user) {
@@ -124,6 +205,13 @@ public class KweetJPADaoImpl extends BaseJPADao<Kweet, Long> implements KweetDao
 
         manager.merge(kweet);
         manager.merge(user);
+    }
+
+    public Kweet getMostFavourited() {
+        Query query = manager.createNamedQuery("Kweet.getMostFavourited", Kweet.class);
+        query.setMaxResults(1);
+
+        return JPAResult.getSingleResultOrNull(query);
     }
 
     private void handleHashTags(Kweet kweet) {
@@ -197,7 +285,7 @@ public class KweetJPADaoImpl extends BaseJPADao<Kweet, Long> implements KweetDao
     }
 
     private HashTag findHashTag(String name) {
-        Query query = manager.createNamedQuery("HashTag.findByName", User.class);
+        Query query = manager.createNamedQuery("HashTag.findByName", HashTag.class);
         query.setParameter("name", name);
 
         return JPAResult.getSingleResultOrNull(query);

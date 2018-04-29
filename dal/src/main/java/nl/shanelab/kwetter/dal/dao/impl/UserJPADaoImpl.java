@@ -1,13 +1,16 @@
 package nl.shanelab.kwetter.dal.dao.impl;
 
+
 import nl.shanelab.kwetter.dal.dao.UserDao;
 import nl.shanelab.kwetter.dal.domain.Kweet;
 import nl.shanelab.kwetter.dal.domain.User;
 import nl.shanelab.kwetter.dal.qualifiers.JPADao;
+import nl.shanelab.kwetter.util.Sha256;
 
-import javax.ejb.*;
+import javax.ejb.Stateless;
 import javax.persistence.Query;
 import java.util.Collection;
+import java.util.Collections;
 
 @JPADao
 @Stateless
@@ -20,15 +23,56 @@ public class UserJPADaoImpl extends BaseJPADao<User, Long> implements UserDao {
             return null;
         }
 
+        user.setPassword(Sha256.hash(user.getPassword()));
+
         return super.create(user);
     }
 
     public User edit(User user) {
-        if (this.find(user.getId()) != null) {
+        User found = this.find(user.getId());
+        if (found != null) {
+            if (user.getPassword() != found.getPassword()) {
+                user.setPassword(Sha256.hash(user.getPassword()));
+            }
             return super.edit(user);
         }
 
         return this.create(user);
+    }
+
+    @Override
+    public void remove(Long id) {
+        Query query = manager.createQuery("DELETE FROM Kweet k WHERE k.author.id = :id");
+        query.setParameter("id", id).executeUpdate();
+
+        User user = find(id);
+        user.setKweets(Collections.EMPTY_SET);
+
+        super.remove(id);
+    }
+
+    public int getAmountOfFollowers(long id) {
+        Query query = manager.createNamedQuery("User.getAmountOfFollowers", User.class);
+        query.setParameter("id", id);
+
+        Object size = JPAResult.getSingleResultOrNull(query);
+        if (size == null) {
+            return 0;
+        }
+
+        return (Integer) size;
+    }
+
+    public int getAmountOfFollowings(long id) {
+        Query query = manager.createNamedQuery("User.getAmountOfFollowings", User.class);
+        query.setParameter("id", id);
+
+        Object size = JPAResult.getSingleResultOrNull(query);
+        if (size == null) {
+            return 0;
+        }
+
+        return (Integer) size;
     }
 
     public User getByUsername(String name) {
@@ -56,12 +100,11 @@ public class UserJPADaoImpl extends BaseJPADao<User, Long> implements UserDao {
     }
 
     public Collection<Kweet> getNthLatestKweets(int nth, User user) {
-        return null;
-//        Query query = manager.createNamedQuery("Kweet.findByUserName", Kweet.class);
-//        query.setParameter("username", user.getUsername());
-//        query.setMaxResults(nth > 0 ? nth : 1);
-//
-//        return JPAResult.getSingleResultOrNull(query);
+        Query query = manager.createNamedQuery("Kweet.findByUserName", Kweet.class);
+        query.setParameter("username", user.getUsername());
+        query.setMaxResults(nth > 0 ? nth : 1);
+
+        return query.getResultList();
     }
 
     public void createFollow(User a, User b) {
@@ -86,5 +129,13 @@ public class UserJPADaoImpl extends BaseJPADao<User, Long> implements UserDao {
 
         manager.merge(a);
         manager.merge(b);
+    }
+
+    @Override
+    public User getMostFollowed() {
+        Query query = manager.createNamedQuery("User.getMostFollowed", User.class);
+        query.setMaxResults(1);
+
+        return JPAResult.getSingleResultOrNull(query);
     }
 }

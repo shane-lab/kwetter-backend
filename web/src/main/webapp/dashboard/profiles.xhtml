@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:mp="http://primefaces.org/ui/material"
+      xmlns:p="http://primefaces.org/ui">
+<f:view>
+    <h:outputLabel value="index"/>
+</f:view>
+<ui:composition template="/WEB-INF/private/layout.xhtml">
+    <ui:define name="page">
+        <div class="text-center">
+            <h1><h:outputLink styleClass="k-link" action="#{routesServlet.profiles()}">Profile management</h:outputLink></h1>
+        </div>
+        <h:panelGroup rendered="${not empty userViewServlet.pagination.collection}" class="row">
+            <h:dataTable styleClass="responsive-table highlight" var="user" value="#{userViewServlet.pagination.collection}" headerClass="grey-text text-darken-3">
+                <h:column>
+                    <f:facet name="header">Username</f:facet>
+                    <h:outputLink styleClass="waves-effect" value="#{routesServlet.profile(user.id)}"><h:outputText value="#{user.username}" /></h:outputLink>
+                </h:column>
+                <h:column>
+                    <f:facet name="header">Role</f:facet>
+                    <h:outputText value="#{user.role.toString()}" />
+                </h:column>
+                <h:column>
+                    <f:facet name="header">Kweets</f:facet>
+                    <h:outputText value="#{userServlet.getKweetsCount(user.id)}" />
+                </h:column>
+                <h:column headerClass="grey-text text-darken-3">
+                    <f:facet name="header">Followers</f:facet>
+                    <h:outputText value="#{userServlet.getFollowerCount(user.id)}" />
+                </h:column>
+                <h:column headerClass="grey-text text-darken-3">
+                    <f:facet name="header">Following</f:facet>
+                    <h:outputText value="#{userServlet.getFollowingCount(user.id)}" />
+                </h:column>
+                <h:column rendered="#{authServlet.administrator}">
+                    <h:commandLink rendered="#{authServlet.administrator and !authServlet.isAdministrator(user.id)}" styleClass="btn-floating halfway-fab waves-effect waves-light red right" action="#{userServlet.delete(user.id)}" onclick="return confirm('Are you sure you want to delete this user?')"><f:actionListener binding="#{userViewServlet.onDelete()}" /><i class="material-icons">delete</i></h:commandLink>
+                </h:column>
+            </h:dataTable>
+        </h:panelGroup>
+        <h:panelGroup rendered="${empty userViewServlet.pagination.collection}" styleClass="row">
+            <p>There are no users to display. Wait?! How are you even browsing on this page?</p>
+        </h:panelGroup>
+        <div id="pagination" data-pages="${userViewServlet.pages()}" data-page="${userViewServlet.page}" class="row"></div>
+        <h:outputScript target="body">
+            (function($) {
+                if ($ === undefined) return;
+
+                var pagination = document.getElementById('pagination') || undefined;
+
+                if (pagination === undefined) return;
+
+                var pages = pagination.attributes['data-pages'].value || 0;
+                var page = pagination.attributes['data-page'].value || 0;
+
+                if (2 > parseInt(pages)) return;
+
+                $(pagination).materializePagination({
+                    align: 'center',
+                    lastPage: pages > 0 ? pages - 1 : 0,
+                    firstPage: 0,
+                    urlParameter: 'page',
+                    useUrlParameter: true,
+                    onClickCallback: function(requestedPage, updatedPageUri) {
+                        window.location = updatedPageUri;
+                    }
+                });
+            })(window['jQuery'] || window['$'] || undefined);
+        </h:outputScript>
+    </ui:define>
+</ui:composition>
+</html>

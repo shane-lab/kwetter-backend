@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
 @InMemoryDao
 @Stateless
 @NoArgsConstructor
-public class HashTagCollectionDaoImpl extends BaseCollectionDao implements HashTagDao {
+public class HashTagCollectionDaoImpl extends BaseCollectionDao<HashTag, Long> implements HashTagDao {
 
     @Inject
     public HashTagCollectionDaoImpl(DummyData data) {
@@ -63,7 +63,8 @@ public class HashTagCollectionDaoImpl extends BaseCollectionDao implements HashT
         return data.getHashTags().values();
     }
 
-    public void remove(HashTag hashTag) {
+    public void remove(Long id) {
+        HashTag hashTag = this.find(id);
         data.getHashTags().remove(hashTag);
     }
 

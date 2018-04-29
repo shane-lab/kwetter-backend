@@ -8,6 +8,7 @@ import org.mapstruct.Mapping;
 import org.mapstruct.Mappings;
 import org.mapstruct.factory.Mappers;
 
+import java.time.LocalDateTime;
 import java.util.Collection;
 
 @Mapper
@@ -26,7 +27,8 @@ public interface UserMapper {
 
     @Mappings({
             @Mapping(source = "role", target = "role", resultType = String.class),
-            @Mapping(source = "role", target = "roleId", resultType = Integer.class)
+            @Mapping(source = "role", target = "roleId", resultType = Integer.class),
+            @Mapping(source = "createdAt", target = "createdAt", resultType = String.class)
     })
     /**
      * Creates a mapping from User to UserDto
@@ -44,6 +46,16 @@ public interface UserMapper {
      */
     default Integer mapRoleToInt(Role role) {
         return role.getId();
+    }
+
+    /**
+     * Auto-accessible mapped method to map from LocalDateTime to a string representation of the date
+     *
+     * @param dateTime The date to map
+     * @return String Returns a representation of the date in standard date format
+     */
+    default String mapLocalDateTimeToString(LocalDateTime dateTime) {
+        return dateTime.toString();
     }
 
     /**

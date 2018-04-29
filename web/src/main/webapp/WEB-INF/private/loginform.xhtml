@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+<f:view>
+    <form id="j_form" method="post" action="j_security_check" name="loginForm">
+        <div class="row">
+            <div class="input-field col s12 center">
+                <!--<img src="images/login-logo.png" alt="" class="circle responsive-img valign profile-image-login" />-->
+                <p class="center login-form-text">Sign in to the Kwetter admin panel</p>
+            </div>
+        </div>
+        <div class="row margin">
+            <div class="input-field col s12">
+                <i class="mdi-social-person-outline prefix"></i>
+                <h:inputText id="j_username" autocomplete="off" />
+                <h:outputLabel id="userNameLabel" for="j_username" value="username"/>
+            </div>
+        </div>
+        <div class="row margin">
+            <div class="input-field col s12">
+                <i class="mdi-action-lock-outline prefix"></i>
+                <h:inputSecret id="j_password" autocomplete="off"/>
+                <h:outputLabel id="passwordLabel" for="j_password" value="password"/>
+            </div>
+        </div>
+        <div class="row">
+            <div class="input-field col s12 m12 l12  login-text">
+                <input id="remember-me" type="checkbox" />
+                <label for="remember-me">Remember me</label>
+            </div>
+        </div>
+        <div class="row">
+            <div class="input-field col s12">
+                <h:commandButton class="btn waves-effect waves-light col s12" type="submit" value="Login"/>
+            </div>
+        </div>
+    </form>
+    <h:outputScript>
+        (function(storage) {
+            var remember = document.getElementById('remember-me');
+            var username = document.getElementById('j_username');
+            var form = document.getElementById('j_form');
+
+            if (form) {
+                if (form.addEventListener) {
+                    form.addEventListener("submit", onSubmit, false);
+                } else if (form.attachEvent) {
+                    form.attachEvent('onsubmit', onSubmit);
+                }
+            }
+
+            if (!storage) {
+                if (remember)
+                    remember.remove();
+                return;
+            }
+
+            var storedName = storage.getItem('username');
+            if (storedName) {
+                if (username) {
+                    username.value = storedName;
+                    if (remember) {
+                        remember.checked = true;
+                    }
+                }
+            }
+
+            function onSubmit(evt) {
+                if (!remember || !remember.checked) {
+                    storage.removeItem('username');
+                } else if (remember.checked) {
+                    storage.setItem('username', username.value);
+                }
+            }
+
+        })((window.localStorage || window.sessionStorage));
+    </h:outputScript>
+</f:view>
+</html>

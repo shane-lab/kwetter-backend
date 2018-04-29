@@ -30,9 +30,7 @@ public class ServicesStartup {
     private void onPostConstruct() {
         try {
             this.createInitialEntities();
-        } catch (Exception e) {
-//            e.printStackTrace();
-        }
+        } catch (Exception e) { }
     }
 
     private void createInitialEntities() throws Exception {
@@ -43,9 +41,13 @@ public class ServicesStartup {
         assert userDao.count() == 3;
 
         userDao.createFollow(user, admin);
-        userDao.createFollow(user, mod);
+//        userDao.createFollow(user, mod);
 
-        kweetDao.create(new Kweet("First Kweet, Hello World! #JEA6", admin));
-        kweetDao.create(new Kweet("Anyone else on this platform? @die_administrator", mod));
+        Kweet kweet = kweetDao.create(new Kweet("First Kweet, Hello World! #JEA6", admin));
+        kweetDao.create(new Kweet("Anyone else on this platform? @die_administrator", user));
+        kweetDao.create(new Kweet("Yes, we have a moderator. @das_moderator say HI!", admin));
+        kweetDao.create(new Kweet("Hello @der_benutzer", mod));
+        kweetDao.create(new Kweet("Wow! #bestsocialmediaplatformever", user));
+        kweetDao.favourite(kweet, user);
     }
 }

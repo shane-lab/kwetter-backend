@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:mp="http://primefaces.org/ui/material">
+<h:head>
+    <h:outputStylesheet library="css" name="fonts.css"/>
+    <h:outputStylesheet library="css" name="global.css"/>
+    <h:outputStylesheet library="material-prime" name="libs/materialize.css"/>
+    <h:outputStylesheet library="material-prime" name="libs/material-icons.css"/>
+    <h:outputStylesheet library="material-prime" name="core/material-prime.css"/>
+    <h:outputScript library="primefaces" name="jquery/jquery.js"/>
+    <h:outputScript library="material-prime" name="core/material-prime.js"/>
+    <h:outputScript library="material-prime" name="libs/materialize.js"/>
+    <h:outputScript library="js" name="materialize.pagination.js"/>
+    <title>Dashboard</title>
+    <link rel="stylesheet" href="http://yandex.st/highlightjs/8.0/styles/default.min.css" />
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
+    <!--<link rel="icon" href="javax.faces.resource/logo.png.xhtml?ln=images" type="image/x-icon"/>-->
+    <!--<link rel="shortcut icon" href="javax.faces.resource/logo.png.xhtml?ln=images" type="image/x-icon"/>-->
+</h:head>
+<h:body>
+    <div class="navbar-fixed">
+        <nav>
+            <div class="green darken-2 hide-on-med-and-down" style="z-index: 1; width:100%; min-height: 10px;" />
+            <div class="nav-wrapper green">
+                <a href="#!" data-target="mobile-demo" class="sidenav-trigger left hide-on-large-only"><i class="material-icons">menu</i></a>
+                <h:outputLink class="brand-logo" value="#{routesServlet.home()}" style="margin-left: 12px;">Kwetter admin panel</h:outputLink>
+                <ul class="right hide-on-med-and-down">
+                    <li><h:outputLink value="#{routesServlet.kweets()}">Kweets</h:outputLink></li>
+                    <li><h:outputLink value="#{routesServlet.profiles()}">Profiles</h:outputLink></li>
+                    <li>
+                        <h:form>
+                            <h:commandLink action="#{logoutServlet.logout}" value="Logout" />
+                        </h:form>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+    </div>
+    <ul class="side-nav" id="mobile-menu">
+        <li class="text-bold"><h:outputLink value="#{routesServlet.kweets()}" >Kweets</h:outputLink></li>
+        <li class="text-bold"><h:outputLink value="#{routesServlet.profiles()}">Profiles</h:outputLink></li>
+        <li class="text-bold">
+            <h:form>
+                <h:commandLink action="#{logoutServlet.logout}" value="Logout" />
+            </h:form>
+        </li>
+    </ul>
+    <div class="container">
+        <div class="row">
+            <h:form>
+                <ui:insert name="page"/>
+            </h:form>
+        </div>
+    </div>
+</h:body>
+</html>

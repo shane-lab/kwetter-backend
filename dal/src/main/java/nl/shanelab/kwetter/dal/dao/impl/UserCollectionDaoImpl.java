@@ -9,16 +9,13 @@ import nl.shanelab.kwetter.dal.qualifiers.InMemoryDao;
 
 import javax.ejb.Stateless;
 import javax.inject.Inject;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 
 @InMemoryDao
 @Stateless
 @NoArgsConstructor
-public class UserCollectionDaoImpl extends BaseCollectionDao implements UserDao {
+public class UserCollectionDaoImpl extends BaseCollectionDao<User, Long> implements UserDao {
 
     @Inject
     public UserCollectionDaoImpl(DummyData data) {
@@ -61,7 +58,11 @@ public class UserCollectionDaoImpl extends BaseCollectionDao implements UserDao 
         return data.getUsers().values();
     }
 
-    public void remove(User user) {
+    public void remove(Long id) {
+        User user = this.find(id);
+        if (user == null) {
+            return;
+        }
         Iterator<User> userIterator = this.findAll().iterator();
 
         for(;;) {
@@ -76,7 +77,17 @@ public class UserCollectionDaoImpl extends BaseCollectionDao implements UserDao 
             this.unFollow(user, next);
         }
 
-        data.getUsers().remove(user.getId());
+        data.getUsers().remove(id);
+    }
+
+    public int getAmountOfFollowers(long id) {
+        User user = this.find(id);
+        return user != null && user.getFollowers() != null ? user.getFollowers().size() : 9;
+    }
+
+    public int getAmountOfFollowings(long id) {
+        User user = this.find(id);
+        return user != null && user.getFollowers() != null ? user.getFollowing().size() : 9;
     }
 
     public User getByUsername(String username) {
@@ -142,5 +153,12 @@ public class UserCollectionDaoImpl extends BaseCollectionDao implements UserDao 
                 edit(b);
             }
         }
+    }
+
+    public User getMostFollowed() {
+        return this.findAll().stream()
+                .filter(user -> user.getFollowers() != null)
+                .sorted(Comparator.comparingInt(o -> o.getFollowers().size()))
+                .findFirst().get();
     }
 }

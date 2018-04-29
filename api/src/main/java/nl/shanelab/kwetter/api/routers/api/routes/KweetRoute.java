@@ -1,9 +1,10 @@
 package nl.shanelab.kwetter.api.routers.api.routes;
 
 import lombok.NoArgsConstructor;
+import nl.shanelab.kwetter.api.BaseRoute;
 import nl.shanelab.kwetter.api.dto.KweetDto;
 import nl.shanelab.kwetter.api.mappers.KweetMapper;
-import nl.shanelab.kwetter.api.routers.BaseRoute;
+import nl.shanelab.kwetter.dal.dao.Pagination;
 import nl.shanelab.kwetter.dal.domain.Kweet;
 import nl.shanelab.kwetter.dal.domain.User;
 import nl.shanelab.kwetter.services.KweetingService;
@@ -20,9 +21,6 @@ import javax.validation.constraints.Size;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 @Path("/kweets")
@@ -38,11 +36,17 @@ public class KweetRoute extends BaseRoute {
 
     @GET
     @Path("/")
-    public Response getAllKweets() {
+    public Response getAllKweets(@QueryParam("page") int page, @QueryParam("size") int size) {
+        Pagination<Kweet> pagination = kweetingService.getAllKweets(page, size);
 
-        return ok(kweetingService.getAllKweets().stream()
-                .map(kweet -> KweetMapper.INSTANCE.kweetToDto(kweet))
-                .collect(Collectors.toSet()));
+        return paginated(
+                pagination.getPage(),
+                pagination.getRequestedSize(),
+                pagination.pages(),
+                pagination.hasPrevious(),
+                pagination.hasNext(), pagination.getCollection().stream()
+                .map(KweetMapper.INSTANCE::kweetToDto)
+                .collect(Collectors.toList()));
     }
 
     @POST
@@ -80,18 +84,33 @@ public class KweetRoute extends BaseRoute {
     }
 
     @GET
-    @Path("/user/{id}/")
-    public Response getKweetsByUserId(@Valid @PathParam("id") long id) throws UserException {
-        Set<KweetDto> kweetDtos = new HashSet<>();
+    @Path("/user/{id}")
+    public Response getKweetsByUserId(@Valid @PathParam("id") long id, @QueryParam("page") int page, @QueryParam("size") int size) throws UserException {
+        Pagination<Kweet> pagination = kweetingService.getKweetsByUserId(id, page, size);
 
-        Collection<Kweet> kweets = kweetingService.getKweetsByUserId(id);
-        if (kweets != null) {
-            kweets.stream()
-                    .map(kweet -> KweetMapper.INSTANCE.kweetToDto(kweet))
-                    .forEach(kweetDtos::add);
-        }
+        return paginated(
+                pagination.getPage(),
+                pagination.getRequestedSize(),
+                pagination.pages(),
+                pagination.hasPrevious(),
+                pagination.hasNext(), pagination.getCollection().stream()
+                .map(KweetMapper.INSTANCE::kweetToDto)
+                .collect(Collectors.toList()));
+    }
 
-        return ok(kweetDtos);
+    @GET
+    @Path("/hashtag/{name}")
+    public Response getKweetsWithHashTagName(@Valid @PathParam("name") String name, @QueryParam("page") int page, @QueryParam("size") int size) {
+        Pagination<Kweet> pagination = kweetingService.getKweetsWithHashTagName(name, page, size);
+
+        return paginated(
+                pagination.getPage(),
+                pagination.getRequestedSize(),
+                pagination.pages(),
+                pagination.hasPrevious(),
+                pagination.hasNext(), pagination.getCollection().stream()
+                .map(KweetMapper.INSTANCE::kweetToDto)
+                .collect(Collectors.toList()));
     }
 
     @NoArgsConstructor

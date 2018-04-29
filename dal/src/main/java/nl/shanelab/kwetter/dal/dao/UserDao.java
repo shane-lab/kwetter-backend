@@ -8,6 +8,22 @@ import java.util.Collection;
 public interface UserDao extends GenericDao<User, Long> {
 
     /**
+     * Get the amount of followers
+     *
+     * @param id The user id to check
+     * @return int Returns the amount of followers
+     */
+    int getAmountOfFollowers(long id);
+
+    /**
+     * Get the amount of followings
+     *
+     * @param id The user id to check
+     * @return int Returns the amount of followings
+     */
+    int getAmountOfFollowings(long id);
+
+    /**
      * Find user by its unique username
      *
      * @param username The username to search a user by
@@ -57,6 +73,13 @@ public interface UserDao extends GenericDao<User, Long> {
      * @param b The user who is unfollwoing
      */
     void unFollow(User a, User b);
+
+    /**
+     * Get the most followed user
+     *
+     * @return User Returns the most followed user or null
+     */
+    User getMostFollowed();
 
     default boolean validateUserPair(User a, User b) {
         if (a == null || b == null) {

@@ -1,5 +1,6 @@
 package nl.shanelab.kwetter.services;
 
+import nl.shanelab.kwetter.dal.dao.Pagination;
 import nl.shanelab.kwetter.dal.domain.HashTag;
 import nl.shanelab.kwetter.dal.domain.Kweet;
 import nl.shanelab.kwetter.dal.domain.User;
@@ -10,6 +11,45 @@ import java.util.Collection;
 import java.util.Date;
 
 public interface KweetingService {
+
+    /**
+     * Get the amount of Kweets
+     *
+     * @return int Returns the amount of Kweets
+     */
+    int getAmountOfKweets();
+
+    /**
+     * Get the amount of Kweets from a specific user
+     *
+     * @param user The user to check
+     * @return int Returns the amount of Kweets
+     */
+    int getAmountOfKweets(User user) throws UserException;
+
+    /**
+     * Get the amount of favourites from a specific Kweet
+     *
+     * @param kweet The Kweet to check
+     * @return int Returns the amount of favourites
+     */
+    int getAmountOfFavourites(Kweet kweet) throws KweetException;
+
+    /**
+     * Get the amount of used hashtags in a specific Kweet
+     *
+     * @param kweet The Kweet to check
+     * @return int Returns the amount of hashtags
+     */
+    int getAmountOfHashtags(Kweet kweet) throws KweetException;
+
+    /**
+     * Get the amount of mentions in a specific Kweet
+     *
+     * @param kweet The Kweet to check
+     * @return int Returns the amount of mentions
+     */
+    int getAmountOfMentions(Kweet kweet) throws KweetException;
 
     /**
      * Creates a new Kweet from a message
@@ -56,7 +96,24 @@ public interface KweetingService {
      * @return Collection<Kweet> Returns a collection of every Kweet
      */
 
-    Collection<Kweet> getAllKweets();
+    default Collection<Kweet> getAllKweets() { return this.getAllKweets(0).getCollection(); }
+
+    /**
+     * Get a collection of all Kweets with pagination
+     *
+     * @param page The page index
+     * @return Pagination<Kweet> Returns a paginated result set of Kweets
+     */
+    Pagination<Kweet> getAllKweets(int page);
+
+    /**
+     * Get a collection of Kweets with pagination
+     *
+     * @param page The page index
+     * @param size The size of the result set
+     * @return Pagination<Kweet> Returns a paginated result set of Kweets
+     */
+    Pagination<Kweet> getAllKweets(int page, int size);
 
     /**
      * Get a collection of a users latest Kweets
@@ -71,17 +128,44 @@ public interface KweetingService {
      * Get a collection of Kweets associated by the given user
      *
      * @param user The author associated with the Kweet
-     * @return Collection<Kweet> Returns a collection of Kweets associcated with the given user name
+     * @return Collection<Kweet> Returns a collection of Kweets associated with the given user name
      */
-    Collection<Kweet> getKweetsByUser(User user) throws UserException;
+    default Collection<Kweet> getKweetsByUser(User user) throws UserException {
+        return this.getKweetsByUser(user, 0).getCollection();
+    }
+
+    Pagination<Kweet> getKweetsByUser(User user, int page) throws UserException;
+
+    Pagination<Kweet> getKweetsByUser(User user, int page, int size) throws UserException;
 
     /**
      * Get a collection of Kweets associated by the given user name
      *
      * @param name The name of the author associated with the Kweet
-     * @return Collection<Kweet> Returns a collection of Kweets associcated with the given user name
+     * @return Collection<Kweet> Returns a collection of Kweets associated with the given user name
      */
-    Collection<Kweet> getKweetsByUserName(String name) throws UserException;
+    default Collection<Kweet> getKweetsByUserName(String name) throws UserException {
+        return this.getKweetsByUserName(name, 0).getCollection();
+    }
+
+    /**
+     * Get a collection of Kweets associated by the given user name with pagination
+     *
+     * @param name The name of the author associated with the Kweet
+     * @param page The page index
+     * @return Pagination<Kweet> Returns a paginated result set of Kweets associated with the given user name
+     */
+    Pagination<Kweet> getKweetsByUserName(String name, int page) throws UserException;
+
+    /**
+     * Get a collection of Kweets associated by the given user name with pagination
+     *
+     * @param name The name of the author associated with the Kweet
+     * @param page The page index
+     * @param size The maximum size of the result set
+     * @return Pagination<Kweet> Returns a paginated result set of Kweets associated with the given user name
+     */
+    Pagination<Kweet> getKweetsByUserName(String name, int page, int size) throws UserException;
 
     /**
      * Get a collection of Kweets associated by the given user identifier
@@ -89,7 +173,13 @@ public interface KweetingService {
      * @param id The identifier of the author associated with the Kweet
      * @return Collection<Kweet> Returns a collection of Kweets associated with the gieven user identifier
      */
-    Collection<Kweet> getKweetsByUserId(long id) throws UserException;
+    default Collection<Kweet> getKweetsByUserId(long id) throws UserException {
+        return this.getKweetsByUserId(id, 0).getCollection();
+    }
+
+    Pagination<Kweet> getKweetsByUserId(long id, int page) throws UserException;
+
+    Pagination<Kweet> getKweetsByUserId(long id, int page, int size) throws UserException;
 
     /**
      * Get a collection of Kweets with the given hashtag
@@ -97,7 +187,13 @@ public interface KweetingService {
      * @param hashTag The hashtag to match
      * @return Collection<Kweet> Returns a collection of Kweets using the hashtag name in the message
      */
-    Collection<Kweet> getKweetsWithHashTag(HashTag hashTag);
+    default Collection<Kweet> getKweetsWithHashTag(HashTag hashTag) {
+        return this.getKweetsWithHashTag(hashTag, 0).getCollection();
+    }
+
+    Pagination<Kweet> getKweetsWithHashTag(HashTag hashTag, int page);
+
+    Pagination<Kweet> getKweetsWithHashTag(HashTag hashTag, int page, int size);
 
     /**
      * Get a collection of Kweets with the given hashtag name
@@ -105,7 +201,13 @@ public interface KweetingService {
      * @param name The name of the hashtag
      * @return Collection<Kweet> Returns a collection of Kweets using the hashtag name in the message
      */
-    Collection<Kweet> getKweetsWithHashTagName(String name);
+    default Collection<Kweet> getKweetsWithHashTagName(String name) {
+        return getKweetsWithHashTagName(name, 0).getCollection();
+    }
+
+    Pagination<Kweet> getKweetsWithHashTagName(String name, int page);
+
+    Pagination<Kweet> getKweetsWithHashTagName(String name, int page, int size);
 
     /**
      * Get a collection of Kweets with the given hashtag id
@@ -113,7 +215,13 @@ public interface KweetingService {
      * @param id The identifier of the hashtag
      * @return Collection<Kweet> Returns a collection of Kweets associated with the identifier of the hashtag
      */
-    Collection<Kweet> getKweetsWithHashTagId(long id);
+    default Collection<Kweet> getKweetsWithHashTagId(long id) {
+        return getKweetsWithHashTagId(id, 0).getCollection();
+    }
+
+    Pagination<Kweet> getKweetsWithHashTagId(long id, int page);
+
+    Pagination<Kweet> getKweetsWithHashTagId(long id, int page, int size);
 
     /**
      * Get a collection of Kweets mentioning a user
@@ -121,7 +229,13 @@ public interface KweetingService {
      * @param user The user mentioned in the message of the Kweet
      * @return Collection<Kweet> Returns a collection of Kweets mentioning the username in the message of the Kweet
      */
-    Collection<Kweet> getKweetsWithMention(User user) throws UserException;
+    default Collection<Kweet> getKweetsWithMention(User user) throws UserException {
+        return getKweetsWithMention(user, 0).getCollection();
+    }
+
+    Pagination<Kweet> getKweetsWithMention(User user, int page) throws UserException;
+
+    Pagination<Kweet> getKweetsWithMention(User user, int page, int size) throws UserException;
 
     /**
      * Get a collection of Kweets mentioning a username
@@ -129,7 +243,13 @@ public interface KweetingService {
      * @param name The name of user mentioned in the message of the Kweet
      * @return Collection<Kweet> Returns a collection of Kweets mentioning the username in the message of the Kweet
      */
-    Collection<Kweet> getKweetsWithMentionByUserName(String name) throws UserException;
+    default Collection<Kweet> getKweetsWithMentionByUserName(String name) throws UserException {
+        return getKweetsWithMentionByUserName(name, 0).getCollection();
+    }
+
+    Pagination<Kweet> getKweetsWithMentionByUserName(String name, int page) throws UserException;
+
+    Pagination<Kweet> getKweetsWithMentionByUserName(String name, int page, int size) throws UserException;
 
     /**
      * Get a collection of Kweets mentioning a username
@@ -137,7 +257,13 @@ public interface KweetingService {
      * @param id The identifier of user mentioned in the message of the Kweet
      * @return Collection<Kweet> Returns a collection of Kweets mentioning the username in the message of the Kweet
      */
-    Collection<Kweet> getKweetsWithMentionByUserId(long id) throws UserException;
+    default Collection<Kweet> getKweetsWithMentionByUserId(long id) throws UserException {
+        return getKweetsWithMentionByUserId(id, 0).getCollection();
+    }
+
+    Pagination<Kweet> getKweetsWithMentionByUserId(long id, int page) throws UserException;
+
+    Pagination<Kweet> getKweetsWithMentionByUserId(long id, int page, int size) throws UserException;
 
     /**
      * Get a collection of Kweets favorited by a user
@@ -145,7 +271,13 @@ public interface KweetingService {
      * @param user The the user who has favourited the Kweet
      * @return Collection<Kweet> Returns a collection of Kweets favourited by a user
      */
-    Collection<Kweet> getFavouritedKweets(User user) throws UserException;
+    default Collection<Kweet> getFavouritedKweets(User user) throws UserException {
+        return getFavouritedKweets(user, 0).getCollection();
+    }
+
+    Pagination<Kweet> getFavouritedKweets(User user, int page) throws UserException;
+
+    Pagination<Kweet> getFavouritedKweets(User user, int page, int size) throws UserException;
 
     /**
      * Get a collection of Kweets favorited by a username
@@ -153,7 +285,13 @@ public interface KweetingService {
      * @param name The name of the user who has favourited the Kweet
      * @return Collection<Kweet> Returns a collection of Kweets favourited by a user
      */
-    Collection<Kweet> getFavouritedKweetsByUserName(String name) throws UserException;
+    default Collection<Kweet> getFavouritedKweetsByUserName(String name) throws UserException {
+        return getFavouritedKweetsByUserName(name, 0).getCollection();
+    }
+
+    Pagination<Kweet> getFavouritedKweetsByUserName(String name, int page) throws UserException;
+
+    Pagination<Kweet> getFavouritedKweetsByUserName(String name, int page, int size) throws UserException;
 
     /**
      * Get a collection of Kweets favorited by a user id
@@ -161,7 +299,13 @@ public interface KweetingService {
      * @param id The identifier of the user who has favourited the Kweet
      * @return Collection<Kweet> Returns a collection of Kweets favourited by a user
      */
-    Collection<Kweet> getFavouritedKweetsByUserId(long id) throws UserException;
+    default Collection<Kweet> getFavouritedKweetsByUserId(long id) throws UserException {
+        return this.getFavouritedKweetsByUserId(id, 0).getCollection();
+    }
+
+    Pagination<Kweet> getFavouritedKweetsByUserId(long id, int page) throws UserException;
+
+    Pagination<Kweet> getFavouritedKweetsByUserId(long id, int page, int size) throws UserException;
 
     /**
      * Checks if a user is mentioned in the given Kweet
@@ -209,6 +353,13 @@ public interface KweetingService {
     void unFavouriteKweet(Kweet kweet, User user) throws KweetException, UserException;
 
     /**
+     * Get the most favourited Kweet
+     *
+     * @return Kweet Returns the most favourited Kweet or null
+     */
+    Kweet getMostFavouritedKweet();
+
+    /**
      * Find a hashtag by its discriminator value
      *
      * @param id The discriminator value to search a hashtag with
@@ -229,7 +380,26 @@ public interface KweetingService {
      *
      * @return Collection<HashTag> Returns all hashtags
      */
-    Collection<HashTag> getAllHashTags();
+    default Collection<HashTag> getAllHashTags() {
+        return this.getAllHashTags(0).getCollection();
+    }
+
+    /**
+     * Find all created hashtags with pagination
+     *
+     * @param page The page index
+     * @return Pagination<HashTag> Returns a paginated result set of hashtags
+     */
+    Pagination<HashTag> getAllHashTags(int page);
+
+    /**
+     * Find all created hashtags with pagination
+     *
+     * @param page The page index
+     * @param size The maximum size of the result set
+     * @return Pagination<HashTag> Returns a paginated result set of hashtags
+     */
+    Pagination<HashTag> getAllHashTags(int page, int size);
 
     /**
      * Find all trending hashtags by date

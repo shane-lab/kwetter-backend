@@ -3,6 +3,7 @@ package nl.shanelab.kwetter.services.impl;
 import lombok.NoArgsConstructor;
 import nl.shanelab.kwetter.dal.dao.HashTagDao;
 import nl.shanelab.kwetter.dal.dao.KweetDao;
+import nl.shanelab.kwetter.dal.dao.Pagination;
 import nl.shanelab.kwetter.dal.dao.UserDao;
 import nl.shanelab.kwetter.dal.domain.HashTag;
 import nl.shanelab.kwetter.dal.domain.Kweet;
@@ -36,10 +37,42 @@ public class KweetingServiceImpl implements KweetingService {
     @Inject
     HashTagDao hashTagDao;
 
+    public int getAmountOfKweets() {
+        return kweetDao.count();
+    }
+
+    public int getAmountOfKweets(User user) throws UserException {
+        validateUser(user);
+
+        return kweetDao.getAmountOfKweets(user);
+    }
+
+    public int getAmountOfFavourites(Kweet kweet) throws KweetException {
+        validateKweet(kweet);
+
+        return kweetDao.getAmountOfFavourites(kweet.getId());
+    }
+
+    public int getAmountOfHashtags(Kweet kweet) throws KweetException {
+        validateKweet(kweet);
+
+        return kweetDao.getAmountOfHashTags(kweet.getId());
+    }
+
+    public int getAmountOfMentions(Kweet kweet) throws KweetException {
+        validateKweet(kweet);
+
+        return kweetDao.getAmountOfMentions(kweet.getId());
+    }
+
+    public int getAmountOfHashtags() {
+        return hashTagDao.count();
+    }
+
     public Kweet createKweet(String message, User user) throws UserException {
         validateUser(user);
 
-        return kweetDao.create(new Kweet(message, user));
+        return kweetDao.create(new Kweet(message, userDao.find(user.getId())));
     }
 
     public Kweet editKweet(Kweet kweet) throws KweetException {
@@ -53,7 +86,7 @@ public class KweetingServiceImpl implements KweetingService {
     public void removeKweet(Kweet kweet) throws KweetException {
         validateKweet(kweet);
 
-        kweetDao.remove(kweet);
+        kweetDao.remove(kweet.getId());
     }
 
     public void removeKweet(long id) throws KweetException {
@@ -65,8 +98,12 @@ public class KweetingServiceImpl implements KweetingService {
         return kweetDao.find(id);
     }
 
-    public Collection<Kweet> getAllKweets() {
-        return kweetDao.findAll();
+    public Pagination<Kweet> getAllKweets(int page) {
+        return kweetDao.findAll(page);
+    }
+
+    public Pagination<Kweet> getAllKweets(int page, int size) {
+        return kweetDao.findAll(page, size);
     }
 
     public Collection<Kweet> getNthLatestKweetsByUser(int nth, User user) throws UserException {
@@ -75,66 +112,132 @@ public class KweetingServiceImpl implements KweetingService {
         return userDao.getNthLatestKweets(nth, user);
     }
 
-    public Collection<Kweet> getKweetsByUser(User user) throws UserException {
+    public Pagination<Kweet> getKweetsByUser(User user, int page) throws UserException {
         validateUser(user);
 
-        return kweetDao.getByUserId(user.getId());
+        return kweetDao.getByUserId(user.getId(), page);
     }
 
-    public Collection<Kweet> getKweetsByUserName(String name) throws UserException {
-        User user = userDao.getByUsername(name);
-
-        return this.getKweetsByUser(user);
-    }
-
-    public Collection<Kweet> getKweetsByUserId(long id) throws UserException {
-        User user = userDao.find(id);
-        return this.getKweetsByUser(user);
-    }
-
-    public Collection<Kweet> getKweetsWithHashTag(HashTag hashTag) {
-        return hashTag == null ? null : this.getKweetsWithHashTagName(hashTag.getName());
-    }
-
-    public Collection<Kweet> getKweetsWithHashTagName(String name) {
-        return kweetDao.getByHashTagName(name);
-    }
-
-    public Collection<Kweet> getKweetsWithHashTagId(long id) {
-        HashTag hashTag = hashTagDao.find(id);
-        return this.getKweetsWithHashTag(hashTag);
-    }
-
-    public Collection<Kweet> getKweetsWithMention(User user) throws UserException {
+    public Pagination<Kweet> getKweetsByUser(User user, int page, int size) throws UserException {
         validateUser(user);
 
-        return kweetDao.getByMention(user.getUsername());
+        return kweetDao.getByUserId(user.getId(), page, size);
     }
 
-    public Collection<Kweet> getKweetsWithMentionByUserName(String name) throws UserException {
+    public Pagination<Kweet> getKweetsByUserName(String name, int page) throws UserException {
         validateUser(userDao.getByUsername(name));
 
-        return kweetDao.getByMention(name);
+        return kweetDao.getByUserName(name, page);
     }
 
-    public Collection<Kweet> getKweetsWithMentionByUserId(long id) throws UserException {
-        User user = userDao.find(id);
-        return this.getKweetsWithMention(user);
-    }
-
-    public Collection<Kweet> getFavouritedKweets(User user) throws UserException {
-        return this.getFavouritedKweetsByUserName(user.getUsername());
-    }
-
-    public Collection<Kweet> getFavouritedKweetsByUserName(String name) throws UserException {
+    public Pagination<Kweet> getKweetsByUserName(String name, int page, int size) throws UserException {
         validateUser(userDao.getByUsername(name));
 
-        return kweetDao.getByFavoritedBy(name);
+        return kweetDao.getByUserName(name, page, size);
     }
 
-    public Collection<Kweet> getFavouritedKweetsByUserId(long id) throws UserException {
+    public Pagination<Kweet> getKweetsByUserId(long id, int page) throws UserException {
+        validateUser(userDao.find(id));
+
+        return kweetDao.getByUserId(id, page);
+    }
+
+    public Pagination<Kweet> getKweetsByUserId(long id, int page, int size) throws UserException {
+        validateUser(userDao.find(id));
+
+        return kweetDao.getByUserId(id, page, size);
+    }
+
+    public Pagination<Kweet> getKweetsWithHashTag(HashTag hashTag, int page) {
+        return hashTag == null ? null : this.getKweetsWithHashTagName(hashTag.getName(), page);
+    }
+
+    public Pagination<Kweet> getKweetsWithHashTag(HashTag hashTag, int page, int size) {
+        return hashTag == null ? null : this.getKweetsWithHashTagName(hashTag.getName(), page, size);
+    }
+
+    public Pagination<Kweet> getKweetsWithHashTagName(String name, int page) {
+        return kweetDao.getByHashTagName(name, page);
+    }
+
+    public Pagination<Kweet> getKweetsWithHashTagName(String name, int page, int size) {
+        return kweetDao.getByHashTagName(name, page, size);
+    }
+
+    public Pagination<Kweet> getKweetsWithHashTagId(long id, int page) {
+        return kweetDao.getByHashTagId(id, page);
+    }
+
+    public Pagination<Kweet> getKweetsWithHashTagId(long id, int page, int size) {
+        return kweetDao.getByHashTagId(id, page, size);
+    }
+
+    public Pagination<Kweet> getKweetsWithMention(User user, int page) throws UserException {
+        validateUser(user);
+
+        return kweetDao.getByMention(user.getUsername(), page);
+    }
+
+    public Pagination<Kweet> getKweetsWithMention(User user, int page, int size) throws UserException {
+        validateUser(user);
+
+        return kweetDao.getByMention(user.getUsername(), page, size);
+    }
+
+    public Pagination<Kweet> getKweetsWithMentionByUserName(String name, int page) throws UserException {
+        validateUser(userDao.getByUsername(name));
+
+        return kweetDao.getByMention(name, page);
+    }
+
+    public Pagination<Kweet> getKweetsWithMentionByUserName(String name, int page, int size) throws UserException {
+        validateUser(userDao.getByUsername(name));
+
+        return kweetDao.getByMention(name, page, size);
+    }
+
+    public Pagination<Kweet> getKweetsWithMentionByUserId(long id, int page) throws UserException {
         User user = userDao.find(id);
-        return this.getFavouritedKweets(user);
+
+        return this.getKweetsWithMention(user, page);
+    }
+
+    public Pagination<Kweet> getKweetsWithMentionByUserId(long id, int page, int size) throws UserException {
+        User user = userDao.find(id);
+
+        return this.getKweetsWithMention(user, page, size);
+    }
+
+    public Pagination<Kweet> getFavouritedKweets(User user, int page) throws UserException {
+        return this.getFavouritedKweetsByUserName(user.getUsername(), page);
+    }
+
+    public Pagination<Kweet> getFavouritedKweets(User user, int page, int size) throws UserException {
+        return this.getFavouritedKweetsByUserName(user.getUsername(), page, size);
+    }
+
+    public Pagination<Kweet> getFavouritedKweetsByUserName(String name, int page) throws UserException {
+        validateUser(userDao.getByUsername(name));
+
+        return kweetDao.getByFavoritedBy(name, page);
+    }
+
+    public Pagination<Kweet> getFavouritedKweetsByUserName(String name, int page, int size) throws UserException {
+        validateUser(userDao.getByUsername(name));
+
+        return kweetDao.getByFavoritedBy(name, page, size);
+    }
+
+    public Pagination<Kweet> getFavouritedKweetsByUserId(long id, int page) throws UserException {
+        User user = userDao.find(id);
+
+        return this.getFavouritedKweets(user, page);
+    }
+
+    public Pagination<Kweet> getFavouritedKweetsByUserId(long id, int page, int size) throws UserException {
+        User user = userDao.find(id);
+
+        return this.getFavouritedKweets(user, page, size);
     }
 
     public boolean isUserMentionedInKweet(Kweet kweet, User user) throws KweetException, UserException {
@@ -182,6 +285,10 @@ public class KweetingServiceImpl implements KweetingService {
         kweetDao.unFavourite(kweet, user);
     }
 
+    public Kweet getMostFavouritedKweet() {
+        return kweetDao.getMostFavourited();
+    }
+
     public HashTag getHashTagById(long id) {
         return hashTagDao.find(id);
     }
@@ -190,8 +297,12 @@ public class KweetingServiceImpl implements KweetingService {
         return hashTagDao.getByName(name);
     }
 
-    public Collection<HashTag> getAllHashTags() {
-        return hashTagDao.findAll();
+    public Pagination<HashTag> getAllHashTags(int page) {
+        return hashTagDao.findAll(page);
+    }
+
+    public Pagination<HashTag> getAllHashTags(int page, int size) {
+        return hashTagDao.findAll(page, size);
     }
 
     public Collection<HashTag> getTrendingHashTags(Date date) {

@@ -1,5 +1,6 @@
 package nl.shanelab.kwetter.services;
 
+import nl.shanelab.kwetter.dal.dao.Pagination;
 import nl.shanelab.kwetter.dal.domain.Role;
 import nl.shanelab.kwetter.dal.domain.User;
 import nl.shanelab.kwetter.services.exceptions.UserException;
@@ -7,6 +8,29 @@ import nl.shanelab.kwetter.services.exceptions.UserException;
 import java.util.Collection;
 
 public interface UserService {
+
+    /**
+     * Get the amount of users
+     *
+     * @return int Returns the amount of users
+     */
+    int count();
+
+    /**
+     * Get the amount of followers
+     *
+     * @param user The user to check
+     * @return int Returns the amount of followers
+     */
+    int getAmountOfFollowers(User user) throws UserException;
+
+    /**
+     * Get the amount of followings
+     *
+     * @param user The user to check
+     * @return int Returns the amount of followings
+     */
+    int getAmountOfFollowings(User user) throws UserException;
 
     /**
      * Creates a new user with default role
@@ -60,6 +84,16 @@ public interface UserService {
     User setBiography(String bio, User user) throws UserException;
 
     /**
+     * Sets the new role for the user
+     *
+     * @param role The role to set
+     * @param user The user to set the role for
+     * @return User Returns the edited user
+     * @throws UserException Throws an exception when no user was found
+     */
+    User setRole(Role role, User user) throws UserException;
+
+    /**
      * Removes a user
      *
      * @param user The user to remove
@@ -106,6 +140,13 @@ public interface UserService {
     void unFollowUser(User a, User b) throws UserException;
 
     /**
+     * Get the most followed user
+     *
+     * @return User Returns the most followed user or null
+     */
+    User getMostFollowed();
+
+    /**
      * Find a user by its discriminator value
      *
      * @param id The discriminator value of the user
@@ -126,5 +167,24 @@ public interface UserService {
      *
      * @return Collection<User> Returns a collection of all users
      */
-    Collection<User> getAllUsers();
+    default Collection<User> getAllUsers() {
+        return getAllUsers(0).getCollection();
+    }
+
+    /**
+     * Get all users
+     *
+     * @param page The current page index
+     * @return Collection<User> Returns a collection of all users on the given page
+     */
+    Pagination<User> getAllUsers(int page);
+
+    /**
+     * Get all users
+     *
+     * @param page The current page index
+     * @param size The amount of maximum records to return
+     * @return Collection<User> Returns a collection of all users on the given page
+     */
+    Pagination<User> getAllUsers(int page, int size);
 }
