@@ -230,14 +230,32 @@ public class KweetingServiceImpl implements KweetingService {
 
     public Pagination<Kweet> getFavouritedKweetsByUserId(long id, int page) throws UserException {
         User user = userDao.find(id);
+        validateUser(user);
 
         return this.getFavouritedKweets(user, page);
     }
 
     public Pagination<Kweet> getFavouritedKweetsByUserId(long id, int page, int size) throws UserException {
         User user = userDao.find(id);
+        validateUser(user);
 
         return this.getFavouritedKweets(user, page, size);
+    }
+
+    @Override
+    public Pagination<Kweet> getTimelineByUserId(long id, int page) throws UserException {
+        User user = userDao.find(id);
+        validateUser(user);
+
+        return kweetDao.getTimeline(id, page);
+    }
+
+    @Override
+    public Pagination<Kweet> getTimelineByUserId(long id, int page, int size) throws UserException {
+        User user = userDao.find(id);
+        validateUser(user);
+
+        return kweetDao.getTimeline(id, page, size);
     }
 
     public boolean isUserMentionedInKweet(Kweet kweet, User user) throws KweetException, UserException {

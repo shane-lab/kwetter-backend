@@ -70,11 +70,16 @@ public class UserRoute extends BaseRoute {
     }
 
     @GET
-    @Path("/{id}")
-    public Response getUserById(@Valid @PathParam("id") long id) throws UserNotFoundException {
-        User user = userService.getById(id);
+    @Path("/{idOrName}")
+    public Response getUserById(@Valid @PathParam("idOrName") String idOrName) throws UserNotFoundException {
+        Long id = null;
+        try {
+            id = Long.parseLong(idOrName);
+        } catch (NumberFormatException ex) { }
+        User user = id != null ? userService.getById(id) : userService.getByUserName(idOrName);
+
         if (user == null) {
-            throw new UserNotFoundException(id);
+            throw new UserNotFoundException();
         }
 
         UserDto userDto = UserMapper.INSTANCE.userAsDTO(user);
@@ -146,12 +151,17 @@ public class UserRoute extends BaseRoute {
     }
 
     @GET
-    @Path("/{id}/avatar")
+    @Path("/{idOrName}/avatar")
     @Produces({"image/png", "image/jpg"})
-    public Response getProfileImage(@Valid @PathParam("id") long id) throws UserException, IOException {
-        User user = userService.getById(id);
+    public Response getProfileImage(@Valid @PathParam("idOrName") String idOrName) throws UserException, IOException {
+        Long id = null;
+        try {
+            id = Long.parseLong(idOrName);
+        } catch (NumberFormatException ex) { }
+        User user = id != null ? userService.getById(id) : userService.getByUserName(idOrName);
+
         if (user == null) {
-            throw new UserNotFoundException(id);
+            throw new UserNotFoundException();
         }
 
         BufferedImage image;

@@ -99,6 +99,48 @@ public class KweetRoute extends BaseRoute {
     }
 
     @GET
+    @Path("/user/{idOrName}/timeline")
+    public Response getTimeline(@Valid @PathParam("idOrName") String idOrName, @QueryParam("page") int page, @QueryParam("size") int size) throws UserException {
+        Long id = null;
+        try {
+            id = Long.parseLong(idOrName);
+        } catch (Exception e) { }
+        User user = id != null ? userService.getById(id) : userService.getByUserName(idOrName);
+
+        Pagination<Kweet> pagination = kweetingService.getTimelineByUserId(user.getId(), page, size);
+
+        return paginated(
+                pagination.getPage(),
+                pagination.getRequestedSize(),
+                pagination.pages(),
+                pagination.hasPrevious(),
+                pagination.hasNext(), pagination.getCollection().stream()
+                .map(KweetMapper.INSTANCE::kweetToDto)
+                .collect(Collectors.toList()));
+    }
+
+    @GET
+    @Path("/user/{idOrName}/favorites")
+    public Response getFavorites(@Valid @PathParam("idOrName") String idOrName, @QueryParam("page") int page, @QueryParam("size") int size) throws UserException {
+        Long id = null;
+        try {
+            id = Long.parseLong(idOrName);
+        } catch (Exception e) { }
+        User user = id != null ? userService.getById(id) : userService.getByUserName(idOrName);
+
+        Pagination<Kweet> pagination = kweetingService.getFavouritedKweets(user, page, size);
+
+        return paginated(
+                pagination.getPage(),
+                pagination.getRequestedSize(),
+                pagination.pages(),
+                pagination.hasPrevious(),
+                pagination.hasNext(), pagination.getCollection().stream()
+                        .map(KweetMapper.INSTANCE::kweetToDto)
+                        .collect(Collectors.toList()));
+    }
+
+    @GET
     @Path("/hashtag/{name}")
     public Response getKweetsWithHashTagName(@Valid @PathParam("name") String name, @QueryParam("page") int page, @QueryParam("size") int size) {
         Pagination<Kweet> pagination = kweetingService.getKweetsWithHashTagName(name, page, size);

@@ -308,6 +308,20 @@ public interface KweetingService {
     Pagination<Kweet> getFavouritedKweetsByUserId(long id, int page, int size) throws UserException;
 
     /**
+     * Get a collection of Kweets posted by a user and mentioned in a Kweet
+     *
+     * @param id The identifier of the user
+     * @return Collection<Kweet> Returns a collection of Kweets posted by a user and mentioned in a Kweet
+     */
+    default Collection<Kweet> getTimelineByUserId(long id) throws UserException {
+        return this.getTimelineByUserId(id, 0).getCollection();
+    }
+
+    Pagination<Kweet> getTimelineByUserId(long id, int page) throws UserException;
+
+    Pagination<Kweet> getTimelineByUserId(long id, int page, int size) throws UserException;
+
+    /**
      * Checks if a user is mentioned in the given Kweet
      *
      * @param kweet The Kweet to check against
