@@ -5,6 +5,7 @@ import lombok.NoArgsConstructor;
 import nl.shanelab.kwetter.api.BaseRoute;
 import nl.shanelab.kwetter.api.dto.UserDto;
 import nl.shanelab.kwetter.api.mappers.UserMapper;
+import nl.shanelab.kwetter.api.qualifiers.Jwt;
 import nl.shanelab.kwetter.dal.dao.Pagination;
 import nl.shanelab.kwetter.dal.domain.User;
 import nl.shanelab.kwetter.services.UserService;
@@ -19,6 +20,7 @@ import javax.validation.Valid;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 import javax.ws.rs.*;
+import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.awt.image.BufferedImage;
@@ -43,6 +45,13 @@ public class UserRoute extends BaseRoute {
     }
 
     @GET
+    @Path("/withjwt")
+    @Jwt
+    public Response testJWT(@QueryParam("message") String message) {
+        return Response.ok(message).build();
+    }
+
+    @GET
     @Path("/")
     public Response getUsers(@QueryParam("page") int page, @QueryParam("size") int size) {
         Pagination<User> pagination = userService.getAllUsers(page, size);
@@ -60,13 +69,28 @@ public class UserRoute extends BaseRoute {
     @POST
     @Path("/")
     @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
+//    @Produces(MediaType.APPLICATION_JSON)
     public Response createUser(@Valid UserCredentials credentials) throws UserException {
         User user = userService.register(credentials.username, credentials.password);
 
-        UserDto userDto = UserMapper.INSTANCE.userAsDTO(user);
+        String token = issue(user.getUsername());
 
-        return ok(userDto);
+        return Response.ok().header(HttpHeaders.AUTHORIZATION, token).build();
+    }
+
+    @POST
+    @Path("/login")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response authenticateUser(@Valid UserCredentials credentials) {
+        try {
+            User user = userService.authenticate(credentials.username, credentials.password);
+
+            String token = issue(user.getUsername());
+
+            return Response.ok().header(HttpHeaders.AUTHORIZATION, token).build();
+        } catch (Exception e) {
+            return Response.status(Response.Status.UNAUTHORIZED).build();
+        }
     }
 
     @GET

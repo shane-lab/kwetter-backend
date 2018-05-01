@@ -38,6 +38,7 @@ public class ApiRouter extends Application {
         resources.add(BufferedImageBodyProvider.class);
         resources.add(ConstraintViolationProvider.class);
         resources.add(CrossOriginProvider.class);
+        resources.add(JwtProvider.class);
         resources.add(UnrecognizedPropertyProvider.class);
         resources.add(UserExceptionProvider.class);
         resources.add(WebExceptionProvider.class);
