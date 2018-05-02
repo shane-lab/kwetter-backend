@@ -86,38 +86,50 @@ public class UserServiceImpl implements UserService {
     }
 
     public User rename(String name, User user) throws UserException {
-        if (name == null || user == null) {
-            throw new IllegalArgumentException();
-        }
-        if (this.getByUserName(name) != null) {
-            throw new UserAlreadyExistsException(name);
-        }
+        validateUser(user);
 
         user.setUsername(name);
 
         return userDao.edit(user);
     }
 
+    @Override
+    public User setPassword(String password, User user) throws UserException {
+        validateUser(user);
+
+        user.setPassword(password);
+
+        return userDao.edit(user);
+    }
+
     public User setBiography(String bio, User user) throws UserException {
-        if (bio == null || user == null) {
-            throw new IllegalArgumentException();
-        }
-        if (this.getById(user.getId()) == null) {
-            throw new UserNotFoundException(user.getId());
-        }
+        validateUser(user);
 
         user.setBio(bio);
 
         return userDao.edit(user);
     }
 
+    @Override
+    public User setLocation(String location, User user) throws UserException {
+        validateUser(user);
+
+        user.setLocation(location);
+
+        return userDao.edit(user);
+    }
+
+    @Override
+    public User setWebsite(String website, User user) throws UserException {
+        validateUser(user);
+
+        user.setWebsite(website);
+
+        return userDao.edit(user);
+    }
+
     public User setRole(Role role, User user) throws UserException {
-        if (user == null) {
-            throw new IllegalArgumentException();
-        }
-        if (this.getById(user.getId()) == null) {
-            throw new UserNotFoundException(user.getId());
-        }
+        validateUser(user);
 
         user.setRole(role);
 

@@ -18,6 +18,6 @@ public class SecretKeyGenerator implements KeyGenerator {
 
     @Override
     public SignatureAlgorithm getAlgorithm() {
-        return SignatureAlgorithm.ES256;
+        return SignatureAlgorithm.HS512;
     }
 }

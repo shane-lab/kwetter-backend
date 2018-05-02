@@ -20,7 +20,6 @@ import javax.validation.Valid;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 import javax.ws.rs.*;
-import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.awt.image.BufferedImage;
@@ -45,13 +44,6 @@ public class UserRoute extends BaseRoute {
     }
 
     @GET
-    @Path("/withjwt")
-    @Jwt
-    public Response testJWT(@QueryParam("message") String message) {
-        return Response.ok(message).build();
-    }
-
-    @GET
     @Path("/")
     public Response getUsers(@QueryParam("page") int page, @QueryParam("size") int size) {
         Pagination<User> pagination = userService.getAllUsers(page, size);
@@ -69,33 +61,50 @@ public class UserRoute extends BaseRoute {
     @POST
     @Path("/")
     @Consumes(MediaType.APPLICATION_JSON)
-//    @Produces(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
     public Response createUser(@Valid UserCredentials credentials) throws UserException {
         User user = userService.register(credentials.username, credentials.password);
 
-        String token = issue(user.getUsername());
-
-        return Response.ok().header(HttpHeaders.AUTHORIZATION, token).build();
+        return okWithJWT(UserMapper.INSTANCE.userAsDTO(user), issue(user.getUsername()));
     }
 
-    @POST
-    @Path("/login")
-    @Consumes(MediaType.APPLICATION_JSON)
-    public Response authenticateUser(@Valid UserCredentials credentials) {
-        try {
-            User user = userService.authenticate(credentials.username, credentials.password);
+    @PUT
+    @Path("/")
+    @Jwt
+    public Response editUser(@Valid UpdateUser updateUser) throws UserException {
+        String name = securityContext.getUserPrincipal().getName();
+        User user = userService.getByUserName(name);
 
-            String token = issue(user.getUsername());
-
-            return Response.ok().header(HttpHeaders.AUTHORIZATION, token).build();
-        } catch (Exception e) {
-            return Response.status(Response.Status.UNAUTHORIZED).build();
+        String newToken = null;
+        if (updateUser.username != null && userService.getByUserName(updateUser.username) == null) {
+            user = userService.rename(updateUser.username, user);
+            newToken = issue(user.getUsername());
         }
+
+        if (updateUser.password != null) {
+            user = userService.setPassword(updateUser.password, user);
+        }
+
+        if (updateUser.bio != null) {
+            user = userService.setBiography(updateUser.bio, user);
+        }
+
+        if (updateUser.location != null) {
+            user = userService.setLocation(updateUser.location, user);
+        }
+
+        if (updateUser.website != null) {
+            user = userService.setWebsite(updateUser.website, user);
+        }
+
+        UserDto userDto = UserMapper.INSTANCE.userAsDTO(user);
+
+        return okWithJWT(userDto, newToken);
     }
 
     @GET
     @Path("/{idOrName}")
-    public Response getUserById(@Valid @PathParam("idOrName") String idOrName) throws UserNotFoundException {
+    public Response getUser(@Valid @PathParam("idOrName") String idOrName) throws UserException {
         Long id = null;
         try {
             id = Long.parseLong(idOrName);
@@ -111,63 +120,35 @@ public class UserRoute extends BaseRoute {
         return ok(userDto);
     }
 
-    @PUT
-    @Path("/{id}")
-    public Response editUserById(@Valid @PathParam("id") long id, @Valid UpdateUser updateUser) throws UserException {
-        User user = userService.getById(id);
-        if (user == null) {
-            throw new UserNotFoundException(id);
-        }
-
-        if (updateUser.username != null && userService.getByUserName(updateUser.username) == null) {
-            user = userService.rename(updateUser.username, user);
-        }
-
-        if (updateUser.bio != null) {
-            user = userService.setBiography(updateUser.bio, user);
-        }
-
-        UserDto userDto = UserMapper.INSTANCE.userAsDTO(user);
-
-        return ok(userDto);
-    }
-
-    @DELETE
-    @Path("/{id}")
-    public Response removeUserById(@Valid @PathParam("id") long id) throws UserException {
-        User user = userService.getById(id);
-        if (user != null) {
-            userService.remove(user);
-        }
-
-        return Response.ok().build();
-    }
-
     @POST
-    @Path("/{id}/follow/{id1}")
-    public Response followUser(@Valid @PathParam("id") long id, @Valid @PathParam("id1") long id1) throws UserException {
-        User userA = userService.getById(id);
-        User userB = userService.getById(id1);
+    @Path("/follow/{id}")
+    @Jwt
+    public Response followUser(@Valid @PathParam("id") long id) throws UserException {
+        String name = securityContext.getUserPrincipal().getName();
+        User userA = userService.getByUserName(name);
+        User userB = userService.getById(id);
 
         userService.followUser(userA, userB);
 
-        return Response.ok().build();
+        return ok();
     }
 
     @DELETE
-    @Path("/{id}/follow/{id1}")
-    public Response unFollowUser(@Valid @PathParam("id") long id, @Valid @PathParam("id1") long id1) throws UserException {
-        User userA = userService.getById(id);
-        User userB = userService.getById(id1);
+    @Path("/follow/{id}")
+    @Jwt
+    public Response unFollowUser(@Valid @PathParam("id") long id) throws UserException {
+        String name = securityContext.getUserPrincipal().getName();
+        User userA = userService.getByUserName(name);
+        User userB = userService.getById(id);
 
         userService.unFollowUser(userA, userB);
 
-        return Response.ok().build();
+        return ok();
     }
 
     @GET
-    @Path("/{id}/follows/{id1}")
-    public Response follows(@Valid @PathParam("id") long id, @Valid @PathParam("id1") long id1) throws UserException {
+    @Path("/{idOrName}/follows/{id1OrName}")
+    public Response follows(@Valid @PathParam("idOrName") long id, @Valid @PathParam("id1OrName") long id1) throws UserException {
         User userA = userService.getById(id);
         User userB = userService.getById(id1);
 
@@ -200,12 +181,15 @@ public class UserRoute extends BaseRoute {
     }
 
     @POST
-    @Path("/{id}/avatar")
+    @Path("/avatar")
     @Consumes({"image/png", "image/jpg"})
-    public Response uploadProfileImage(@Valid @PathParam("id") long id, BufferedImage image) throws UserException {
-        User user = userService.getById(id);
+    @Jwt
+    public Response uploadProfileImage(@Valid BufferedImage image) throws UserException {
+        String name = securityContext.getUserPrincipal().getName();
+        User user = userService.getByUserName(name);
+
         if (user == null) {
-            throw new UserNotFoundException(id);
+            throw new UserNotFoundException();
         }
 
         if (image == null) {
@@ -223,15 +207,18 @@ public class UserRoute extends BaseRoute {
             return nok("Unable to save the uploaded image.");
         }
 
-        return Response.ok().build();
+        return ok();
     }
 
     @DELETE
-    @Path("/{id}/avatar")
-    public Response deleteProfileImage(@Valid @PathParam("id") long id) throws UserException {
-        User user = userService.getById(id);
+    @Path("/avatar")
+    @Jwt
+    public Response deleteProfileImage() throws UserException {
+        String name = securityContext.getUserPrincipal().getName();
+        User user = userService.getByUserName(name);
+
         if (user == null) {
-            throw new UserNotFoundException(id);
+            throw new UserNotFoundException();
         }
 
         String basePath = String.format("%s/%s", getAvatarBaseURL(), user.getUsername());
@@ -253,7 +240,7 @@ public class UserRoute extends BaseRoute {
             return nok("The profile image was not removed");
         }
 
-        return Response.ok().build();
+        return ok();
     }
 
     @NoArgsConstructor
@@ -271,6 +258,10 @@ public class UserRoute extends BaseRoute {
         @Size(max = 160, message = "Exceeding the biography limit of {max} is not allowed")
         public String bio;
 
+        @Pattern(regexp = Patterns.DOMAIN_PATTERN, message = "The given website does is not meet a valid domain name")
+        public String website;
+
+        public String location;
     }
 
 }
