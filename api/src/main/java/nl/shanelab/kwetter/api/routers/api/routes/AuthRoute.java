@@ -6,6 +6,7 @@ import nl.shanelab.kwetter.api.qualifiers.Jwt;
 import nl.shanelab.kwetter.dal.domain.User;
 import nl.shanelab.kwetter.services.UserService;
 import nl.shanelab.kwetter.services.exceptions.UserException;
+import nl.shanelab.kwetter.services.exceptions.user.UserNotFoundException;
 
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
@@ -26,13 +27,12 @@ public class AuthRoute extends BaseRoute {
     @POST
     @Path("/login")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response authenticateUser(@Valid UserRoute.UserCredentials credentials) {
+    public Response authenticateUser(@Valid UserRoute.UserCredentials credentials) throws UserException {
+        User user = userService.authenticate(credentials.username, credentials.password);
         try {
-            User user = userService.authenticate(credentials.username, credentials.password);
-
             return okWithJWT(UserMapper.INSTANCE.userAsDTO(user), issue(user.getUsername()));
         } catch (Exception e) {
-            return Response.status(Response.Status.UNAUTHORIZED).build();
+            return nok("Unable to authenticate the user");
         }
     }
 
@@ -40,7 +40,14 @@ public class AuthRoute extends BaseRoute {
     @Path("/refresh")
     @Jwt
     public Response refreshToken() throws UserException {
-        return ok();
+        String name = securityContext.getUserPrincipal().getName();
+        User user = userService.getByUserName(name);
+
+        if (user == null) {
+            throw new UserNotFoundException(name);
+        }
+
+        return ok(UserMapper.INSTANCE.userAsDTO(user));
     }
 
 }

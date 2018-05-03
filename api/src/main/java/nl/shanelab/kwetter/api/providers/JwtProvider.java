@@ -4,8 +4,11 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.impl.crypto.JwtSigner;
+import lombok.RequiredArgsConstructor;
+import lombok.Value;
 import nl.shanelab.kwetter.api.jwt.KeyGenerator;
 import nl.shanelab.kwetter.api.qualifiers.Jwt;
+import org.jboss.weld.context.http.Http;
 
 import javax.annotation.Priority;
 import javax.inject.Inject;
@@ -14,6 +17,7 @@ import javax.ws.rs.Priorities;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.core.HttpHeaders;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
 import javax.ws.rs.ext.Provider;
@@ -36,7 +40,7 @@ public class JwtProvider implements ContainerRequestFilter {
         String authorizationHeader = requestContext.getHeaderString(HttpHeaders.AUTHORIZATION);
 
         if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
-            throw new NotAuthorizedException("Authorization header must be provided");
+            throw NotAuthorizedExceptionEntity("The Authorization header must be provided");
         }
 
         String token = authorizationHeader.substring("Bearer".length()).trim();
@@ -52,6 +56,7 @@ public class JwtProvider implements ContainerRequestFilter {
 
             body.setExpiration(Date.from(LocalDateTime.now().plusMinutes(60L).atZone(ZoneId.systemDefault()).toInstant()));
 
+            requestContext.getHeaders().remove(HttpHeaders.AUTHORIZATION);
             requestContext.getHeaders().add(HttpHeaders.AUTHORIZATION, String.format("Bearer %s", Jwts.builder()
                     .setClaims(body)
                     .signWith(keyGenerator.getAlgorithm(), key)
@@ -81,7 +86,28 @@ public class JwtProvider implements ContainerRequestFilter {
             });
 
         } catch (Exception e) {
-            requestContext.abortWith(Response.status(Response.Status.UNAUTHORIZED).build());
+            if (e instanceof io.jsonwebtoken.ExpiredJwtException) {
+                throw NotAuthorizedExceptionEntity("The provided JWT has expired");
+            }
+
+            throw NotAuthorizedExceptionEntity("Unable to authenticate the user with the provided JWT");
         }
+    }
+
+    private NotAuthorizedException NotAuthorizedExceptionEntity(String reason) {
+        return new NotAuthorizedException(Response
+                .status(Response.Status.UNAUTHORIZED)
+                .entity(new NotAuthorizedExceptionEntity(reason))
+                .build());
+    }
+
+    @Value
+    @RequiredArgsConstructor
+    protected static class NotAuthorizedExceptionEntity {
+
+        protected final int statusCode = Response.Status.UNAUTHORIZED.getStatusCode();
+
+        protected final String message;
+
     }
 }

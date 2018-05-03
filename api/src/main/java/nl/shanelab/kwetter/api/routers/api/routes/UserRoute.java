@@ -31,6 +31,8 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.stream.Collectors;
 
+import static javax.ws.rs.core.HttpHeaders.AUTHORIZATION;
+
 @Path("/users")
 @Produces(MediaType.APPLICATION_JSON)
 @RequestScoped
