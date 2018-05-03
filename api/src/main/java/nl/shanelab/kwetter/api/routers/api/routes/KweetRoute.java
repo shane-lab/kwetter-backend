@@ -4,6 +4,7 @@ import lombok.NoArgsConstructor;
 import nl.shanelab.kwetter.api.BaseRoute;
 import nl.shanelab.kwetter.api.dto.KweetDto;
 import nl.shanelab.kwetter.api.mappers.KweetMapper;
+import nl.shanelab.kwetter.api.qualifiers.Jwt;
 import nl.shanelab.kwetter.dal.dao.Pagination;
 import nl.shanelab.kwetter.dal.domain.Kweet;
 import nl.shanelab.kwetter.dal.domain.User;
@@ -13,6 +14,7 @@ import nl.shanelab.kwetter.services.exceptions.KweetException;
 import nl.shanelab.kwetter.services.exceptions.UserException;
 import nl.shanelab.kwetter.services.exceptions.kweet.KweetNotFoundException;
 
+import javax.annotation.PostConstruct;
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
 import javax.validation.Valid;
@@ -51,42 +53,95 @@ public class KweetRoute extends BaseRoute {
 
     @POST
     @Path("/")
-    public Response createKweet(@Valid KweetCreation kweetCreation) throws UserException {
-        User user = userService.authenticate(kweetCreation.username, kweetCreation.password);
+    @Jwt
+    public Response createKweet(
+            @Valid
+            @Size(max = 144, message = "Exceeding the character length limit of {max} of a Kweet is not allowed")
+            @NotBlank(message = "The Kweet message can not be left empty") String message) throws UserException {
+        String name = securityContext.getUserPrincipal().getName();
+        User user = userService.getByUserName(name);
 
-        Kweet kweet = kweetingService.createKweet(kweetCreation.message, user);
+        Kweet kweet = kweetingService.createKweet(message, user);
 
-        KweetDto kweetDto = KweetMapper.INSTANCE.kweetToDto(kweet);
-
-        return ok(kweetDto);
+        return ok(KweetMapper.INSTANCE.kweetToDto(kweet));
     }
 
     @GET
     @Path("/{id}")
-    public Response getKweetById(@Valid @PathParam("id") long id) throws KweetNotFoundException {
+    public Response getKweet(@Valid @PathParam("id") long id) throws KweetException {
         Kweet kweet = kweetingService.getKweetById(id);
 
         if (kweet == null) {
             throw new KweetNotFoundException(id);
         }
 
-        KweetDto kweetDto = KweetMapper.INSTANCE.kweetToDto(kweet);
-
-        return ok(kweetDto);
+        return ok(KweetMapper.INSTANCE.kweetToDto(kweet));
     }
 
     @DELETE
     @Path("/{id}")
-    public Response removeKweetById(@Valid @PathParam("id") long id) throws KweetException {
+    @Jwt
+    public Response removeKweet(@Valid @PathParam("id") long id) throws KweetException {
+        Kweet kweet = kweetingService.getKweetById(id);
+
+        String name = securityContext.getUserPrincipal().getName();
+        User user = userService.getByUserName(name);
+
+        if (!kweet.getAuthor().equals(user)) {
+            return nok("The Kweet to remove does not belong to the user");
+        }
+
         kweetingService.removeKweet(id);
 
-        return Response.ok().build();
+        return ok();
+    }
+
+    @POST
+    @Path("/favorite/{id}")
+    @Jwt
+    public Response favoriteKweet(@Valid @PathParam("id") long id) throws KweetException, UserException {
+        Kweet kweet = kweetingService.getKweetById(id);
+
+        if (kweet == null) {
+            throw new KweetNotFoundException(id);
+        }
+
+        String name = securityContext.getUserPrincipal().getName();
+        User user = userService.getByUserName(name);
+
+        kweetingService.favouriteKweet(kweet, user);
+
+        return ok();
+    }
+
+    @DELETE
+    @Path("/favorite/{id}")
+    @Jwt
+    public Response unFavoriteKweet(@Valid @PathParam("id") long id) throws KweetException, UserException {
+        Kweet kweet = kweetingService.getKweetById(id);
+
+        if (kweet == null) {
+            throw new KweetNotFoundException(id);
+        }
+
+        String name = securityContext.getUserPrincipal().getName();
+        User user = userService.getByUserName(name);
+
+        kweetingService.unFavouriteKweet(kweet, user);
+
+        return ok();
     }
 
     @GET
-    @Path("/user/{id}")
-    public Response getKweetsByUserId(@Valid @PathParam("id") long id, @QueryParam("page") int page, @QueryParam("size") int size) throws UserException {
-        Pagination<Kweet> pagination = kweetingService.getKweetsByUserId(id, page, size);
+    @Path("/user/{idOrName}")
+    public Response getKweetsByUser(@Valid @PathParam("idOrName") String idOrName, @QueryParam("page") int page, @QueryParam("size") int size) throws UserException {
+        Long id = null;
+        try {
+            id = Long.parseLong(idOrName);
+        } catch (Exception e) { }
+        User user = id != null ? userService.getById(id) : userService.getByUserName(idOrName);
+
+        Pagination<Kweet> pagination = kweetingService.getKweetsByUser(user, page, size);
 
         return paginated(
                 pagination.getPage(),
@@ -155,11 +210,4 @@ public class KweetRoute extends BaseRoute {
                 .collect(Collectors.toList()));
     }
 
-    @NoArgsConstructor
-    public static class KweetCreation extends UserRoute.UserCredentials {
-        @Size(max = 144, message = "Exceeding the character length limit of {max} of a Kweet is not allowed")
-        @NotBlank(message = "The Kweet message can not be left empty")
-        public String message;
-
-    }
 }

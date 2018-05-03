@@ -4,6 +4,7 @@ import nl.shanelab.kwetter.dal.dao.Pagination;
 import nl.shanelab.kwetter.dal.domain.Role;
 import nl.shanelab.kwetter.dal.domain.User;
 import nl.shanelab.kwetter.services.exceptions.UserException;
+import nl.shanelab.kwetter.services.exceptions.user.UserNotFoundException;
 
 import java.util.Collection;
 
@@ -74,14 +75,44 @@ public interface UserService {
     User rename(String name, User user) throws UserException;
 
     /**
+     * Sets a new password for the user
+     *
+     * @param password The new password
+     * @param user The user to update
+     * @return User Returns the edited user
+     * @throws UserException Throws an exception when no user was found
+     */
+    User setPassword(String password, User user) throws UserException;
+
+    /**
      * Sets a new biography for the user
      *
      * @param bio The biography
-     * @param user The user to set the biography for
+     * @param user The user to update
      * @return User Returns the edited user
      * @throws UserException Throws an exception when no user was found
      */
     User setBiography(String bio, User user) throws UserException;
+
+    /**
+     * Sets a new location for the user
+     *
+     * @param location The location
+     * @param user The user to set the biography for
+     * @return User Returns the edited user
+     * @throws UserException Throws an exception when no user was found
+     */
+    User setLocation(String location, User user) throws UserException;
+
+    /**
+     * Sets a new website for the user
+     *
+     * @param website The website
+     * @param user The user to update
+     * @return User Returns the edited user
+     * @throws UserException Throws an exception when no user was found
+     */
+    User setWebsite(String website, User user) throws UserException;
 
     /**
      * Sets the new role for the user
@@ -187,4 +218,13 @@ public interface UserService {
      * @return Collection<User> Returns a collection of all users on the given page
      */
     Pagination<User> getAllUsers(int page, int size);
+
+    default void validateUser(User user) throws UserNotFoundException {
+        if (user == null) {
+            throw new IllegalArgumentException();
+        }
+        if (this.getById(user.getId()) == null) {
+            throw new UserNotFoundException(user.getId());
+        }
+    }
 }

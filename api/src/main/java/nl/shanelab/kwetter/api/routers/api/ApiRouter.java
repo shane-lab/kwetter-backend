@@ -2,6 +2,7 @@ package nl.shanelab.kwetter.api.routers.api;
 
 import io.swagger.jaxrs2.integration.resources.OpenApiResource;
 import nl.shanelab.kwetter.api.providers.*;
+import nl.shanelab.kwetter.api.routers.api.routes.AuthRoute;
 import nl.shanelab.kwetter.api.routers.api.routes.HashTagRoute;
 import nl.shanelab.kwetter.api.routers.api.routes.KweetRoute;
 import nl.shanelab.kwetter.api.routers.api.routes.UserRoute;
@@ -25,6 +26,7 @@ public class ApiRouter extends Application {
         Set<Class<?>> resources = new HashSet<>();
 
         // routes
+        resources.add(AuthRoute.class);
         resources.add(UserRoute.class);
         resources.add(KweetRoute.class);
         resources.add(HashTagRoute.class);
@@ -38,6 +40,7 @@ public class ApiRouter extends Application {
         resources.add(BufferedImageBodyProvider.class);
         resources.add(ConstraintViolationProvider.class);
         resources.add(CrossOriginProvider.class);
+        resources.add(JwtProvider.class);
         resources.add(UnrecognizedPropertyProvider.class);
         resources.add(UserExceptionProvider.class);
         resources.add(WebExceptionProvider.class);

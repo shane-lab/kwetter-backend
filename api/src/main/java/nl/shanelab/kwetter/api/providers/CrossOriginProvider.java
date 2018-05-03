@@ -13,6 +13,7 @@ public class CrossOriginProvider implements ContainerResponseFilter {
     public void filter(ContainerRequestContext requestCtx, ContainerResponseContext responseCtx) throws IOException {
         responseCtx.getHeaders().add("Access-Control-Allow-Origin", "*");
         responseCtx.getHeaders().add("Access-Control-Allow-Credentials", "true");
+        responseCtx.getHeaders().add("Access-Control-Expose-Headers", "authorization");
         responseCtx.getHeaders().add("Access-Control-Allow-Headers", "origin, content-type, accept, authorization");
         responseCtx.getHeaders().add("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS, HEAD");
     }
