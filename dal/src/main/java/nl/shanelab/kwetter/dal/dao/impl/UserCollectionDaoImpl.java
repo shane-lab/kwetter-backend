@@ -1,6 +1,7 @@
 package nl.shanelab.kwetter.dal.dao.impl;
 
 import lombok.NoArgsConstructor;
+import nl.shanelab.kwetter.dal.dao.Pagination;
 import nl.shanelab.kwetter.dal.dao.UserDao;
 import nl.shanelab.kwetter.dal.domain.Kweet;
 import nl.shanelab.kwetter.dal.domain.User;
@@ -124,6 +125,16 @@ public class UserCollectionDaoImpl extends BaseCollectionDao<User, Long> impleme
         List<Kweet> kweetList = new ArrayList<>(user.getKweets());
 
         return kweetList.subList(Math.max(kweetList.size() - nth, 0), kweetList.size());
+    }
+
+    @Override
+    public Pagination<User> getFollowers(User user, int page, int size) {
+        return null;
+    }
+
+    @Override
+    public Pagination<User> getFollowing(User user, int page, int size) {
+        return null;
     }
 
     public void createFollow(User a, User b) {

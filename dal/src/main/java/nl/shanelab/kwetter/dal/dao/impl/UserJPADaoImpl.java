@@ -1,6 +1,7 @@
 package nl.shanelab.kwetter.dal.dao.impl;
 
 
+import nl.shanelab.kwetter.dal.dao.Pagination;
 import nl.shanelab.kwetter.dal.dao.UserDao;
 import nl.shanelab.kwetter.dal.domain.Kweet;
 import nl.shanelab.kwetter.dal.domain.User;
@@ -105,6 +106,24 @@ public class UserJPADaoImpl extends BaseJPADao<User, Long> implements UserDao {
         query.setMaxResults(nth > 0 ? nth : 1);
 
         return query.getResultList();
+    }
+
+    public Pagination<User> getFollowers(User user, int page, int size) {
+        int count = this.getAmountOfFollowers(user.getId());
+
+        Query query = manager.createNamedQuery("User.findFollowers", User.class);
+        query.setParameter("username", user.getUsername());
+
+        return fromQuery(page, size, count, query);
+    }
+
+    public Pagination<User> getFollowing(User user, int page, int size) {
+        int count = this.getAmountOfFollowings(user.getId());
+
+        Query query = manager.createNamedQuery("User.findFollowing", User.class);
+        query.setParameter("username", user.getUsername());
+
+        return fromQuery(page, size, count, query);
     }
 
     public void createFollow(User a, User b) {

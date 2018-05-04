@@ -58,6 +58,26 @@ public interface UserDao extends GenericDao<User, Long> {
      */
     Collection<Kweet> getNthLatestKweets(int nth, User user);
 
+    default Collection<User> getFollowers(User user) {
+        return getFollowers(user, 0).getCollection();
+    }
+
+    default Pagination<User> getFollowers(User user, int page) {
+        return getFollowers(user, page, defaultResults);
+    }
+
+    Pagination<User> getFollowers(User user, int page, int size);
+
+    default Collection<User> getFollowing(User user) {
+        return getFollowing(user, 0).getCollection();
+    }
+
+    default Pagination<User> getFollowing(User user, int page) {
+        return getFollowing(user, page, defaultResults);
+    }
+
+    Pagination<User> getFollowing(User user, int page, int size);
+
     /**
      * Sets a following from a user to another user
      *

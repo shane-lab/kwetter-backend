@@ -122,6 +122,56 @@ public class UserRoute extends BaseRoute {
         return ok(userDto);
     }
 
+    @GET
+    @Path("{idOrName}/followers")
+    public Response getFollowers(@Valid @PathParam("idOrName") String idOrName, @QueryParam("page") int page, @QueryParam("size") int size) throws UserException {
+        Long id = null;
+        try {
+            id = Long.parseLong(idOrName);
+        } catch (NumberFormatException ex) { }
+        User user = id != null ? userService.getById(id) : userService.getByUserName(idOrName);
+
+        if (user == null) {
+            throw new UserNotFoundException();
+        }
+
+        Pagination<User> pagination = userService.getFollowers(user, page, size);
+
+        return paginated(
+                pagination.getPage(),
+                pagination.getRequestedSize(),
+                pagination.pages(),
+                pagination.hasPrevious(),
+                pagination.hasNext(), pagination.getCollection().stream()
+                        .map(UserMapper.INSTANCE::userAsDTO)
+                        .collect(Collectors.toSet()));
+    }
+
+    @GET
+    @Path("{idOrName}/following")
+    public Response getFollowing(@Valid @PathParam("idOrName") String idOrName, @QueryParam("page") int page, @QueryParam("size") int size) throws UserException {
+        Long id = null;
+        try {
+            id = Long.parseLong(idOrName);
+        } catch (NumberFormatException ex) { }
+        User user = id != null ? userService.getById(id) : userService.getByUserName(idOrName);
+
+        if (user == null) {
+            throw new UserNotFoundException();
+        }
+
+        Pagination<User> pagination = userService.getFollowing(user, page, size);
+
+        return paginated(
+                pagination.getPage(),
+                pagination.getRequestedSize(),
+                pagination.pages(),
+                pagination.hasPrevious(),
+                pagination.hasNext(), pagination.getCollection().stream()
+                        .map(UserMapper.INSTANCE::userAsDTO)
+                        .collect(Collectors.toSet()));
+    }
+
     @POST
     @Path("/follow/{id}")
     @Jwt

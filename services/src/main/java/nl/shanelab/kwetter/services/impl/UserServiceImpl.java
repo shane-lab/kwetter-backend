@@ -93,7 +93,6 @@ public class UserServiceImpl implements UserService {
         return userDao.edit(user);
     }
 
-    @Override
     public User setPassword(String password, User user) throws UserException {
         validateUser(user);
 
@@ -110,7 +109,6 @@ public class UserServiceImpl implements UserService {
         return userDao.edit(user);
     }
 
-    @Override
     public User setLocation(String location, User user) throws UserException {
         validateUser(user);
 
@@ -119,7 +117,6 @@ public class UserServiceImpl implements UserService {
         return userDao.edit(user);
     }
 
-    @Override
     public User setWebsite(String website, User user) throws UserException {
         validateUser(user);
 
@@ -201,6 +198,30 @@ public class UserServiceImpl implements UserService {
         }
 
         return userDao.getByUsername(name);
+    }
+
+    public Pagination<User> getFollowers(User user, int page) throws UserException {
+        validateUser(user);
+
+        return userDao.getFollowers(user, page);
+    }
+
+    public Pagination<User> getFollowers(User user, int page, int size) throws UserException {
+        validateUser(user);
+
+        return userDao.getFollowers(user, page, size);
+    }
+
+    public Pagination<User> getFollowing(User user, int page) throws UserException {
+        validateUser(user);
+
+        return userDao.getFollowing(user, page);
+    }
+
+    public Pagination<User> getFollowing(User user, int page, int size) throws UserException {
+        validateUser(user);
+
+        return userDao.getFollowing(user, page, size);
     }
 
     public Pagination<User> getAllUsers(int page) {

@@ -193,6 +193,22 @@ public interface UserService {
      */
     User getByUserName(String name);
 
+    default Collection<User> getFollowers(User user) throws UserException {
+        return getFollowers(user, 0).getCollection();
+    }
+
+    Pagination<User> getFollowers(User user, int page) throws UserException;
+
+    Pagination<User> getFollowers(User user, int page, int size) throws UserException;
+
+    default Collection<User> getFollowing(User user) throws UserException {
+        return getFollowing(user, 0).getCollection();
+    }
+
+    Pagination<User> getFollowing(User user, int page) throws UserException;
+
+    Pagination<User> getFollowing(User user, int page, int size) throws UserException;
+
     /**
      * Get all users
      *
