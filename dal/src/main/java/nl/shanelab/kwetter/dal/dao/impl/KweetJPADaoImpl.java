@@ -10,6 +10,9 @@ import nl.shanelab.kwetter.util.Patterns;
 
 import javax.ejb.Stateless;
 import javax.persistence.Query;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Root;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.regex.Matcher;
@@ -30,6 +33,17 @@ public class KweetJPADaoImpl extends BaseJPADao<Kweet, Long> implements KweetDao
         manager.merge(kweet.getAuthor());
 
         return kweet;
+    }
+
+    @Override
+    public Pagination<Kweet> findAll(int page, int size) {
+        CriteriaBuilder criteriaBuilder = manager.getCriteriaBuilder();
+        CriteriaQuery criteriaQuery = criteriaBuilder.createQuery();
+        Root<Kweet> from = criteriaQuery.from(Kweet.class);
+        criteriaQuery.select(from);
+        criteriaQuery.orderBy(criteriaBuilder.desc(from.get("id")));
+
+        return super.fromQuery(page, size, this.count(), manager.createQuery(criteriaQuery));
     }
 
     public int getAmountOfKweets(User user) {
