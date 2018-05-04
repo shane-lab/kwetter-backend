@@ -48,8 +48,6 @@ public class HashTagJPADaoImpl extends BaseJPADao<HashTag, Long> implements Hash
         calendar.clear(Calendar.SECOND);
         calendar.clear(Calendar.MILLISECOND);
 
-        int i = calendar.get(Calendar.DAY_OF_WEEK);
-
         while (calendar.get(Calendar.DAY_OF_WEEK) > calendar.getFirstDayOfWeek()) {
             calendar.add(Calendar.DATE, -1);
         }
@@ -60,13 +58,8 @@ public class HashTagJPADaoImpl extends BaseJPADao<HashTag, Long> implements Hash
 
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
 
-//        Query query = manager.createNamedQuery("HashTag.findTrendingByWeek", HashTag.class);
-//        Query query = manager.createQuery("SELECT h FROM HashTag h WHERE h IN (SELECT k.hashTags FROM Kweet k)");
-//        Query query = manager.createQuery("SELECT h FROM HashTag h WHERE h.id IN(SELECT k.hashTags FROM Kweet k WHERE k.createdAt BETWEEN :startDate AND :endDate)");
-//        query.setParameter("startDate", startDate);
-//        query.setParameter("endDate", endDate);
-
-        Query query = manager.createNativeQuery(String.format("SELECT * FROM `HASHTAG` h WHERE h.id IN(SELECT kh.hashtag_id FROM kweet_hashtag kh WHERE kh.kweet_id IN(SELECT k.id FROM KWEET k WHERE k.createdAt BETWEEN \"%1s\" AND \"%2s\"))", formatter.format(startDate), formatter.format(endDate)), HashTag.class);
+        Query query = manager.createNativeQuery(String.format("SELECT h.* FROM `HASHTAG` h, kweet_hashtag kh WHERE h.id = kh.hashtag_id AND kh.kweet_id IN(SELECT k.id FROM KWEET k WHERE k.createdAt BETWEEN \"%1s\" AND \"%2s\") GROUP BY kh.hashtag_id ORDER BY COUNT(*) DESC, kh.hashtag_id ASC", formatter.format(startDate), formatter.format(endDate)), HashTag.class);
+        query.setMaxResults(10);
 
         return query.getResultList();
     }
