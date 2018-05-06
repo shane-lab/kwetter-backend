@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:mp="http://primefaces.org/ui/material"
+      xmlns:p="http://primefaces.org/ui">
+<f:view>
+    <h:outputLabel value="index"/>
+</f:view>
+<ui:composition template="/WEB-INF/private/layout.xhtml">
+    <ui:define name="page">
+        <h:outputStylesheet>
+            .ui-selectonemenu.form-control {
+                color: #555 !important;
+                width: 128px;
+                margin-bottom: 0 !important;
+                padding: 5px 10px !important;
+                background-color: #fff !important;
+                border: 1px solid #ccc !important;
+                display: none;
+            }
+
+            .radius-none {
+                border-radius: 0 !important;
+            }
+
+            .ui-selectonemenu.form-control .ui-selectonemenu-trigger {
+                top: 0;
+                right: 0;
+                width: 16px;
+                height: 100%;
+                cursor: pointer;
+                position: absolute;
+                padding: 0 !important;
+                margin: 0 !important;
+                border: none !important;
+                margin-top: 5px !important;
+                background: transparent !important;
+            }
+
+            .ui-selectonemenu.form-control .ui-selectonemenu-trigger.ui-state-hover, .ui-selectonemenu.form-control .ui-selectonemenu-trigger.ui-state-focus {
+                -moz-box-shadow: unset;
+                -webkit-box-shadow: unset;
+                box-shadow: unset;
+            }
+
+            .ui-selectonemenu .ui-selectonemenu-label {
+                width: 100%;
+                border: none;
+                display: block;
+                cursor: pointer;
+                text-align: left;
+                overflow: hidden;
+                margin-bottom: 0px;
+                white-space: nowrap;
+                font-weight: normal;
+            }
+
+            .ui-selectonemenu .ui-selectonemenu-label.ui-inputfield.ui-corner-all {
+                text-overflow: ellipsis;
+            }
+
+            .ui-inputfield {
+                margin: 0;
+                padding: 5px;
+                background: #ffffff;
+                font-weight: normal;
+                outline: medium none;
+                box-shadow: inset 0 0 0 #8f8f8f !important;
+                -webkit-box-shadow: inset 0 0 0 #8f8f8f !important;
+            }
+        </h:outputStylesheet>
+        <div class="text-center hide-on-med-and-down">
+            <h1>#{updateUserViewServlet.user.username}</h1>
+        </div>
+
+        <div class="row">
+            <div id="profile-page-header" class="card">
+                <div class="card-content">
+                    <img src="/api/v1/users/${updateUserViewServlet.user.id}/avatar" class="circle z-depth-1 responsive-img" width="64"/>
+
+                    <div id="details">
+                        <span class="card-title grey-text text-darken-4"><h:outputText value="#{updateUserViewServlet.user.username}" /></span>
+                        <span id="roleDisplay"><i class="material-icons green-text text-darken-2">perm_identity</i> <h:outputText id="userRole" value="#{userServlet.roles[updateUserViewServlet.currentRoleId].toString()}" styleClass="#{(authServlet.administrator and !authServlet.isAdministrator(updateUserViewServlet.user.id) ? 'editable pointer' : '')}" /></span>
+                        <p:selectOneMenu id="roleSelect" data-id="role-select" rendered="#{authServlet.administrator and !authServlet.isAdministrator(updateUserViewServlet.user.id)}" value="#{updateUserViewServlet.pendingRoleId}" widgetVar="roleValue" onchange="PF('roleDialog').show()" styleClass="form-control radius-none">
+                            <p:ajax listener="#{updateUserViewServlet.handleRoleChange}" process="@this" />
+                            <f:selectItem itemDisabled="true" itemLabel="Select a role" itemValue="-1" />
+                            <f:selectItems value="#{userServlet.roles}" var="r"
+                                           itemLabel="#{r.toString()}" itemValue="#{r.id}" />
+                        </p:selectOneMenu>
+                        <p:confirmDialog rendered="#{authServlet.administrator and !authServlet.isAdministrator(updateUserViewServlet.user.id)}" widgetVar="roleDialog" message="Are you sure you want to update the role of this profile?" >
+                            <p:commandButton value="Yes" styleClass="btn waves-effect waves-light col s5" onclick="PF('roleDialog').hide()">
+                                <p:ajax listener="${updateUserViewServlet.handleRoleConfirm}" update="userRole" />
+                            </p:commandButton>
+                            <p:commandButton value="No" styleClass="btn waves-effect waves-light col s2 right red" onclick="PF('roleValue').selectValue(PF('roleValue').preShowValue.val()); PF('roleDialog').hide()">
+                                <p:ajax listener="${updateUserViewServlet.handleRoleDeny}" />
+                            </p:commandButton>
+                        </p:confirmDialog>
+                        <span id="closeSelect" class="pointer" style="display: none;"><i class="material-icons red-text text-darken-2">close</i></span>
+                        <h:commandLink id="deleteUser" rendered="#{authServlet.administrator and !authServlet.isAdministrator(updateUserViewServlet.user.id)}" styleClass="btn-floating halfway-fab waves-effect waves-light red right" action="#{userServlet.delete(updateUserViewServlet.user.id)}" onclick="return confirm('Are you sure you want to delete this profile?')"><f:actionListener binding="#{userViewServlet.onDelete()}" /><i class="material-icons">delete</i></h:commandLink>
+                    </div>
+
+                    <p style="margin-bottom: 12px;"><h:outputText styleClass="${updateUserViewServlet.hasBiography() ? '' : 'grey-text darken-1'}" value="#{updateUserViewServlet.hasBiography() ? updateUserViewServlet.user.bio : 'no biography was set'}" /></p>
+
+                    <p title="kweets"><i class="material-icons green-text text-darken-2">message</i>&nbsp;<h:outputText value="#{userServlet.getKweetsCount(updateUserViewServlet.user.id)}" /></p>
+                    <p title="followers"><i class="material-icons green-text text-darken-2">people</i>&nbsp;<h:outputText value="#{userServlet.getFollowerCount(updateUserViewServlet.user.id)}" /></p>
+                    <p title="following"><i class="material-icons green-text text-darken-2">favorite</i>&nbsp;<h:outputText value="${userServlet.getFollowingCount(updateUserViewServlet.user.id)}"/></p>
+                    <p title="website"><i class="material-icons green-text text-darken-2">language</i>&nbsp;<h:outputText value="${updateUserViewServlet.user.website != null ? updateUserViewServlet.user.website : '-'}" /></p>
+                    <p title="join date"><i class="material-icons green-text text-darken-2">insert_invitation</i>&nbsp;${localeServlet.formatDate(updateUserViewServlet.user.createdAt)}</p>
+                    <p title="location"><i class="material-icons green-text text-darken-2">location_on</i>&nbsp;${updateUserViewServlet.user.location != null ? updateUserViewServlet.user.location : '-'}</p>
+                </div>
+            </div>
+        </div>
+
+        <h:panelGroup rendered="${not empty updateUserViewServlet.kweets}">
+            <h4>Latests Kweets&nbsp;<small class="grey-text">(up to 10)</small></h4>
+            <h:dataTable styleClass="responsive-table highlight" var="kweet" value="#{updateUserViewServlet.kweets}" headerClass="grey-text text-darken-3">
+                <h:column>
+                    <f:facet name="header">Id</f:facet>
+                    <h:outputLink styleClass="waves-effect" value="#{routesServlet.kweet(kweet.id)}"><h:outputText value="#{kweet.id}" /></h:outputLink>
+                </h:column>
+                <h:column>
+                    <f:facet name="header">Kweet</f:facet>
+                    <h:outputText value="#{kweet.message}" />
+                </h:column>
+                <h:column>
+                    <f:facet name="header">Favourites</f:facet>
+                    <h:outputText value="#{kweetServlet.getFavouriteCount(kweet.id)}" />
+                </h:column>
+                <h:column rendered="#{authServlet.administrator or authServlet.moderator}">
+                    <h:commandLink styleClass="btn-floating halfway-fab waves-effect waves-light red right" action="#{kweetServlet.delete(kweet.id)}" onclick="return confirm('Are you sure you want to delete this Kweet?')"><f:actionListener binding="#{kweetViewServlet.onDelete()}" /><i class="material-icons">delete</i></h:commandLink>
+                </h:column>
+            </h:dataTable>
+        </h:panelGroup>
+
+        <h:outputScript target="body">
+            (function($) {
+                if ($ === undefined) return;
+
+                var container = document.getElementById('details');
+
+                function find(partialId) {
+                    var ctx = $(container).find('[id$="'+partialId+'"]');
+
+                    if (!ctx || !ctx['0']) {
+                        return false;
+                    }
+
+                    return ctx[0];
+                }
+
+                $(find('closeSelect')).on('click', function() {
+                    var roleDisplay = find('roleDisplay');
+                    if (!roleDisplay) {
+                        return;
+                    }
+                    $(this).hide();
+                    $(find('roleSelect')).hide();
+
+                    $(roleDisplay).css('display', 'initial').hide().fadeIn();
+                });
+
+                var txt = '';
+                $(find('roleDisplay')).on('click', function() {
+                    var roleSelect = find('roleSelect');
+                    if (!roleSelect) {
+                        return;
+                    }
+                    $(this).hide();
+
+                    $(roleSelect).css('display', 'inline-flex').hide().fadeIn();
+                    $(find('closeSelect')).css('display', 'inline-flex').hide().fadeIn();
+                }).bind("DOMSubtreeModified", function() {
+                    var text = $(this).text();
+                    if (text !== txt) {
+                        txt = text;
+
+                        if (/administrator/igm.test(text)) {
+                            $(find('closeSelect')).remove();
+                            $(find('roleSelect')).remove();
+                            $(find('deleteUser')).remove();
+                            $(find('userRole')).removeClass('pointer editable');
+                            $(find('roleDisplay')).css('display', 'initial').hide().fadeIn();
+                        }
+                    }
+
+                });
+            })(window['jQuery'] || window['$'] || undefined);
+        </h:outputScript>
+    </ui:define>
+</ui:composition>
+</html>

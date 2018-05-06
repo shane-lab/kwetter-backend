@@ -12,6 +12,16 @@ import java.util.Collection;
 public interface GenericDao<T, Id extends Serializable> {
 
     /**
+     * The amount of default paginated results
+     */
+    int defaultResults = 10;
+
+    /**
+     * @field The amount of maximum paginated results
+     */
+    int maxResults = 20;
+
+    /**
      * Count the amount of entities
      *
      * @return int The amount of stored entities
@@ -42,18 +52,34 @@ public interface GenericDao<T, Id extends Serializable> {
      */
     T find(Id id);
 
-
     /**
      * Find all existing entities
      *
-     * @return Collection Returns a collection of persisted entities of the targeted class type
+     * @return Collection<T> Returns a collection of persisted entities of the targeted class type
      */
     Collection<T> findAll();
 
     /**
+     * Find all existing entities with pagination
+     *
+     * @param page The page index
+     * @return Collection<T> Returns a paginated collection of persisted entities of the targeted class type
+     */
+    Pagination<T> findAll(int page);
+
+    /**
+     * Find all existing entities with pagination
+     *
+     * @param page The page index
+     * @param size The maximum results to return
+     * @return Collection<T> Returns a paginated collection of persisted entities of the targeted class type
+     */
+    Pagination<T> findAll(int page, int size);
+
+    /**
      * Remove an existing entity
      *
-     * @param arg entity instance of target class type The entity to remove
+     * @param id The id of the entity of the targeted target class type
      */
-    void remove(T arg);
+    void remove(Id id);
 }

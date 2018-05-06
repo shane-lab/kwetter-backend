@@ -1,0 +1,16 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html">
+<h:head>
+    <title>Kwetter admin panel</title>
+</h:head>
+<h:body>
+    <p>Navigate to the <h:outputLink value="#{routesServlet.dashboard()}">dashboard</h:outputLink></p>
+    <h:panelGroup rendered="#{authServlet.isSignedIn()}">
+        <h:form>
+            <h:commandLink action="#{logoutServlet.logout}" value="Logout" />
+        </h:form>
+    </h:panelGroup>
+</h:body>
+</html>
