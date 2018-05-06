@@ -32,6 +32,22 @@ public interface UserDao extends GenericDao<User, Long> {
     User getByUsername(String username);
 
     /**
+     * Find a list of users by partial username
+     *
+     * @param name The partia; username of the user to find
+     * @return Collection<User> Returns a collection of users starting with the partial username
+     */
+    default Collection<User> getByPartialUsername(String name) {
+        return getByPartialUsername(name, 0).getCollection();
+    }
+
+    default Pagination<User> getByPartialUsername(String name, int page) {
+        return getByPartialUsername(name, page, defaultResults);
+    }
+
+    Pagination<User> getByPartialUsername(String name, int page, int size);
+
+    /**
      * Checks if a user is following another user
      *
      * @param a The user who is following

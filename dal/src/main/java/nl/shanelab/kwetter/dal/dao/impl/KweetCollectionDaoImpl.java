@@ -256,7 +256,7 @@ public class KweetCollectionDaoImpl extends BaseCollectionDao<Kweet, Long> imple
     }
 
     @Override
-    public Pagination<Kweet> getTimeline(long id, int page, int size) {
+    public Pagination<Kweet> getTimeline(String name, int page, int size) {
         return null;
     }
 

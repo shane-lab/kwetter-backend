@@ -10,6 +10,7 @@ import nl.shanelab.kwetter.dal.dao.Pagination;
 import nl.shanelab.kwetter.dal.domain.User;
 import nl.shanelab.kwetter.services.UserService;
 import nl.shanelab.kwetter.services.exceptions.UserException;
+import nl.shanelab.kwetter.services.exceptions.user.UserFollowException;
 import nl.shanelab.kwetter.services.exceptions.user.UserNotFoundException;
 import nl.shanelab.kwetter.util.Patterns;
 
@@ -29,6 +30,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.LinkedHashSet;
 import java.util.stream.Collectors;
 
 import static javax.ws.rs.core.HttpHeaders.AUTHORIZATION;
@@ -107,15 +109,7 @@ public class UserRoute extends BaseRoute {
     @GET
     @Path("/{idOrName}")
     public Response getUser(@Valid @PathParam("idOrName") String idOrName) throws UserException {
-        Long id = null;
-        try {
-            id = Long.parseLong(idOrName);
-        } catch (NumberFormatException ex) { }
-        User user = id != null ? userService.getById(id) : userService.getByUserName(idOrName);
-
-        if (user == null) {
-            throw new UserNotFoundException();
-        }
+        User user = getUserByIdOrName(idOrName);
 
         UserDto userDto = UserMapper.INSTANCE.userAsDTO(user);
 
@@ -123,17 +117,24 @@ public class UserRoute extends BaseRoute {
     }
 
     @GET
+    @Path("/partial/{name}")
+    public Response getUsersByPartialName(@Valid @PathParam("name") String name, @QueryParam("page") int page, @QueryParam("size") int size) {
+        Pagination<User> pagination = userService.getByPartialUsername(name, page, size);
+
+        return paginated(
+                pagination.getPage(),
+                pagination.getRequestedSize(),
+                pagination.pages(),
+                pagination.hasPrevious(),
+                pagination.hasNext(), pagination.getCollection().stream()
+                        .map(UserMapper.INSTANCE::userAsDTO)
+                        .collect(Collectors.toSet()));
+    }
+
+    @GET
     @Path("{idOrName}/followers")
     public Response getFollowers(@Valid @PathParam("idOrName") String idOrName, @QueryParam("page") int page, @QueryParam("size") int size) throws UserException {
-        Long id = null;
-        try {
-            id = Long.parseLong(idOrName);
-        } catch (NumberFormatException ex) { }
-        User user = id != null ? userService.getById(id) : userService.getByUserName(idOrName);
-
-        if (user == null) {
-            throw new UserNotFoundException();
-        }
+        User user = getUserByIdOrName(idOrName);
 
         Pagination<User> pagination = userService.getFollowers(user, page, size);
 
@@ -150,15 +151,7 @@ public class UserRoute extends BaseRoute {
     @GET
     @Path("{idOrName}/following")
     public Response getFollowing(@Valid @PathParam("idOrName") String idOrName, @QueryParam("page") int page, @QueryParam("size") int size) throws UserException {
-        Long id = null;
-        try {
-            id = Long.parseLong(idOrName);
-        } catch (NumberFormatException ex) { }
-        User user = id != null ? userService.getById(id) : userService.getByUserName(idOrName);
-
-        if (user == null) {
-            throw new UserNotFoundException();
-        }
+        User user = getUserByIdOrName(idOrName);
 
         Pagination<User> pagination = userService.getFollowing(user, page, size);
 
@@ -173,12 +166,12 @@ public class UserRoute extends BaseRoute {
     }
 
     @POST
-    @Path("/follow/{id}")
+    @Path("/follow/{idOrName}")
     @Jwt
-    public Response followUser(@Valid @PathParam("id") long id) throws UserException {
+    public Response followUser(@Valid @PathParam("idOrName") String idOrName) throws UserException {
         String name = securityContext.getUserPrincipal().getName();
         User userA = userService.getByUserName(name);
-        User userB = userService.getById(id);
+        User userB = getUserByIdOrName(idOrName);
 
         userService.followUser(userA, userB);
 
@@ -186,12 +179,12 @@ public class UserRoute extends BaseRoute {
     }
 
     @DELETE
-    @Path("/follow/{id}")
+    @Path("/follow/{idOrName}")
     @Jwt
-    public Response unFollowUser(@Valid @PathParam("id") long id) throws UserException {
+    public Response unFollowUser(@Valid @PathParam("idOrName") String idOrName) throws UserException {
         String name = securityContext.getUserPrincipal().getName();
         User userA = userService.getByUserName(name);
-        User userB = userService.getById(id);
+        User userB = getUserByIdOrName(idOrName);
 
         userService.unFollowUser(userA, userB);
 
@@ -200,26 +193,23 @@ public class UserRoute extends BaseRoute {
 
     @GET
     @Path("/{idOrName}/follows/{id1OrName}")
-    public Response follows(@Valid @PathParam("idOrName") long id, @Valid @PathParam("id1OrName") long id1) throws UserException {
-        User userA = userService.getById(id);
-        User userB = userService.getById(id1);
+    public Response follows(@Valid @PathParam("idOrName") String idOrName, @Valid @PathParam("id1OrName") String id1OrName) throws UserException {
+        User userA = getUserByIdOrName(idOrName);
+        User userB = getUserByIdOrName(id1OrName);
 
-        return Response.ok().status(userService.isUserFollowing(userA, userB) ? Response.Status.OK : Response.Status.BAD_REQUEST).build();
+        boolean flag = false;
+        try {
+            flag = userService.isUserFollowing(userA, userB);
+        } catch (UserFollowException e) { }
+
+        return Response.ok().status(Response.Status.OK).entity(flag).build();
     }
 
     @GET
     @Path("/{idOrName}/avatar")
     @Produces({"image/png", "image/jpg"})
     public Response getProfileImage(@Valid @PathParam("idOrName") String idOrName) throws UserException, IOException {
-        Long id = null;
-        try {
-            id = Long.parseLong(idOrName);
-        } catch (NumberFormatException ex) { }
-        User user = id != null ? userService.getById(id) : userService.getByUserName(idOrName);
-
-        if (user == null) {
-            throw new UserNotFoundException();
-        }
+        User user = getUserByIdOrName(idOrName);
 
         BufferedImage image;
         try {
@@ -293,6 +283,19 @@ public class UserRoute extends BaseRoute {
         }
 
         return ok();
+    }
+
+    private User getUserByIdOrName(String idOrName) throws UserException {
+        Long id = null;
+        try {
+            id = Long.parseLong(idOrName);
+        } catch (NumberFormatException ex) { }
+        User user = id != null ? userService.getById(id) : userService.getByUserName(idOrName);
+
+        if (user == null) {
+            throw new UserNotFoundException();
+        }
+        return user;
     }
 
     @NoArgsConstructor

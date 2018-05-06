@@ -1,8 +1,6 @@
 package nl.shanelab.kwetter.api.routers.api.routes;
 
-import lombok.NoArgsConstructor;
 import nl.shanelab.kwetter.api.BaseRoute;
-import nl.shanelab.kwetter.api.dto.KweetDto;
 import nl.shanelab.kwetter.api.mappers.KweetMapper;
 import nl.shanelab.kwetter.api.qualifiers.Jwt;
 import nl.shanelab.kwetter.dal.dao.Pagination;
@@ -12,9 +10,10 @@ import nl.shanelab.kwetter.services.KweetingService;
 import nl.shanelab.kwetter.services.UserService;
 import nl.shanelab.kwetter.services.exceptions.KweetException;
 import nl.shanelab.kwetter.services.exceptions.UserException;
+import nl.shanelab.kwetter.services.exceptions.kweet.KweetFavouriteException;
 import nl.shanelab.kwetter.services.exceptions.kweet.KweetNotFoundException;
+import nl.shanelab.kwetter.services.exceptions.user.UserNotFoundException;
 
-import javax.annotation.PostConstruct;
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
 import javax.validation.Valid;
@@ -114,6 +113,33 @@ public class KweetRoute extends BaseRoute {
         return ok();
     }
 
+    @GET
+    @Path("{id}/favorited/{idOrName}")
+    public Response isFavoritedBy(@Valid @PathParam("id") long id, @Valid @PathParam("idOrName") String idOrName) throws KweetException, UserException {
+        Kweet kweet = kweetingService.getKweetById(id);
+
+        if (kweet == null) {
+            throw new KweetNotFoundException(id);
+        }
+
+        Long userId = null;
+        try {
+            userId = Long.parseLong(idOrName);
+        } catch (Exception e) { }
+        User user = userId != null ? userService.getById(userId) : userService.getByUserName(idOrName);
+
+        if (user == null) {
+            throw new UserNotFoundException();
+        }
+
+        boolean flag = false;
+        try {
+            flag = kweetingService.isKweetFavoritedByUser(kweet, user);
+        } catch (KweetFavouriteException e) { }
+
+        return Response.ok().status(Response.Status.OK).entity(flag).build();
+    }
+
     @DELETE
     @Path("/favorite/{id}")
     @Jwt
@@ -162,7 +188,7 @@ public class KweetRoute extends BaseRoute {
         } catch (Exception e) { }
         User user = id != null ? userService.getById(id) : userService.getByUserName(idOrName);
 
-        Pagination<Kweet> pagination = kweetingService.getTimelineByUserId(user.getId(), page, size);
+        Pagination<Kweet> pagination = kweetingService.getTimeline(user.getUsername(), page, size);
 
         return paginated(
                 pagination.getPage(),

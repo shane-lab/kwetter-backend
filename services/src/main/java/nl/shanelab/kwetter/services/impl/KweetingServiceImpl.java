@@ -243,19 +243,19 @@ public class KweetingServiceImpl implements KweetingService {
     }
 
     @Override
-    public Pagination<Kweet> getTimelineByUserId(long id, int page) throws UserException {
-        User user = userDao.find(id);
+    public Pagination<Kweet> getTimeline(String name, int page) throws UserException {
+        User user = userDao.getByUsername(name);
         validateUser(user);
 
-        return kweetDao.getTimeline(id, page);
+        return kweetDao.getTimeline(name, page);
     }
 
     @Override
-    public Pagination<Kweet> getTimelineByUserId(long id, int page, int size) throws UserException {
-        User user = userDao.find(id);
+    public Pagination<Kweet> getTimeline(String name, int page, int size) throws UserException {
+        User user = userDao.getByUsername(name);
         validateUser(user);
 
-        return kweetDao.getTimeline(id, page, size);
+        return kweetDao.getTimeline(name, page, size);
     }
 
     public boolean isUserMentionedInKweet(Kweet kweet, User user) throws KweetException, UserException {

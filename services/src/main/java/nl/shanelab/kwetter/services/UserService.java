@@ -193,6 +193,20 @@ public interface UserService {
      */
     User getByUserName(String name);
 
+    /**
+     * Find a list of users by partial username
+     *
+     * @param name The partial username of the user to find
+     * @return Collection<User> Returns a collection of users starting with the partial username
+     */
+    default Collection<User> getByPartialUsername(String name) {
+        return getByPartialUsername(name, 0).getCollection();
+    }
+
+    Pagination<User> getByPartialUsername(String name, int page);
+
+    Pagination<User> getByPartialUsername(String name, int page, int size);
+
     default Collection<User> getFollowers(User user) throws UserException {
         return getFollowers(user, 0).getCollection();
     }

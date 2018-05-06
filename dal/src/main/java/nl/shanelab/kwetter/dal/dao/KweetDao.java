@@ -141,18 +141,18 @@ public interface KweetDao extends GenericDao<Kweet, Long> {
     /**
      * Get a collection of Kweets associated by the given user and the followed user
      *
-     * @param id The id of the user
+     * @param name The name of the user
      * @return Collection<Kweet> Returns a collection of Kweets associated by the given user and the followed user
      */
-    default Collection<Kweet> getTimeline(long id) {
-        return this.getTimeline(id, 0).getCollection();
+    default Collection<Kweet> getTimeline(String name) {
+        return this.getTimeline(name, 0).getCollection();
     }
 
-    default Pagination<Kweet> getTimeline(long id, int page) {
-        return this.getTimeline(id, page, 0);
+    default Pagination<Kweet> getTimeline(String name, int page) {
+        return this.getTimeline(name, page, 0);
     }
 
-    Pagination<Kweet> getTimeline(long id, int page, int size);
+    Pagination<Kweet> getTimeline(String name, int page, int size);
 
     /**
      * Checks if a user favourited the given Kweet

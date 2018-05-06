@@ -47,7 +47,7 @@ public class Kweet {
     static final String findByHashTagName = "SELECT k FROM Kweet k WHERE :name IN(SELECT h.name FROM k.hashTags h)";
     static final String findByMentioned = "SELECT k FROM Kweet k WHERE :username IN(SELECT u.username FROM k.mentions u)";
     static final String findByFavoritedBy = "SELECT k FROM Kweet k WHERE :username IN(SELECT u.username FROM k.favoritedBy u)";
-    static final String getTimeline = "SELECT k FROM Kweet k WHERE k.author.id = :id OR k.author IN (SELECT f FROM User u INNER JOIN u.following f WHERE u.id = :id)";
+    static final String getTimeline = "SELECT k FROM Kweet k WHERE k.author.username = :username OR :username IN(SELECT u.username FROM k.mentions u) OR k.author IN(SELECT f FROM User u INNER JOIN u.following f WHERE u.username = :username)";
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -25,11 +25,15 @@ import static nl.shanelab.kwetter.util.Patterns.NO_SPACES_PATTERN;
         @NamedQuery(name = "User.getAmountOfFollowers", query = "SELECT size(u.followers) FROM User u WHERE u.id = :id"),
         @NamedQuery(name = "User.getAmountOfFollowings", query = "SELECT size(u.following) FROM User u WHERE u.id = :id"),
         @NamedQuery(name = "User.findByName", query = "SELECT DISTINCT u FROM User u WHERE u.username = :username"),
+        @NamedQuery(name = "User.findByPartialName", query = User.findByPartialName),
+        @NamedQuery(name = "User.findByPartialName.count", query = "SELECT COUNT(u) FROM User u WHERE u IN("+User.findByPartialName+")"),
         @NamedQuery(name = "User.findFollowers", query = "SELECT u.followers FROM User u WHERE u.username = :username"),
         @NamedQuery(name = "User.findFollowing", query = "SELECT u.following FROM User u WHERE u.username = :username"),
         @NamedQuery(name = "User.getMostFollowed", query = "SELECT u FROM User u WHERE size(u.followers) > 0 ORDER BY u.id")
 })
 public class User {
+
+    static final String findByPartialName = "SELECT u FROM User u WHERE LOWER(u.username) like CONCAT(:username,'%')";
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -102,7 +106,7 @@ public class User {
      */
     private LocalDateTime createdAt = LocalDateTime.now();
 
-    @Max(value = 160, message = "Exceeding the biography limit of {value} is not allowed")
+//    @Max(value = 160, message = "Exceeding the biography limit of {value} is not allowed")
     @Column
     /**
      * A brief description about the user

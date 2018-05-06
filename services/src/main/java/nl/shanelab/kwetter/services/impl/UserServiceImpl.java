@@ -17,6 +17,8 @@ import nl.shanelab.kwetter.util.Sha256;
 import javax.ejb.Stateless;
 import javax.inject.Inject;
 
+import java.util.Collection;
+
 import static nl.shanelab.kwetter.services.util.UserFollowHelper.with;
 
 @Stateless
@@ -198,6 +200,22 @@ public class UserServiceImpl implements UserService {
         }
 
         return userDao.getByUsername(name);
+    }
+
+    public Pagination<User> getByPartialUsername(String name, int page) {
+        if (name == null) {
+            throw new IllegalArgumentException();
+        }
+
+        return userDao.getByPartialUsername(name, page);
+    }
+
+    public Pagination<User> getByPartialUsername(String name, int page, int size) {
+        if (name == null) {
+            throw new IllegalArgumentException();
+        }
+
+        return userDao.getByPartialUsername(name, page, size);
     }
 
     public Pagination<User> getFollowers(User user, int page) throws UserException {

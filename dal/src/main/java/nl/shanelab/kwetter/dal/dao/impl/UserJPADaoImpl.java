@@ -32,10 +32,22 @@ public class UserJPADaoImpl extends BaseJPADao<User, Long> implements UserDao {
     public User edit(User user) {
         User found = this.find(user.getId());
         if (found != null) {
-            if (user.getPassword() != found.getPassword()) {
-                user.setPassword(Sha256.hash(user.getPassword()));
+            if (user.getUsername() != null && user.getUsername() != found.getUsername() && this.getByUsername(user.getUsername()) == null) {
+                found.setUsername(user.getUsername());
             }
-            return super.edit(user);
+            if (user.getPassword() != found.getPassword()) {
+                found.setPassword(Sha256.hash(user.getPassword()));
+            }
+            if (user.getBio() != found.getBio()) {
+                found.setBio(user.getBio());
+            }
+            if (user.getLocation() != found.getLocation()) {
+                found.setLocation(user.getLocation());
+            }
+            if (user.getWebsite() != found.getWebsite()) {
+                found.setWebsite(user.getWebsite());
+            }
+            return super.edit(found);
         }
 
         return this.create(user);
@@ -81,6 +93,18 @@ public class UserJPADaoImpl extends BaseJPADao<User, Long> implements UserDao {
         query.setParameter("username", name);
 
         return JPAResult.getSingleResultOrNull(query);
+    }
+
+    public Pagination<User> getByPartialUsername(String name, int page, int size) {
+        Query countQuery = manager.createNamedQuery("User.findByPartialName.count", User.class);
+        countQuery.setParameter("username", name);
+
+        int count = ((Number)countQuery.getSingleResult()).intValue();
+
+        Query query = manager.createNamedQuery("User.findByPartialName", User.class);
+        query.setParameter("username", name.toLowerCase());
+
+        return fromQuery(page, size, count, query);
     }
 
     public boolean isFollowing(User a, User b) {

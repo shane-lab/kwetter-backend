@@ -103,6 +103,11 @@ public class UserCollectionDaoImpl extends BaseCollectionDao<User, Long> impleme
         return userRef.get();
     }
 
+    @Override
+    public Pagination<User> getByPartialUsername(String name, int page, int size) {
+        return null;
+    }
+
     public boolean isFollowing(User a, User b) {
         if (!this.validateUserPair(a, b)) {
             return false;
