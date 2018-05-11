@@ -1,7 +1,5 @@
 package nl.shanelab.kwetter.api.routers.api.routes;
 
-import nl.shanelab.kwetter.api.BaseRoute;
-import nl.shanelab.kwetter.api.mappers.UserMapper;
 import nl.shanelab.kwetter.api.qualifiers.Jwt;
 import nl.shanelab.kwetter.dal.domain.User;
 import nl.shanelab.kwetter.services.UserService;

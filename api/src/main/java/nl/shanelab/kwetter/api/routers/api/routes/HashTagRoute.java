@@ -61,7 +61,7 @@ public class HashTagRoute extends BaseRoute {
 
         return ok(kweetingService.getTrendingHashTags(date.getDate()).stream()
                 .map(this::mapHashTagWithLinks)
-                .collect(Collectors.toSet()));
+                .collect(Collectors.toCollection(LinkedHashSet::new)));
     }
 
     private HashTagDto mapHashTag(HashTag hashTag) {

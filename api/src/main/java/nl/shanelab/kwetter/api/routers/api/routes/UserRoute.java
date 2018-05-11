@@ -1,16 +1,8 @@
 package nl.shanelab.kwetter.api.routers.api.routes;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
-import nl.shanelab.kwetter.api.BaseRoute;
-import nl.shanelab.kwetter.api.dto.UserDto;
-import nl.shanelab.kwetter.api.hateoas.Methods;
-import nl.shanelab.kwetter.api.hateoas.routelinks.KweetRouteLinks;
 import nl.shanelab.kwetter.api.hateoas.routelinks.UserRouteLinks;
-import nl.shanelab.kwetter.api.mappers.UserMapper;
 import nl.shanelab.kwetter.api.qualifiers.Jwt;
 import nl.shanelab.kwetter.dal.dao.Pagination;
 import nl.shanelab.kwetter.dal.domain.User;

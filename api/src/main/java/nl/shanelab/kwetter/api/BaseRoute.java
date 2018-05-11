@@ -3,7 +3,6 @@ package nl.shanelab.kwetter.api;
 import io.jsonwebtoken.Jwts;
 import lombok.*;
 import nl.shanelab.kwetter.api.hateoas.Linked;
-import nl.shanelab.kwetter.api.hateoas.Methods;
 import nl.shanelab.kwetter.api.jwt.KeyGenerator;
 
 import javax.inject.Inject;
@@ -13,10 +12,8 @@ import javax.ws.rs.core.*;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
-import java.util.HashSet;
 
 public abstract class BaseRoute {
 

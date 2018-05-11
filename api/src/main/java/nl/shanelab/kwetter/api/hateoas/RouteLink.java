@@ -1,7 +1,5 @@
 package nl.shanelab.kwetter.api.hateoas;
 
-import nl.shanelab.kwetter.api.hateoas.routelinks.UserRouteLinks;
-
 import java.util.HashSet;
 import java.util.Set;
 import java.util.regex.Matcher;

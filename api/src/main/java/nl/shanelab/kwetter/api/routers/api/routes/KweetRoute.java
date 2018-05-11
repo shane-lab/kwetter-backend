@@ -4,7 +4,6 @@ import nl.shanelab.kwetter.api.BaseRoute;
 import nl.shanelab.kwetter.api.dto.KweetDto;
 import nl.shanelab.kwetter.api.hateoas.routelinks.HashTagRouteLinks;
 import nl.shanelab.kwetter.api.hateoas.routelinks.KweetRouteLinks;
-import nl.shanelab.kwetter.api.hateoas.routelinks.UserRouteLinks;
 import nl.shanelab.kwetter.api.mappers.KweetMapper;
 import nl.shanelab.kwetter.api.qualifiers.Jwt;
 import nl.shanelab.kwetter.dal.dao.Pagination;
