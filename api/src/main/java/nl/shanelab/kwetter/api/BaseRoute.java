@@ -1,13 +1,13 @@
 package nl.shanelab.kwetter.api;
 
 import io.jsonwebtoken.Jwts;
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
-import lombok.Value;
+import lombok.*;
+import nl.shanelab.kwetter.api.hateoas.Linked;
 import nl.shanelab.kwetter.api.jwt.KeyGenerator;
 
 import javax.inject.Inject;
 import javax.servlet.ServletContext;
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.*;
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -15,7 +15,7 @@ import java.time.ZoneId;
 import java.util.Collection;
 import java.util.Date;
 
-public class BaseRoute {
+public abstract class BaseRoute {
 
     @Context
     protected UriInfo uriInfo;
@@ -28,6 +28,9 @@ public class BaseRoute {
 
     @Context
     protected SecurityContext securityContext;
+
+    @Context
+    private HttpServletRequest httpRequest;
 
     @Inject
     private KeyGenerator keyGenerator;
@@ -57,7 +60,14 @@ public class BaseRoute {
     }
 
     private Response.ResponseBuilder okBuilder(Object any) {
-        return Response.ok(any != null ? new ResultEntity(any) : any, MediaType.APPLICATION_JSON_TYPE);
+        return Response.ok(any != null ? new ResultEntity(any, Linked.builder()
+                .type(httpRequest.getMethod().toUpperCase())
+                .path(uriInfo.getAbsolutePath().toString())
+                .href(uriInfo.getPath())
+                .title("The requested entry point")
+                .requiresAuth(securityContext.getUserPrincipal() != null) // checks if jwt was set, auth was required
+                .rel("self")
+                .build()) : any, MediaType.APPLICATION_JSON_TYPE);
     }
 
     protected Response paginated(int page, int size, int pages, boolean prev, boolean next, Collection<Object> items) {
@@ -78,6 +88,14 @@ public class BaseRoute {
                 .setExpiration(Date.from(expireDate))
                 .signWith(keyGenerator.getAlgorithm(), keyGenerator.generate())
                 .compact();
+    }
+
+    protected boolean isAuthenticated(String username) {
+        if (securityContext.getUserPrincipal() == null) {
+            return false;
+        }
+
+        return username.equalsIgnoreCase(securityContext.getUserPrincipal().getName());
     }
 
     @Value
@@ -107,6 +125,9 @@ public class BaseRoute {
 
         @NonNull
         private Object data;
+
+        @NonNull
+        protected Linked link;
 
     }
 
