@@ -12,7 +12,7 @@ import java.io.Serializable;
  *
  * @see nl.shanelab.kwetter.dal.domain.HashTag
  */
-public class HashTagDto extends LinkedDto implements Serializable {
+public class HashTagDto implements Serializable {
 
     /**
      * The serializable identifier of a hashtag

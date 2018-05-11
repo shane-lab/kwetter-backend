@@ -1,13 +1,9 @@
 package nl.shanelab.kwetter.api.routers.api.routes;
 
 import nl.shanelab.kwetter.api.BaseRoute;
-import nl.shanelab.kwetter.api.dto.KweetDto;
-import nl.shanelab.kwetter.api.hateoas.routelinks.HashTagRouteLinks;
-import nl.shanelab.kwetter.api.hateoas.routelinks.KweetRouteLinks;
 import nl.shanelab.kwetter.api.mappers.KweetMapper;
 import nl.shanelab.kwetter.api.qualifiers.Jwt;
 import nl.shanelab.kwetter.dal.dao.Pagination;
-import nl.shanelab.kwetter.dal.domain.HashTag;
 import nl.shanelab.kwetter.dal.domain.Kweet;
 import nl.shanelab.kwetter.dal.domain.User;
 import nl.shanelab.kwetter.services.KweetingService;
@@ -40,7 +36,7 @@ public class KweetRoute extends BaseRoute {
     UserService userService;
 
     @GET
-    @Path(KweetRouteLinks.Constants.LIST_KWEETS)
+    @Path("/")
     public Response getAllKweets(@QueryParam("page") int page, @QueryParam("size") int size) {
         Pagination<Kweet> pagination = kweetingService.getAllKweets(page, size);
 
@@ -50,12 +46,12 @@ public class KweetRoute extends BaseRoute {
                 pagination.pages(),
                 pagination.hasPrevious(),
                 pagination.hasNext(), pagination.getCollection().stream()
-                .map(this::mapKweetWithLinks)
+                .map(KweetMapper.INSTANCE::kweetToDto)
                 .collect(Collectors.toList()));
     }
 
     @POST
-    @Path(KweetRouteLinks.Constants.CREATE_KWEET)
+    @Path("/")
     @Jwt
     public Response createKweet(
             @Valid
@@ -66,11 +62,11 @@ public class KweetRoute extends BaseRoute {
 
         Kweet kweet = kweetingService.createKweet(message, user);
 
-        return ok(mapKweetWithLinks(kweet));
+        return ok(KweetMapper.INSTANCE.kweetToDto(kweet));
     }
 
     @GET
-    @Path(KweetRouteLinks.Constants.FETCH_KWEET)
+    @Path("/{id}")
     public Response getKweet(@Valid @PathParam("id") long id) throws KweetException {
         Kweet kweet = kweetingService.getKweetById(id);
 
@@ -78,11 +74,11 @@ public class KweetRoute extends BaseRoute {
             throw new KweetNotFoundException(id);
         }
 
-        return ok(mapKweetWithLinks(kweet));
+        return ok(KweetMapper.INSTANCE.kweetToDto(kweet));
     }
 
     @DELETE
-    @Path(KweetRouteLinks.Constants.DELETE_KWEET)
+    @Path("/{id}")
     @Jwt
     public Response removeKweet(@Valid @PathParam("id") long id) throws KweetException {
         Kweet kweet = kweetingService.getKweetById(id);
@@ -100,7 +96,7 @@ public class KweetRoute extends BaseRoute {
     }
 
     @POST
-    @Path(KweetRouteLinks.Constants.FAVORITE_KWEET)
+    @Path("/favorite/{id}")
     @Jwt
     public Response favoriteKweet(@Valid @PathParam("id") long id) throws KweetException, UserException {
         Kweet kweet = kweetingService.getKweetById(id);
@@ -117,26 +113,8 @@ public class KweetRoute extends BaseRoute {
         return ok();
     }
 
-    @DELETE
-    @Path(KweetRouteLinks.Constants.UNFAVORITE_KWEET)
-    @Jwt
-    public Response unFavoriteKweet(@Valid @PathParam("id") long id) throws KweetException, UserException {
-        Kweet kweet = kweetingService.getKweetById(id);
-
-        if (kweet == null) {
-            throw new KweetNotFoundException(id);
-        }
-
-        String name = securityContext.getUserPrincipal().getName();
-        User user = userService.getByUserName(name);
-
-        kweetingService.unFavouriteKweet(kweet, user);
-
-        return ok();
-    }
-
     @GET
-    @Path(KweetRouteLinks.Constants.IS_KWEET_FAVORITED_BY)
+    @Path("{id}/favorited/{idOrName}")
     public Response isFavoritedBy(@Valid @PathParam("id") long id, @Valid @PathParam("idOrName") String idOrName) throws KweetException, UserException {
         Kweet kweet = kweetingService.getKweetById(id);
 
@@ -162,8 +140,26 @@ public class KweetRoute extends BaseRoute {
         return Response.ok().status(Response.Status.OK).entity(flag).build();
     }
 
+    @DELETE
+    @Path("/favorite/{id}")
+    @Jwt
+    public Response unFavoriteKweet(@Valid @PathParam("id") long id) throws KweetException, UserException {
+        Kweet kweet = kweetingService.getKweetById(id);
+
+        if (kweet == null) {
+            throw new KweetNotFoundException(id);
+        }
+
+        String name = securityContext.getUserPrincipal().getName();
+        User user = userService.getByUserName(name);
+
+        kweetingService.unFavouriteKweet(kweet, user);
+
+        return ok();
+    }
+
     @GET
-    @Path(KweetRouteLinks.Constants.FETCH_KWEETS_CREATED_BY)
+    @Path("/user/{idOrName}")
     public Response getKweetsByUser(@Valid @PathParam("idOrName") String idOrName, @QueryParam("page") int page, @QueryParam("size") int size) throws UserException {
         Long id = null;
         try {
@@ -179,12 +175,12 @@ public class KweetRoute extends BaseRoute {
                 pagination.pages(),
                 pagination.hasPrevious(),
                 pagination.hasNext(), pagination.getCollection().stream()
-                .map(this::mapKweetWithLinks)
+                .map(KweetMapper.INSTANCE::kweetToDto)
                 .collect(Collectors.toList()));
     }
 
     @GET
-    @Path(KweetRouteLinks.Constants.FETCH_TIMELINE)
+    @Path("/user/{idOrName}/timeline")
     public Response getTimeline(@Valid @PathParam("idOrName") String idOrName, @QueryParam("page") int page, @QueryParam("size") int size) throws UserException {
         Long id = null;
         try {
@@ -200,12 +196,12 @@ public class KweetRoute extends BaseRoute {
                 pagination.pages(),
                 pagination.hasPrevious(),
                 pagination.hasNext(), pagination.getCollection().stream()
-                .map(this::mapKweetWithLinks)
+                .map(KweetMapper.INSTANCE::kweetToDto)
                 .collect(Collectors.toList()));
     }
 
     @GET
-    @Path(KweetRouteLinks.Constants.FETCH_KWEETS_FAVORITED_BY)
+    @Path("/user/{idOrName}/favorites")
     public Response getFavorites(@Valid @PathParam("idOrName") String idOrName, @QueryParam("page") int page, @QueryParam("size") int size) throws UserException {
         Long id = null;
         try {
@@ -221,12 +217,12 @@ public class KweetRoute extends BaseRoute {
                 pagination.pages(),
                 pagination.hasPrevious(),
                 pagination.hasNext(), pagination.getCollection().stream()
-                .map(this::mapKweetWithLinks)
-                .collect(Collectors.toList()));
+                        .map(KweetMapper.INSTANCE::kweetToDto)
+                        .collect(Collectors.toList()));
     }
 
     @GET
-    @Path(KweetRouteLinks.Constants.FIND_KWEETS)
+    @Path("/hashtag/{name}")
     public Response getKweetsWithHashTagName(@Valid @PathParam("name") String name, @QueryParam("page") int page, @QueryParam("size") int size) {
         Pagination<Kweet> pagination = kweetingService.getKweetsWithHashTagName(name, page, size);
 
@@ -236,36 +232,8 @@ public class KweetRoute extends BaseRoute {
                 pagination.pages(),
                 pagination.hasPrevious(),
                 pagination.hasNext(), pagination.getCollection().stream()
-                .map(this::mapKweetWithLinks)
+                .map(KweetMapper.INSTANCE::kweetToDto)
                 .collect(Collectors.toList()));
-    }
-
-    private KweetDto mapKweetWithLinks(Kweet kweet) {
-        KweetDto dto = KweetMapper.INSTANCE.kweetToDto(kweet);
-
-        String base = uriInfo.getBaseUri().toString();
-        long id = kweet.getId();
-        String author = kweet.getAuthor().getUsername();
-
-        dto.add(KweetRouteLinks.FETCH_KWEET.asLinked(base, id));
-        if (kweet.getHashTags().size() > 0) {
-            for (HashTag hashTag: kweet.getHashTags()) {
-                String tagName = hashTag.getName();
-                dto.add(KweetRouteLinks.FIND_KWEETS.asLinked(base, tagName));
-                dto.add(HashTagRouteLinks.FETCH_HASHTAG.asLinked(base, tagName));
-            }
-        }
-
-        if (isAuthenticated(author)) {
-            dto.add(KweetRouteLinks.DELETE_KWEET.asLinked(base, id));
-            dto.add(KweetRouteLinks.FAVORITE_KWEET.asLinked(base, id));
-            dto.add(KweetRouteLinks.UNFAVORITE_KWEET.asLinked(base, id));
-            dto.add(KweetRouteLinks.IS_KWEET_FAVORITED_BY.asLinked(base, id, author));
-            dto.add(KweetRouteLinks.FETCH_KWEETS_CREATED_BY.asLinked(base, author));
-            dto.add(KweetRouteLinks.FETCH_KWEETS_FAVORITED_BY.asLinked(base, author));
-        }
-
-        return dto;
     }
 
 }
