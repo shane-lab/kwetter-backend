@@ -13,7 +13,7 @@ import java.io.Serializable;
  *
  * @see nl.shanelab.kwetter.dal.domain.User
  */
-public class UserDto extends LinkedDto implements Serializable {
+public class UserDto implements Serializable {
 
     /**
      * The id of a user

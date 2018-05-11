@@ -1,5 +1,7 @@
 package nl.shanelab.kwetter.api.routers.api.routes;
 
+import nl.shanelab.kwetter.api.BaseRoute;
+import nl.shanelab.kwetter.api.mappers.UserMapper;
 import nl.shanelab.kwetter.api.qualifiers.Jwt;
 import nl.shanelab.kwetter.dal.domain.User;
 import nl.shanelab.kwetter.services.UserService;
@@ -17,7 +19,7 @@ import javax.ws.rs.core.Response;
 
 @Path("/auth")
 @RequestScoped
-public class AuthRoute extends UserBaseRoute {
+public class AuthRoute extends BaseRoute {
 
     @Inject
     UserService userService;
@@ -28,7 +30,7 @@ public class AuthRoute extends UserBaseRoute {
     public Response authenticateUser(@Valid UserRoute.UserCredentials credentials) throws UserException {
         User user = userService.authenticate(credentials.username, credentials.password);
         try {
-            return okWithJWT(mapUserWithLinks(user, true), issue(user.getUsername()));
+            return okWithJWT(UserMapper.INSTANCE.userAsDTO(user), issue(user.getUsername()));
         } catch (Exception e) {
             return nok("Unable to authenticate the user");
         }
@@ -45,7 +47,7 @@ public class AuthRoute extends UserBaseRoute {
             throw new UserNotFoundException(name);
         }
 
-        return ok(mapUserWithLinks(user));
+        return ok(UserMapper.INSTANCE.userAsDTO(user));
     }
 
 }

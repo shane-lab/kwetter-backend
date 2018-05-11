@@ -13,7 +13,7 @@ import java.util.Collection;
  *
  * @see nl.shanelab.kwetter.dal.domain.Kweet
  */
-public class KweetDto extends LinkedDto implements Serializable {
+public class KweetDto implements Serializable {
 
     /**
      * The serializable identifier of a kweet
@@ -53,4 +53,5 @@ public class KweetDto extends LinkedDto implements Serializable {
      * The amount of times the Kweet was favourited
      */
     private int favorites;
+
 }
