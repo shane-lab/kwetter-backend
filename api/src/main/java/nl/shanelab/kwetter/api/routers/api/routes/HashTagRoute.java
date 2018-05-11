@@ -3,6 +3,7 @@ package nl.shanelab.kwetter.api.routers.api.routes;
 import lombok.Getter;
 import nl.shanelab.kwetter.api.BaseRoute;
 import nl.shanelab.kwetter.api.dto.HashTagDto;
+import nl.shanelab.kwetter.api.hateoas.routelinks.HashTagRouteLinks;
 import nl.shanelab.kwetter.dal.dao.Pagination;
 import nl.shanelab.kwetter.dal.domain.HashTag;
 import nl.shanelab.kwetter.services.KweetingService;
@@ -30,7 +31,7 @@ public class HashTagRoute extends BaseRoute {
     KweetingService kweetingService;
 
     @GET
-    @Path("/")
+    @Path(HashTagRouteLinks.Constants.LIST_HASHTAGS)
     public Response getAllHashTags(@QueryParam("page") int page, @QueryParam("size") int size) {
         Pagination<HashTag> pagination = kweetingService.getAllHashTags(page, size);
 
@@ -40,12 +41,12 @@ public class HashTagRoute extends BaseRoute {
                 pagination.pages(),
                 pagination.hasPrevious(),
                 pagination.hasNext(), pagination.getCollection().stream()
-                .map(this::mapHashTag)
+                .map(this::mapHashTagWithLinks)
                 .collect(Collectors.toSet()));
     }
 
     @GET
-    @Path("/{id}")
+    @Path(HashTagRouteLinks.Constants.FETCH_HASHTAG)
     public Response getHashTagById(@Valid @PathParam("id") long id) {
         HashTag hashTag = kweetingService.getHashTagById(id);
 
@@ -55,12 +56,12 @@ public class HashTagRoute extends BaseRoute {
     }
 
     @GET
-    @Path("/trending/{date}")
+    @Path(HashTagRouteLinks.Constants.FETCH_TRENDING)
     public Response getTrendingHashTags(@Valid @PathParam("date") DateParam date) {
 
         return ok(kweetingService.getTrendingHashTags(date.getDate()).stream()
-                .map(this::mapHashTag)
-                .collect(Collectors.toCollection(LinkedHashSet::new)));
+                .map(this::mapHashTagWithLinks)
+                .collect(Collectors.toSet()));
     }
 
     private HashTagDto mapHashTag(HashTag hashTag) {
@@ -69,6 +70,13 @@ public class HashTagRoute extends BaseRoute {
         hashTagDto.setName(hashTag.getName());
 
         return hashTagDto;
+    }
+
+    private HashTagDto mapHashTagWithLinks(HashTag hashTag) {
+        HashTagDto dto = mapHashTag(hashTag);
+        dto.add(HashTagRouteLinks.FETCH_HASHTAG.asLinked(uriInfo.getBaseUri().toString(), hashTag.getId()));
+
+        return dto;
     }
 
     @Getter
