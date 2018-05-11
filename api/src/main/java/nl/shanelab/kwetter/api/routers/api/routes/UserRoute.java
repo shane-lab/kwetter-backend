@@ -2,9 +2,7 @@ package nl.shanelab.kwetter.api.routers.api.routes;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.NoArgsConstructor;
-import nl.shanelab.kwetter.api.BaseRoute;
-import nl.shanelab.kwetter.api.dto.UserDto;
-import nl.shanelab.kwetter.api.mappers.UserMapper;
+import nl.shanelab.kwetter.api.hateoas.routelinks.UserRouteLinks;
 import nl.shanelab.kwetter.api.qualifiers.Jwt;
 import nl.shanelab.kwetter.dal.dao.Pagination;
 import nl.shanelab.kwetter.dal.domain.User;
@@ -30,15 +28,12 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.LinkedHashSet;
 import java.util.stream.Collectors;
-
-import static javax.ws.rs.core.HttpHeaders.AUTHORIZATION;
 
 @Path("/users")
 @Produces(MediaType.APPLICATION_JSON)
 @RequestScoped
-public class UserRoute extends BaseRoute {
+public class UserRoute extends UserBaseRoute {
 
     @Inject
     UserService userService;
@@ -48,7 +43,7 @@ public class UserRoute extends BaseRoute {
     }
 
     @GET
-    @Path("/")
+    @Path(UserRouteLinks.Constants.LIST_USERS)
     public Response getUsers(@QueryParam("page") int page, @QueryParam("size") int size) {
         Pagination<User> pagination = userService.getAllUsers(page, size);
 
@@ -58,22 +53,22 @@ public class UserRoute extends BaseRoute {
                 pagination.pages(),
                 pagination.hasPrevious(),
                 pagination.hasNext(), pagination.getCollection().stream()
-                .map(UserMapper.INSTANCE::userAsDTO)
+                .map(this::mapUserWithLinks)
                 .collect(Collectors.toSet()));
     }
 
     @POST
-    @Path("/")
+    @Path(UserRouteLinks.Constants.CREATE_USER)
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response createUser(@Valid UserCredentials credentials) throws UserException {
         User user = userService.register(credentials.username, credentials.password);
 
-        return okWithJWT(UserMapper.INSTANCE.userAsDTO(user), issue(user.getUsername()));
+        return okWithJWT(mapUserWithLinks(user, true), issue(user.getUsername()));
     }
 
     @PUT
-    @Path("/")
+    @Path(UserRouteLinks.Constants.UPDATE_USER)
     @Jwt
     public Response editUser(@Valid UpdateUser updateUser) throws UserException {
         String name = securityContext.getUserPrincipal().getName();
@@ -101,23 +96,19 @@ public class UserRoute extends BaseRoute {
             user = userService.setWebsite(updateUser.website, user);
         }
 
-        UserDto userDto = UserMapper.INSTANCE.userAsDTO(user);
-
-        return okWithJWT(userDto, newToken);
+        return okWithJWT(mapUserWithLinks(user), newToken);
     }
 
     @GET
-    @Path("/{idOrName}")
+    @Path(UserRouteLinks.Constants.FETCH_USER)
     public Response getUser(@Valid @PathParam("idOrName") String idOrName) throws UserException {
         User user = getUserByIdOrName(idOrName);
 
-        UserDto userDto = UserMapper.INSTANCE.userAsDTO(user);
-
-        return ok(userDto);
+        return ok(mapUserWithLinks(user));
     }
 
     @GET
-    @Path("/partial/{name}")
+    @Path(UserRouteLinks.Constants.FIND_USER)
     public Response getUsersByPartialName(@Valid @PathParam("name") String name, @QueryParam("page") int page, @QueryParam("size") int size) {
         Pagination<User> pagination = userService.getByPartialUsername(name, page, size);
 
@@ -127,12 +118,12 @@ public class UserRoute extends BaseRoute {
                 pagination.pages(),
                 pagination.hasPrevious(),
                 pagination.hasNext(), pagination.getCollection().stream()
-                        .map(UserMapper.INSTANCE::userAsDTO)
-                        .collect(Collectors.toSet()));
+                .map(this::mapUserWithLinks)
+                .collect(Collectors.toSet()));
     }
 
     @GET
-    @Path("{idOrName}/followers")
+    @Path(UserRouteLinks.Constants.FETCH_USER_FOLLOWERS)
     public Response getFollowers(@Valid @PathParam("idOrName") String idOrName, @QueryParam("page") int page, @QueryParam("size") int size) throws UserException {
         User user = getUserByIdOrName(idOrName);
 
@@ -144,12 +135,12 @@ public class UserRoute extends BaseRoute {
                 pagination.pages(),
                 pagination.hasPrevious(),
                 pagination.hasNext(), pagination.getCollection().stream()
-                        .map(UserMapper.INSTANCE::userAsDTO)
-                        .collect(Collectors.toSet()));
+                .map(this::mapUserWithLinks)
+                .collect(Collectors.toSet()));
     }
 
     @GET
-    @Path("{idOrName}/following")
+    @Path(UserRouteLinks.Constants.FETCH_USER_FOLLOWINGS)
     public Response getFollowing(@Valid @PathParam("idOrName") String idOrName, @QueryParam("page") int page, @QueryParam("size") int size) throws UserException {
         User user = getUserByIdOrName(idOrName);
 
@@ -161,12 +152,12 @@ public class UserRoute extends BaseRoute {
                 pagination.pages(),
                 pagination.hasPrevious(),
                 pagination.hasNext(), pagination.getCollection().stream()
-                        .map(UserMapper.INSTANCE::userAsDTO)
-                        .collect(Collectors.toSet()));
+                .map(this::mapUserWithLinks)
+                .collect(Collectors.toSet()));
     }
 
     @POST
-    @Path("/follow/{idOrName}")
+    @Path(UserRouteLinks.Constants.CREATE_USER_FOLLOW)
     @Jwt
     public Response followUser(@Valid @PathParam("idOrName") String idOrName) throws UserException {
         String name = securityContext.getUserPrincipal().getName();
@@ -179,7 +170,7 @@ public class UserRoute extends BaseRoute {
     }
 
     @DELETE
-    @Path("/follow/{idOrName}")
+    @Path(UserRouteLinks.Constants.DELETE_USER_FOLLOW)
     @Jwt
     public Response unFollowUser(@Valid @PathParam("idOrName") String idOrName) throws UserException {
         String name = securityContext.getUserPrincipal().getName();
@@ -192,10 +183,10 @@ public class UserRoute extends BaseRoute {
     }
 
     @GET
-    @Path("/{idOrName}/follows/{id1OrName}")
-    public Response follows(@Valid @PathParam("idOrName") String idOrName, @Valid @PathParam("id1OrName") String id1OrName) throws UserException {
-        User userA = getUserByIdOrName(idOrName);
-        User userB = getUserByIdOrName(id1OrName);
+    @Path(UserRouteLinks.Constants.CHECK_USER_FOLLOWING)
+    public Response follows(@Valid @PathParam("idOrNameA") String idOrNameA, @Valid @PathParam("idOrNameB") String idOrNameB) throws UserException {
+        User userA = getUserByIdOrName(idOrNameA);
+        User userB = getUserByIdOrName(idOrNameB);
 
         boolean flag = false;
         try {
@@ -206,7 +197,7 @@ public class UserRoute extends BaseRoute {
     }
 
     @GET
-    @Path("/{idOrName}/avatar")
+    @Path(UserRouteLinks.Constants.FETCH_USER_AVATAR)
     @Produces({"image/png", "image/jpg"})
     public Response getProfileImage(@Valid @PathParam("idOrName") String idOrName) throws UserException, IOException {
         User user = getUserByIdOrName(idOrName);
@@ -223,7 +214,7 @@ public class UserRoute extends BaseRoute {
     }
 
     @POST
-    @Path("/avatar")
+    @Path(UserRouteLinks.Constants.CREATE_USER_AVATAR)
     @Consumes({"image/png", "image/jpg"})
     @Jwt
     public Response uploadProfileImage(@Valid BufferedImage image) throws UserException {
@@ -253,7 +244,7 @@ public class UserRoute extends BaseRoute {
     }
 
     @DELETE
-    @Path("/avatar")
+    @Path(UserRouteLinks.Constants.DELETE_USER_AVATAR)
     @Jwt
     public Response deleteProfileImage() throws UserException {
         String name = securityContext.getUserPrincipal().getName();
