@@ -8,6 +8,7 @@ import nl.shanelab.kwetter.api.jwt.KeyGenerator;
 
 import javax.inject.Inject;
 import javax.servlet.ServletContext;
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.*;
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -17,7 +18,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
 
-public class BaseRoute {
+public abstract class BaseRoute {
 
     @Context
     protected UriInfo uriInfo;
@@ -30,6 +31,9 @@ public class BaseRoute {
 
     @Context
     protected SecurityContext securityContext;
+
+    @Context
+    private HttpServletRequest httpRequest;
 
     @Inject
     private KeyGenerator keyGenerator;
@@ -60,7 +64,7 @@ public class BaseRoute {
 
     private Response.ResponseBuilder okBuilder(Object any) {
         return Response.ok(any != null ? new ResultEntity(any, Linked.builder()
-                .type("get") // todo fix type
+                .type(httpRequest.getMethod().toUpperCase())
                 .path(uriInfo.getAbsolutePath().toString())
                 .href(uriInfo.getPath())
                 .title("The requested entry point")
