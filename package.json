@@ -1,8 +1,8 @@
 {
   "devDependencies": {
-    "gulp": "^3.9.1",
-    "gulp-prompt": "^1.0.1",
-    "gulp-shell": "^0.6.5",
-    "mysql": "^2.15.0"
+    "gulp": "3.9.1",
+    "gulp-prompt": "1.0.1",
+    "gulp-shell": "0.6.5",
+    "mysql": "2.15.0"
   }
 }
